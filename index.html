@@ -1,208 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlimit.pro - UI Prototypes</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlimit.pro — Prototypes (Low-Fi)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    background: #e9e9e9;
+    color: #111;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .frame {
+    width: 100%;
+    max-width: 920px;
+    background: #fff;
+    border: 2px solid #111;
+    border-radius: 16px;
+    box-shadow: 6px 6px 0 #111;
+    padding: 28px;
+  }
+  header {
+    border-bottom: 2px solid #111;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header .brand { font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+  header .meta { font-size: 12px; color: #666; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  p.lead { font-size: 13px; color: #444; margin: 0 0 24px; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    border: 2px solid #111;
+    border-radius: 12px;
+    padding: 18px;
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #111;
+    background: #fafafa;
+  }
+  .thumb {
+    height: 110px;
+    border: 2px dashed #111;
+    border-radius: 8px;
+    background:
+      repeating-linear-gradient(45deg, #eee 0 8px, #fff 8px 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .card h2 {
+    font-size: 16px;
+    margin: 0;
+    border-bottom: 1.5px solid #111;
+    padding-bottom: 4px;
+  }
+  .card p { font-size: 12px; color: #444; margin: 0; line-height: 1.5; flex: 1; }
+  .card .cta {
+    align-self: flex-start;
+    border: 2px solid #111;
+    background: #111;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .card.disabled { opacity: 0.55; cursor: not-allowed; }
+  .card.disabled .cta { background: #fff; color: #111; }
 
-        .container {
-            max-width: 1200px;
-            width: 100%;
-        }
+  .badge {
+    display: inline-block;
+    border: 1.5px solid #111;
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 10px;
+  }
+  .badge.live { background: #111; color: #fff; }
+  .badge.wip { background: #fff; color: #111; }
 
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 60px;
-            animation: fadeInDown 0.6s ease-out;
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .subtitle {
-            font-size: 1.3rem;
-            font-weight: 300;
-            opacity: 0.95;
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .project-card {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: fadeInUp 0.6s ease-out;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-        }
-
-        .project-icon {
-            font-size: 3rem;
-            margin: 0 auto;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .project-card:nth-child(1) .project-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .project-card:nth-child(2) .project-icon {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .project-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .project-description {
-            font-size: 0.95rem;
-            color: #666;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-
-        .project-link {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px 25px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: auto;
-        }
-
-        .project-card:nth-child(2) .project-link {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .project-link:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        footer {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            margin-top: 40px;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            .subtitle {
-                font-size: 1.1rem;
-            }
-
-            .projects-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .project-card {
-                padding: 30px;
-            }
-        }
-    </style>
+  footer {
+    margin-top: 24px;
+    border-top: 2px solid #111;
+    padding-top: 12px;
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Unlimit.pro</h1>
-            <p class="subtitle">UI Prototypes & Design System</p>
-        </header>
+  <div class="frame">
+    <header>
+      <div>
+        <div class="brand">UNLIMIT.PRO</div>
+        <div class="meta">UI Prototype Index · Low Fidelity</div>
+      </div>
+      <div class="meta">v0.2 · wireframe</div>
+    </header>
 
-        <div class="projects-grid">
-            <a href="./intelligent-system/index.html" class="project-card">
-                <div class="project-icon">🧠</div>
-                <h2 class="project-title">Intelligent System</h2>
-                <p class="project-description">Explore the intelligent system prototype with advanced features and modern UI design.</p>
-                <span class="project-link">View Prototype →</span>
-            </a>
+    <h1>Project Prototypes</h1>
+    <p class="lead">Pick a prototype to open. All screens are low-fidelity wireframes — black &amp; white, click-through, feature-complete.</p>
 
-            <a href="./wallet/index.html" class="project-card">
-                <div class="project-icon">💳</div>
-                <h2 class="project-title">Wallet</h2>
-                <p class="project-description">Digital wallet interface with intuitive navigation and secure design patterns.</p>
-                <span class="project-link">View Prototype →</span>
-            </a>
-        </div>
+    <div class="grid">
+      <a class="card" href="./wallet/index.html">
+        <div class="thumb">[ 💳 ]</div>
+        <h2>Wallet <span class="badge live">LIVE</span></h2>
+        <p>Self-custody wallet across three surfaces: <b>Web App</b>, <b>Browser Extension</b>, <b>Mobile</b>. Multi-chain · seed/key/HW · swap/bridge · approvals manager · dApp connect.</p>
+        <span class="cta">OPEN →</span>
+      </a>
 
-        <footer>
-            <p>&copy; 2026 Unlimit.pro Prototypes. All rights reserved.</p>
-        </footer>
+      <a class="card" href="./intelligent-system/index.html">
+        <div class="thumb">[ 🧠 ]</div>
+        <h2>Intelligent System <span class="badge wip">WIP</span></h2>
+        <p>AI-driven workflow prototype. Concept screens for agents, prompts and orchestration.</p>
+        <span class="cta">OPEN →</span>
+      </a>
+
+      <div class="card disabled" title="Coming soon">
+        <div class="thumb">[ + ]</div>
+        <h2>Add Prototype <span class="badge wip">SOON</span></h2>
+        <p>Drop a new folder with an <code>index.html</code> and link it here.</p>
+        <span class="cta">COMING SOON</span>
+      </div>
     </div>
+
+    <footer>
+      <span>© 2026 Unlimit.pro · Prototype workspace</span>
+      <span>README ▸ ./README.md</span>
+    </footer>
+  </div>
 </body>
 </html>

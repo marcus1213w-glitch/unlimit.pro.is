@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlimit.pro Wallet · Web App (Low-Fi)</title>
+<link rel="stylesheet" href="../lowfi.css">
+<style>
+  body{background:var(--paper);min-height:100vh;margin:0;display:flex;flex-direction:column}
+  .topbar{padding:10px 16px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;border-bottom:2px solid #111;background:#fff}
+  .app{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 40px);background:#fff;position:relative}
+  /* Sidebar */
+  .side{border-right:2px solid #111;padding:12px;display:flex;flex-direction:column;gap:6px;background:#fff}
+  .brand{font-weight:bold;letter-spacing:1px;border:2px solid #111;padding:8px 10px;border-radius:8px;text-align:center;margin-bottom:6px}
+  .nav-item{padding:8px 10px;border:2px solid transparent;border-radius:8px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .nav-item:hover{background:var(--soft)}
+  .nav-item.active{background:#111;color:#fff;border-color:#111}
+  .nav-item .ico{font-size:14px;margin-right:6px}
+  .side .acct{border:2px solid #111;border-radius:10px;padding:8px;margin-top:auto;display:flex;align-items:center;gap:8px;cursor:pointer}
+  .side .acct:hover{background:var(--soft)}
+  .side .acct .info{font-size:11px;flex:1}
+
+  /* Main */
+  .main{padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+  .pagehead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  .pagehead h1{margin:0;font-size:20px}
+  .quickbar{display:flex;gap:8px;flex-wrap:wrap}
+  .net-pill{display:inline-flex;align-items:center;gap:6px;border:2px solid #111;border-radius:999px;padding:4px 10px;background:#fff;font-size:12px;cursor:pointer}
+
+  /* Cards & grids */
+  .grid{display:grid;gap:12px}
+  .grid.k4{grid-template-columns:repeat(4,1fr)}
+  .grid.k3{grid-template-columns:repeat(3,1fr)}
+  .grid.k2{grid-template-columns:2fr 1fr}
+  .card{border:2px solid #111;border-radius:10px;padding:12px;background:#fff}
+  .card h3{margin:0 0 8px;font-size:13px;border-bottom:1.5px solid #111;padding-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+  .stat{font-size:22px;font-weight:bold}
+  .stat .small{display:block;font-weight:normal;font-size:11px;color:var(--muted)}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{border-bottom:1.5px solid #111;padding:6px 8px;text-align:left}
+  th{background:#f6f6f6;font-weight:bold;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  tr{cursor:pointer}
+  tr:hover{background:var(--soft)}
+
+  .screen{display:none;flex-direction:column;gap:14px}
+  .screen.active{display:flex}
+
+  .nft-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .nft-card{border:2px solid #111;border-radius:8px;padding:8px;cursor:pointer;background:#fff}
+  .nft-card .ph-img,.nft-card .ph-dash{width:100%;height:120px}
+  .nft-card .small{margin-top:6px}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-row{display:flex;flex-direction:column;gap:4px}
+
+  .pill-tabs{display:flex;gap:6px}
+  .pill{border:2px solid #111;border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer;background:#fff}
+  .pill.active{background:#111;color:#fff}
+
+  .swap-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .swap-side{border:2px solid #111;border-radius:10px;padding:10px}
+
+  /* sticky right rail */
+  .rail{display:flex;flex-direction:column;gap:10px}
+
+  @media(max-width:980px){.app{grid-template-columns:1fr}.side{border-right:none;border-bottom:2px solid #111;flex-direction:row;flex-wrap:wrap;overflow-x:auto}.side .acct{margin-top:0}.grid.k4{grid-template-columns:repeat(2,1fr)}.grid.k3,.grid.k2{grid-template-columns:1fr}.nft-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><a href="../index.html">← Wallet platforms</a></div>
+  <div>Unlimit.pro Wallet · Web App · Low-Fi</div>
+  <div>v0.2</div>
+</div>
+
+<div class="app" id="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="side">
+    <div class="brand">UNLIMIT.PRO</div>
+    <div class="nav-item active" data-nav="dash" onclick="nav('dash',this)"><span><span class="ico">⌂</span>Portfolio</span></div>
+    <div class="nav-item" data-nav="tokens" onclick="nav('tokens',this)"><span><span class="ico">◎</span>Tokens</span></div>
+    <div class="nav-item" data-nav="nfts" onclick="nav('nfts',this)"><span><span class="ico">▤</span>NFTs</span></div>
+    <div class="nav-item" data-nav="defi" onclick="nav('defi',this)"><span><span class="ico">%</span>DeFi / Earn</span></div>
+    <div class="nav-item" data-nav="swap" onclick="nav('swap',this)"><span><span class="ico">⇄</span>Swap</span></div>
+    <div class="nav-item" data-nav="bridge" onclick="nav('bridge',this)"><span><span class="ico">≋</span>Bridge</span></div>
+    <div class="nav-item" data-nav="send" onclick="nav('send',this)"><span><span class="ico">↗</span>Send</span></div>
+    <div class="nav-item" data-nav="receive" onclick="nav('receive',this)"><span><span class="ico">↙</span>Receive</span></div>
+    <div class="nav-item" data-nav="buy" onclick="nav('buy',this)"><span><span class="ico">＄</span>Buy / Sell</span></div>
+    <div class="nav-item" data-nav="activity" onclick="nav('activity',this)"><span><span class="ico">≡</span>Activity</span></div>
+    <div class="nav-item" data-nav="approvals" onclick="nav('approvals',this)"><span><span class="ico">⛨</span>Approvals</span><span class="badge warn">2</span></div>
+    <div class="nav-item" data-nav="security" onclick="nav('security',this)"><span><span class="ico">🛡</span>Security</span></div>
+    <div class="nav-item" data-nav="connected" onclick="nav('connected',this)"><span><span class="ico">⚭</span>Connected</span></div>
+    <div class="nav-item" data-nav="settings" onclick="nav('settings',this)"><span><span class="ico">⚙</span>Settings</span></div>
+
+    <div class="acct" onclick="openModal('m-acc')">
+      <span class="avatar lg"></span>
+      <div class="info"><div><b id="acctLabel">Account 1</b></div><div class="small">brendan.eth</div></div>
+      <span>▾</span>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+    <!-- Persistent header bar -->
+    <div class="pagehead">
+      <h1 id="pageTitle">Portfolio</h1>
+      <div class="quickbar">
+        <input class="input" placeholder="Search tokens, NFTs, addresses…" style="width:280px">
+        <button class="net-pill" onclick="openModal('m-net')"><span class="dot k"></span><span id="netLabel">All Networks</span> ▾</button>
+        <button class="icon-btn" onclick="openModal('m-wc')" title="WalletConnect">⚭</button>
+        <button class="icon-btn" onclick="openModal('m-notif')" title="Notifications">🔔</button>
+        <button class="icon-btn" onclick="nav('lock',null)" title="Lock">🔒</button>
+      </div>
+    </div>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="screen active" data-screen="dash">
+      <div class="grid k4">
+        <div class="card"><h3>Total Net Worth</h3><div class="stat">$ 12,438.19<span class="small">+ $260 today (+2.1%)</span></div></div>
+        <div class="card"><h3>Tokens</h3><div class="stat">$ 12,438<span class="small">8 assets · 5 chains</span></div></div>
+        <div class="card"><h3>NFTs</h3><div class="stat">12<span class="small">est. 1.4 ETH floor</span></div></div>
+        <div class="card"><h3>DeFi positions</h3><div class="stat">$ 5,150<span class="small">3.1% blended APR</span></div></div>
+      </div>
+
+      <div class="grid k2">
+        <div class="card">
+          <h3>Performance <span class="pill-tabs"><span class="pill">1D</span><span class="pill active">1W</span><span class="pill">1M</span><span class="pill">1Y</span><span class="pill">All</span></span></h3>
+          <div class="chart"></div>
+          <div class="kv"><span class="k">Best performer (24h)</span><span>SOL +3.2%</span></div>
+          <div class="kv"><span class="k">Worst performer (24h)</span><span>DAI -0.1%</span></div>
+        </div>
+        <div class="rail">
+          <div class="card">
+            <h3>Quick actions</h3>
+            <div class="grid k2" style="gap:6px">
+              <button class="btn" onclick="nav('send',null)">↗ Send</button>
+              <button class="btn" onclick="nav('receive',null)">↙ Receive</button>
+              <button class="btn" onclick="nav('swap',null)">⇄ Swap</button>
+              <button class="btn" onclick="nav('bridge',null)">≋ Bridge</button>
+              <button class="btn" onclick="nav('buy',null)">＄ Buy</button>
+              <button class="btn" onclick="openModal('m-wc')">⚭ Connect</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Security health <span class="badge warn">Action needed</span></h3>
+            <div class="kv"><span class="k">Recovery phrase backed up</span><span class="badge ok">Yes</span></div>
+            <div class="kv"><span class="k">Risky approvals</span><span class="badge err">2 found</span></div>
+            <div class="kv"><span class="k">Hardware wallet</span><span class="badge">Not paired</span></div>
+            <button class="btn full" onclick="nav('approvals',null)">Review approvals</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid k2">
+        <div class="card">
+          <h3>Top assets <a href="#" onclick="event.preventDefault();nav('tokens',null)" class="small">View all</a></h3>
+          <table>
+            <thead><tr><th>Asset</th><th>Network</th><th>Balance</th><th>Price</th><th>Value</th><th>24h</th></tr></thead>
+            <tbody>
+              <tr onclick="openModal('m-tok')"><td><span class="token">ETH</span> Ethereum</td><td>Ethereum</td><td>2.34</td><td>$3,341</td><td>$7,820</td><td><span class="badge ok">+1.4%</span></td></tr>
+              <tr onclick="openModal('m-tok')"><td><span class="token">USDC</span> USD Coin</td><td>Multi</td><td>3,200</td><td>$1.00</td><td>$3,200</td><td><span class="badge">0%</span></td></tr>
+              <tr onclick="openModal('m-tok')"><td><span class="token">SOL</span> Solana</td><td>Solana</td><td>12.4</td><td>$100</td><td>$1,240</td><td><span class="badge ok">+3.2%</span></td></tr>
+              <tr onclick="openModal('m-tok')"><td><span class="token">BTC</span> Bitcoin</td><td>Bitcoin</td><td>0.012</td><td>$65k</td><td>$780</td><td><span class="badge ok">+0.4%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Recent activity <a href="#" onclick="event.preventDefault();nav('activity',null)" class="small">View all</a></h3>
+          <div class="list">
+            <div class="li" onclick="openModal('m-tx')"><div class="li-l"><div class="token">↗</div><div><div>Send 0.12 ETH</div><div class="small">to bob.eth · 2 min</div></div></div><span class="badge ok">OK</span></div>
+            <div class="li" onclick="openModal('m-tx')"><div class="li-l"><div class="token">⇄</div><div><div>Swap ETH→USDC</div><div class="small">Uniswap · 1h</div></div></div><span class="badge warn">Pending</span></div>
+            <div class="li" onclick="openModal('m-tx')"><div class="li-l"><div class="token">≋</div><div><div>Bridge ETH→Base</div><div class="small">Across · 3h</div></div></div><span class="badge ok">OK</span></div>
+            <div class="li" onclick="openModal('m-tx')"><div class="li-l"><div class="token">!</div><div><div>Approve USDT</div><div class="small">unknown · 2d</div></div></div><span class="badge err">Failed</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TOKENS ============ -->
+    <section class="screen" data-screen="tokens">
+      <div class="card">
+        <div class="row between">
+          <div class="pill-tabs"><span class="pill active">All</span><span class="pill">Ethereum</span><span class="pill">Polygon</span><span class="pill">Solana</span><span class="pill">Bitcoin</span></div>
+          <div class="row gap"><input class="input" placeholder="Search" style="width:200px"><button class="btn" onclick="openModal('m-add-tok')">+ Import Token</button></div>
+        </div>
+        <table style="margin-top:10px">
+          <thead><tr><th>Asset</th><th>Balance</th><th>Price</th><th>Value</th><th>24h</th><th>Allocation</th><th></th></tr></thead>
+          <tbody>
+            <tr onclick="openModal('m-tok')"><td><span class="token">ETH</span> Ethereum</td><td>2.34</td><td>$3,341</td><td>$7,820</td><td><span class="badge ok">+1.4%</span></td><td>62.9%</td><td><button class="btn sm">Send</button></td></tr>
+            <tr onclick="openModal('m-tok')"><td><span class="token">USDC</span> USD Coin</td><td>3,200</td><td>$1.00</td><td>$3,200</td><td><span class="badge">0%</span></td><td>25.7%</td><td><button class="btn sm">Send</button></td></tr>
+            <tr onclick="openModal('m-tok')"><td><span class="token">SOL</span> Solana</td><td>12.4</td><td>$100</td><td>$1,240</td><td><span class="badge ok">+3.2%</span></td><td>10.0%</td><td><button class="btn sm">Send</button></td></tr>
+            <tr onclick="openModal('m-tok')"><td><span class="token">BTC</span> Bitcoin</td><td>0.012</td><td>$65k</td><td>$780</td><td><span class="badge ok">+0.4%</span></td><td>6.3%</td><td><button class="btn sm">Send</button></td></tr>
+            <tr onclick="openModal('m-tok')"><td><span class="token">DAI</span> Dai</td><td>1,418</td><td>$1.00</td><td>$1,418</td><td><span class="badge err">-0.1%</span></td><td>11.4%</td><td><button class="btn sm">Send</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ NFTs ============ -->
+    <section class="screen" data-screen="nfts">
+      <div class="card">
+        <div class="row between">
+          <div class="pill-tabs"><span class="pill active">All</span><span class="pill">Collections</span><span class="pill">Hidden</span></div>
+          <div class="row gap"><input class="input" placeholder="Search" style="width:200px"><button class="btn" onclick="alert('Import NFT (mock)')">+ Import</button><button class="btn" onclick="alert('Hide spam (mock)')">Hide Spam</button></div>
+        </div>
+        <div class="nft-grid" style="margin-top:10px">
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-img"></div><div class="small">Foxes #042</div><div class="kv"><span class="k">Floor</span><span>0.4 ETH</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-dash"></div><div class="small">Punks #777</div><div class="kv"><span class="k">Floor</span><span>32 ETH</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-img"></div><div class="small">ENS · brendan.eth</div><div class="kv"><span class="k">Type</span><span>Domain</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-dash"></div><div class="small">Ordinal #1729</div><div class="kv"><span class="k">Chain</span><span>Bitcoin</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-img"></div><div class="small">DeGods #41</div><div class="kv"><span class="k">Chain</span><span>Solana</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-dash"></div><div class="small">Azuki #2300</div><div class="kv"><span class="k">Floor</span><span>4.2 ETH</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-img"></div><div class="small">Pudgy #99</div><div class="kv"><span class="k">Floor</span><span>10 ETH</span></div></div>
+          <div class="nft-card" onclick="openModal('m-nft')"><div class="ph-dash"></div><div class="small">Art Block #1</div><div class="kv"><span class="k">Type</span><span>Generative</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DEFI ============ -->
+    <section class="screen" data-screen="defi">
+      <div class="grid k3">
+        <div class="card"><h3>Total earning</h3><div class="stat">$ 5,150<span class="small">+$12.40 today</span></div></div>
+        <div class="card"><h3>Blended APR</h3><div class="stat">3.10%<span class="small">across 3 protocols</span></div></div>
+        <div class="card"><h3>Claimable rewards</h3><div class="stat">$ 24.50<span class="small"><button class="btn sm" onclick="alert('Claim all (mock)')">Claim all</button></span></div></div>
+      </div>
+      <div class="card">
+        <h3>Positions</h3>
+        <table>
+          <thead><tr><th>Protocol</th><th>Type</th><th>Asset</th><th>APR</th><th>Value</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><span class="token">L</span> Lido</td><td>Stake</td><td>stETH</td><td>3.4%</td><td>$4,000</td><td><button class="btn sm">Manage</button></td></tr>
+            <tr><td><span class="token">A</span> Aave</td><td>Lend</td><td>USDC</td><td>5.1%</td><td>$2,000</td><td><button class="btn sm">Manage</button></td></tr>
+            <tr><td><span class="token">U</span> Uniswap</td><td>LP v3</td><td>ETH/USDC</td><td>—</td><td>$1,150</td><td><button class="btn sm">Manage</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Discover</h3>
+        <div class="grid k4">
+          <div class="card"><h3>Lido stETH</h3><div class="kv"><span class="k">APR</span><span>3.4%</span></div><button class="btn full" onclick="openModal('m-stake')">Stake</button></div>
+          <div class="card"><h3>Marinade mSOL</h3><div class="kv"><span class="k">APR</span><span>6.8%</span></div><button class="btn full" onclick="openModal('m-stake')">Stake</button></div>
+          <div class="card"><h3>Aave USDC</h3><div class="kv"><span class="k">APR</span><span>5.1%</span></div><button class="btn full" onclick="openModal('m-stake')">Supply</button></div>
+          <div class="card"><h3>Compound DAI</h3><div class="kv"><span class="k">APR</span><span>4.2%</span></div><button class="btn full" onclick="openModal('m-stake')">Supply</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SWAP ============ -->
+    <section class="screen" data-screen="swap">
+      <div class="grid k2">
+        <div class="card">
+          <h3>Swap <button class="icon-btn" onclick="openModal('m-slip')">⚙</button></h3>
+          <div class="swap-card">
+            <div class="swap-side">
+              <div class="small">From</div>
+              <div class="row between"><input class="input" placeholder="0.0" style="border:none;font-size:22px"><button class="btn" onclick="openModal('m-pick')">ETH ▾</button></div>
+              <div class="small">Bal 2.34 · <a href="#" onclick="event.preventDefault();">Max</a></div>
+            </div>
+            <div class="swap-side">
+              <div class="small">To</div>
+              <div class="row between"><input class="input" placeholder="0.0" style="border:none;font-size:22px"><button class="btn" onclick="openModal('m-pick')">USDC ▾</button></div>
+              <div class="small">Bal 3,200</div>
+            </div>
+          </div>
+          <div class="kv"><span class="k">Rate</span><span>1 ETH ≈ 3,340 USDC</span></div>
+          <div class="kv"><span class="k">Slippage</span><span>0.5%</span></div>
+          <div class="kv"><span class="k">Network fee</span><span>~ $4.20 <a href="#" onclick="event.preventDefault();openModal('m-gas')">edit</a></span></div>
+          <div class="kv"><span class="k">Price impact</span><span class="badge ok">0.04%</span></div>
+          <div class="kv"><span class="k">MEV protection</span><span class="badge ok">On</span></div>
+          <button class="btn primary full" onclick="openModal('m-confirm')">Get Quote</button>
+        </div>
+        <div class="card">
+          <h3>Best route (compared 5)</h3>
+          <table>
+            <thead><tr><th>Provider</th><th>You get</th><th>Fee</th></tr></thead>
+            <tbody>
+              <tr><td>MetaSwap</td><td>334.0 USDC</td><td>$4.20</td></tr>
+              <tr><td>1inch</td><td>333.8</td><td>$4.30</td></tr>
+              <tr><td>0x</td><td>333.6</td><td>$4.20</td></tr>
+              <tr><td>Paraswap</td><td>333.5</td><td>$4.50</td></tr>
+              <tr><td>CowSwap</td><td>333.2</td><td>$3.80 (gasless)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BRIDGE ============ -->
+    <section class="screen" data-screen="bridge">
+      <div class="card" style="max-width:560px">
+        <h3>Bridge</h3>
+        <div class="form-grid">
+          <div class="form-row"><label>From network</label><select class="input"><option>Ethereum</option><option>Polygon</option><option>Arbitrum</option><option>Base</option></select></div>
+          <div class="form-row"><label>To network</label><select class="input"><option>Base</option><option>Polygon</option><option>Arbitrum</option><option>Optimism</option></select></div>
+          <div class="form-row"><label>Asset</label><select class="input"><option>ETH</option><option>USDC</option></select></div>
+          <div class="form-row"><label>Amount</label><input class="input" placeholder="0.0"></div>
+        </div>
+        <div class="kv"><span class="k">Route</span><span>Across Bridge</span></div>
+        <div class="kv"><span class="k">Estimated time</span><span>~ 45 sec</span></div>
+        <div class="kv"><span class="k">Fee</span><span>~ $1.10</span></div>
+        <button class="btn primary full" onclick="openModal('m-confirm')">Review Bridge</button>
+      </div>
+    </section>
+
+    <!-- ============ SEND ============ -->
+    <section class="screen" data-screen="send">
+      <div class="card" style="max-width:560px">
+        <h3>Send</h3>
+        <div class="form-row"><label>Recipient</label><input class="input" placeholder="0x… / ENS / SNS"></div>
+        <div class="row gap" style="margin:6px 0"><button class="btn sm" onclick="alert('Contacts')">Contacts</button><button class="btn sm" onclick="alert('Paste')">Paste</button></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Asset</label><select class="input"><option>ETH 2.34</option><option>USDC 3,200</option><option>SOL 12.4</option></select></div>
+          <div class="form-row"><label>Amount</label><input class="input" placeholder="0.0"></div>
+        </div>
+        <div class="kv"><span class="k">Network fee</span><span>~ 0.0012 ETH <a href="#" onclick="event.preventDefault();openModal('m-gas')">edit</a></span></div>
+        <div class="kv"><span class="k">Address risk check</span><span class="badge ok">No risks found</span></div>
+        <button class="btn primary full" onclick="openModal('m-confirm')">Review</button>
+      </div>
+    </section>
+
+    <!-- ============ RECEIVE ============ -->
+    <section class="screen" data-screen="receive">
+      <div class="card center" style="max-width:480px">
+        <h3>Receive</h3>
+        <div class="qr"></div>
+        <div class="small" style="word-break:break-all;margin-top:8px">0xAb12 3456 7890 abcd ef01 9F0e</div>
+        <div class="row gap" style="justify-content:center;margin-top:6px"><button class="btn" onclick="alert('Copied')">Copy</button><button class="btn" onclick="alert('Share')">Share</button></div>
+        <div class="form-row" style="margin-top:8px"><label>Network</label><select class="input"><option>Ethereum</option><option>Polygon</option><option>Solana</option><option>Bitcoin</option></select></div>
+      </div>
+    </section>
+
+    <!-- ============ BUY ============ -->
+    <section class="screen" data-screen="buy">
+      <div class="card" style="max-width:560px">
+        <h3>Buy / Sell</h3>
+        <div class="pill-tabs"><span class="pill active">Buy</span><span class="pill">Sell</span></div>
+        <div class="form-grid" style="margin-top:8px">
+          <div class="form-row"><label>Pay with</label><select class="input"><option>USD · Card</option><option>EUR · Bank</option><option>GBP · Bank</option></select></div>
+          <div class="form-row"><label>Amount</label><input class="input" placeholder="$ 100"></div>
+          <div class="form-row"><label>Receive</label><select class="input"><option>ETH</option><option>USDC</option><option>BTC</option><option>SOL</option></select></div>
+        </div>
+        <table style="margin-top:8px"><thead><tr><th>Provider</th><th>Receive</th><th>Method</th></tr></thead><tbody>
+          <tr><td>MoonPay</td><td>≈ 0.0299 ETH</td><td>Card</td></tr>
+          <tr><td>Transak</td><td>≈ 0.0297 ETH</td><td>Bank</td></tr>
+          <tr><td>Coinbase Pay</td><td>≈ 0.0301 ETH</td><td>Account</td></tr>
+        </tbody></table>
+        <button class="btn primary full" style="margin-top:8px" onclick="alert('Continue (mock)')">Continue</button>
+      </div>
+    </section>
+
+    <!-- ============ ACTIVITY ============ -->
+    <section class="screen" data-screen="activity">
+      <div class="card">
+        <div class="row between">
+          <div class="pill-tabs"><span class="pill active">All</span><span class="pill">Pending</span><span class="pill">Completed</span><span class="pill">Failed</span></div>
+          <div class="row gap"><input class="input" placeholder="Search hash, address, dApp" style="width:240px"><button class="btn" onclick="alert('Export CSV (mock)')">Export CSV</button></div>
+        </div>
+        <table style="margin-top:10px">
+          <thead><tr><th>Type</th><th>Detail</th><th>Network</th><th>Amount</th><th>Time</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr onclick="openModal('m-tx')"><td>↗ Send</td><td>to bob.eth</td><td>Ethereum</td><td>-0.12 ETH</td><td>2 min</td><td><span class="badge ok">Confirmed</span></td><td><button class="btn sm">View</button></td></tr>
+            <tr onclick="openModal('m-tx')"><td>⇄ Swap</td><td>ETH→USDC · Uniswap</td><td>Ethereum</td><td>+334 USDC</td><td>1h</td><td><span class="badge warn">Pending</span></td><td><button class="btn sm">Speed up</button></td></tr>
+            <tr onclick="openModal('m-tx')"><td>≋ Bridge</td><td>Across</td><td>ETH→Base</td><td>0.5 ETH</td><td>3h</td><td><span class="badge ok">OK</span></td><td><button class="btn sm">View</button></td></tr>
+            <tr onclick="openModal('m-tx')"><td>✓ Approve</td><td>USDC → Aave</td><td>Ethereum</td><td>—</td><td>1d</td><td><span class="badge ok">OK</span></td><td><button class="btn sm">View</button></td></tr>
+            <tr onclick="openModal('m-tx')"><td>! Approve</td><td>USDT → unknown</td><td>Ethereum</td><td>—</td><td>2d</td><td><span class="badge err">Failed</span></td><td><button class="btn sm">View</button></td></tr>
+            <tr onclick="openModal('m-tx')"><td>↙ Receive</td><td>from alice.eth</td><td>Polygon</td><td>+ 500 DAI</td><td>3d</td><td><span class="badge ok">OK</span></td><td><button class="btn sm">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ APPROVALS ============ -->
+    <section class="screen" data-screen="approvals">
+      <div class="card">
+        <h3>Token approvals manager</h3>
+        <p class="small">Active spending allowances. Revoke any you no longer need to reduce risk.</p>
+        <table>
+          <thead><tr><th>Token</th><th>Spender</th><th>Allowance</th><th>Risk</th><th>Last used</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><span class="token">USDC</span></td><td>Uniswap V3 Router</td><td>Unlimited</td><td><span class="badge ok">Trusted</span></td><td>2h</td><td><button class="btn sm danger">Revoke</button></td></tr>
+            <tr><td><span class="token">USDC</span></td><td>Aave V3 Pool</td><td>100</td><td><span class="badge ok">Trusted</span></td><td>1d</td><td><button class="btn sm">Revoke</button></td></tr>
+            <tr><td><span class="token">USDT</span></td><td>0xunknown…</td><td>Unlimited</td><td><span class="badge err">Risky</span></td><td>30d</td><td><button class="btn sm danger">Revoke</button></td></tr>
+            <tr><td><span class="token">NFT</span></td><td>OpenSea Seaport</td><td>setApprovalForAll</td><td><span class="badge warn">Broad</span></td><td>5d</td><td><button class="btn sm">Revoke</button></td></tr>
+          </tbody>
+        </table>
+        <div class="row gap" style="margin-top:8px"><button class="btn">Revoke all risky</button><button class="btn danger">Revoke all</button></div>
+      </div>
+    </section>
+
+    <!-- ============ SECURITY ============ -->
+    <section class="screen" data-screen="security">
+      <div class="grid k2">
+        <div class="card">
+          <h3>Health check</h3>
+          <div class="kv"><span class="k">Recovery phrase backed up</span><span class="badge ok">Yes</span></div>
+          <div class="kv"><span class="k">Auto-lock enabled</span><span class="badge ok">5 min</span></div>
+          <div class="kv"><span class="k">Tx simulation</span><span class="badge ok">On</span></div>
+          <div class="kv"><span class="k">Phishing shield</span><span class="badge ok">On</span></div>
+          <div class="kv"><span class="k">Hardware wallet</span><span class="badge warn">Not paired</span></div>
+          <div class="kv"><span class="k">Risky approvals</span><span class="badge err">2 found</span></div>
+          <button class="btn full" onclick="nav('approvals',null)">Review approvals</button>
+        </div>
+        <div class="card">
+          <h3>Keys &amp; backups</h3>
+          <button class="btn full" onclick="openModal('m-reveal')">Reveal Recovery Phrase</button>
+          <button class="btn full" onclick="alert('Show private key (mock)')">Show Private Key</button>
+          <button class="btn full" onclick="alert('Export keystore JSON (mock)')">Export Encrypted JSON</button>
+          <button class="btn full" onclick="alert('Shamir backup (mock)')">Shamir Backup (split)</button>
+          <button class="btn full" onclick="alert('Pair HW (mock)')">Pair Hardware Wallet</button>
+          <div class="hr"></div>
+          <div class="row between"><span class="small">Privacy mode (hide $)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span class="small">Use Tor / private RPC</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span class="small">Address-poisoning warnings</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span class="small">Smart Account (EIP-7702)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONNECTED ============ -->
+    <section class="screen" data-screen="connected">
+      <div class="card">
+        <h3>Connected sites</h3>
+        <table>
+          <thead><tr><th>Site</th><th>Permissions</th><th>Last used</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><span class="dot ok"></span> app.uniswap.org</td><td>View account · Sign · Tx</td><td>2 min ago</td><td><button class="btn sm">Disconnect</button></td></tr>
+            <tr><td><span class="dot ok"></span> opensea.io</td><td>View account · Sign · Tx</td><td>1d ago</td><td><button class="btn sm">Disconnect</button></td></tr>
+            <tr><td><span class="dot warn"></span> app.aave.com</td><td>View · Tx · Spend approvals</td><td>3d ago</td><td><button class="btn sm">Disconnect</button></td></tr>
+          </tbody>
+        </table>
+        <div class="row gap" style="margin-top:8px"><button class="btn" onclick="openModal('m-wc')">+ WalletConnect</button><button class="btn">Disconnect all</button></div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="screen" data-screen="settings">
+      <div class="grid k2">
+        <div class="card"><h3>General</h3>
+          <div class="row between"><span>Currency</span><select class="input" style="width:auto"><option>USD</option><option>EUR</option><option>JPY</option></select></div>
+          <div class="row between"><span>Language</span><select class="input" style="width:auto"><option>English</option><option>Español</option><option>中文</option></select></div>
+          <div class="row between"><span>Theme</span><select class="input" style="width:auto"><option>System</option><option>Light</option><option>Dark</option></select></div>
+          <div class="row between"><span>Show test networks</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span>Hide zero balances</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+        </div>
+        <div class="card"><h3>Networks</h3>
+          <div class="list">
+            <div class="li"><div class="li-l"><span class="dot"></span>Ethereum</div><span class="badge ok">On</span></div>
+            <div class="li"><div class="li-l"><span class="dot k"></span>Polygon</div><span class="badge ok">On</span></div>
+            <div class="li"><div class="li-l"><span class="dot warn"></span>BNB Chain</div><span class="badge">Off</span></div>
+            <div class="li"><div class="li-l"><span class="dot"></span>Arbitrum</div><span class="badge ok">On</span></div>
+            <div class="li"><div class="li-l"><span class="dot"></span>Base</div><span class="badge ok">On</span></div>
+            <div class="li"><div class="li-l"><span class="dot k"></span>Solana</div><span class="badge ok">On</span></div>
+            <div class="li"><div class="li-l"><span class="dot"></span>Bitcoin</div><span class="badge ok">On</span></div>
+          </div>
+          <button class="btn full" onclick="openModal('m-add-net')">+ Add Custom Network</button>
+        </div>
+        <div class="card"><h3>Address book</h3>
+          <div class="list">
+            <div class="li"><div class="li-l"><span class="avatar"></span>Alice — alice.eth</div><span>›</span></div>
+            <div class="li"><div class="li-l"><span class="avatar"></span>Bob — 0x9c..f3a</div><span>›</span></div>
+            <div class="li"><div class="li-l"><span class="avatar"></span>Coinbase — 0x77..b22</div><span class="badge">CEX</span></div>
+          </div>
+          <button class="btn full" onclick="alert('Add contact (mock)')">+ New Contact</button>
+        </div>
+        <div class="card"><h3>Advanced</h3>
+          <div class="row between"><span>Show hex data</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span>Custom nonce</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span>Snaps (plugins)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <div class="row between"><span>Gasless tx (relayer)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+          <button class="btn full">Reset Account</button>
+          <button class="btn full">Sync With Mobile (QR)</button>
+          <button class="btn full">Download State Logs</button>
+          <button class="btn danger full" onclick="confirm('Reset wallet?')">Reset Wallet</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LOCK ============ -->
+    <section class="screen" data-screen="lock">
+      <div class="card center" style="max-width:380px;margin:auto">
+        <h3>Wallet Locked</h3>
+        <div style="font-size:36px">🔒</div>
+        <input class="input" type="password" placeholder="Password" style="margin-top:8px">
+        <button class="btn primary full" style="margin-top:8px" onclick="nav('dash',null)">Unlock</button>
+        <a href="#" class="small" onclick="event.preventDefault();alert('Reset (mock)')">Forgot password?</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== MODALS ===== -->
+  <div class="modal-back" id="m-net"><div class="modal" style="max-width:420px"><div class="row between"><h4>Network</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><input class="input" placeholder="Search"><div class="list" style="margin-top:6px"><div class="li" onclick="setNet('All Networks')"><div class="li-l"><span class="dot k"></span>All Networks</div><span class="small">Aggregated</span></div><div class="li" onclick="setNet('Ethereum')"><div class="li-l"><span class="dot"></span>Ethereum</div><span class="small">ETH</span></div><div class="li" onclick="setNet('Polygon')"><div class="li-l"><span class="dot k"></span>Polygon</div><span class="small">MATIC</span></div><div class="li" onclick="setNet('Arbitrum')"><div class="li-l"><span class="dot"></span>Arbitrum</div><span class="small">ETH</span></div><div class="li" onclick="setNet('Base')"><div class="li-l"><span class="dot"></span>Base</div><span class="small">ETH</span></div><div class="li" onclick="setNet('Solana')"><div class="li-l"><span class="dot k"></span>Solana</div><span class="small">SOL</span></div><div class="li" onclick="setNet('Bitcoin')"><div class="li-l"><span class="dot"></span>Bitcoin</div><span class="small">BTC</span></div></div></div></div>
+
+  <div class="modal-back" id="m-acc"><div class="modal" style="max-width:480px"><div class="row between"><h4>Accounts</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><input class="input" placeholder="Search"><div class="list" style="margin-top:6px"><div class="li" onclick="setAcct('Account 1')"><div class="li-l"><span class="avatar"></span><div><div>Account 1</div><div class="small">brendan.eth · $12,438</div></div></div><span class="badge ok">Active</span></div><div class="li" onclick="setAcct('Account 2')"><div class="li-l"><span class="avatar"></span><div><div>Account 2</div><div class="small">0x77b2..3c1a · $452</div></div></div><span>›</span></div><div class="li" onclick="setAcct('Trezor 1')"><div class="li-l"><span class="avatar"></span><div><div>Trezor 1</div><div class="small">$0</div></div></div><span class="badge">HW</span></div><div class="li" onclick="setAcct('Vitalik (watch)')"><div class="li-l"><span class="avatar"></span><div><div>Vitalik (watch)</div><div class="small">vitalik.eth</div></div></div><span class="badge">👁</span></div></div><div class="row gap" style="margin-top:6px"><button class="btn full" onclick="alert('New (mock)')">+ Create</button><button class="btn full" onclick="alert('Import (mock)')">Import</button><button class="btn full" onclick="alert('HW pair (mock)')">Connect HW</button></div></div></div>
+
+  <div class="modal-back" id="m-tok"><div class="modal" style="max-width:560px"><div class="row between"><h4>Ethereum (ETH)</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="grid k2"><div class="card"><div class="stat">2.34 ETH<span class="small">$ 7,820.10</span></div><div class="row gap" style="margin-top:6px"><button class="btn full" onclick="closeModal();nav('send',null)">Send</button><button class="btn full" onclick="closeModal();nav('receive',null)">Receive</button><button class="btn full" onclick="closeModal();nav('swap',null)">Swap</button></div></div><div class="card"><div class="chart"></div><div class="kv"><span class="k">Market cap</span><span>$ 410B</span></div><div class="kv"><span class="k">24h volume</span><span>$ 18B</span></div></div></div></div></div>
+
+  <div class="modal-back" id="m-add-tok"><div class="modal" style="max-width:480px"><div class="row between"><h4>Import Token</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="pill-tabs"><span class="pill active">Search</span><span class="pill">Custom</span></div><input class="input" placeholder="Symbol or contract address" style="margin-top:6px"><div class="list" style="margin-top:6px"><div class="li"><div class="li-l"><div class="token">UNI</div>Uniswap</div><button class="btn sm">Add</button></div><div class="li"><div class="li-l"><div class="token">LDO</div>Lido</div><button class="btn sm">Add</button></div></div></div></div>
+
+  <div class="modal-back" id="m-pick"><div class="modal" style="max-width:420px"><div class="row between"><h4>Select Token</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><input class="input" placeholder="Search"><div class="list" style="margin-top:6px"><div class="li" onclick="closeModal()"><div class="li-l"><div class="token">ETH</div>Ethereum</div><span class="small">2.34</span></div><div class="li" onclick="closeModal()"><div class="li-l"><div class="token">USDC</div>USD Coin</div><span class="small">3,200</span></div><div class="li" onclick="closeModal()"><div class="li-l"><div class="token">DAI</div>Dai</div><span class="small">1,418</span></div></div></div></div>
+
+  <div class="modal-back" id="m-slip"><div class="modal" style="max-width:420px"><div class="row between"><h4>Swap settings</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><label>Slippage</label><div class="row gap"><button class="btn sm">0.1%</button><button class="btn sm primary">0.5%</button><button class="btn sm">1%</button><input class="input" placeholder="Custom"></div><label style="margin-top:6px">Deadline (min)</label><input class="input" value="20"><div class="row between" style="margin-top:6px"><span class="small">MEV protection</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div></div></div>
+
+  <div class="modal-back" id="m-gas"><div class="modal" style="max-width:420px"><div class="row between"><h4>Edit gas</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="list"><div class="li"><div>Low</div><div class="small">~30s · 0.0008 ETH</div></div><div class="li" style="background:#f2f2f2"><div>Market</div><div class="small">~15s · 0.0012 ETH</div></div><div class="li"><div>Aggressive</div><div class="small">~5s · 0.0019 ETH</div></div><div class="li"><div>Custom</div><div class="small">advanced</div></div></div></div></div>
+
+  <div class="modal-back" id="m-confirm"><div class="modal" style="max-width:480px"><div class="row between"><h4>Confirm transaction</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="kv"><span class="k">From</span><span>Account 1</span></div><div class="kv"><span class="k">To</span><span>0x9c..f3a</span></div><div class="kv"><span class="k">Amount</span><span>0.12 ETH</span></div><div class="kv"><span class="k">Network fee</span><span>0.0012 ETH</span></div><div class="kv"><span class="k">Total</span><span>0.1212 ETH</span></div><div class="hr"></div><div class="kv"><span class="k">Tx simulation</span><span class="badge ok">Will succeed</span></div><div class="kv"><span class="k">Risk check</span><span class="badge ok">No risks found</span></div><div class="pill-tabs"><span class="pill active">Details</span><span class="pill">Data</span><span class="pill">Hex</span></div><div class="row gap" style="margin-top:8px"><button class="btn full" onclick="closeModal()">Reject</button><button class="btn primary full" onclick="closeModal();openModal('m-pending')">Confirm</button></div></div></div>
+
+  <div class="modal-back" id="m-pending"><div class="modal center" style="max-width:380px"><h4>Submitted</h4><div style="font-size:32px">⌛</div><p class="small">Waiting for confirmation…</p><div class="kv"><span class="k">Hash</span><span>0xabc…123</span></div><button class="btn full" onclick="alert('Explorer (mock)')">View on Explorer</button><button class="btn primary full" onclick="closeModal()">Close</button></div></div>
+
+  <div class="modal-back" id="m-tx"><div class="modal" style="max-width:520px"><div class="row between"><h4>Transaction</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="kv"><span class="k">Status</span><span class="badge ok">Confirmed</span></div><div class="kv"><span class="k">From</span><span>0xAb12…9F0e</span></div><div class="kv"><span class="k">To</span><span>0x9c..f3a</span></div><div class="kv"><span class="k">Value</span><span>0.12 ETH</span></div><div class="kv"><span class="k">Gas Used</span><span>21,000</span></div><div class="kv"><span class="k">Nonce</span><span>42</span></div><div class="kv"><span class="k">Hash</span><span>0xabc…123</span></div><div class="row gap" style="margin-top:6px"><button class="btn full">Speed Up</button><button class="btn full">Cancel</button><button class="btn full">View on Explorer</button></div></div></div>
+
+  <div class="modal-back" id="m-nft"><div class="modal" style="max-width:520px"><div class="row between"><h4>CryptoFox #042</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="ph-img" style="height:220px"></div><div class="kv"><span class="k">Collection</span><span>CryptoFoxes</span></div><div class="kv"><span class="k">Token ID</span><span>42</span></div><div class="kv"><span class="k">Standard</span><span>ERC-721</span></div><div class="kv"><span class="k">Floor</span><span>0.4 ETH</span></div><div class="row gap" style="margin-top:6px"><button class="btn full" onclick="closeModal();nav('send',null)">Send</button><button class="btn full">List on OpenSea</button><button class="btn full">Hide</button></div></div></div>
+
+  <div class="modal-back" id="m-stake"><div class="modal" style="max-width:480px"><div class="row between"><h4>Stake</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="form-row"><label>Amount</label><input class="input" placeholder="0.0"></div><div class="kv"><span class="k">APR</span><span>3.4%</span></div><div class="kv"><span class="k">You receive</span><span>stETH (liquid)</span></div><div class="kv"><span class="k">Network fee</span><span>~ $4.20</span></div><button class="btn primary full" onclick="closeModal();openModal('m-confirm')">Stake</button></div></div>
+
+  <div class="modal-back" id="m-reveal"><div class="modal" style="max-width:480px"><div class="row between"><h4>Recovery Phrase</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><p class="small"><span class="badge warn">DO NOT SHARE</span> Anyone with this phrase can take your funds.</p><div class="seed-grid" id="seedReveal"></div><div class="row gap" style="margin-top:8px"><button class="btn full" onclick="alert('Copied')">Copy</button><button class="btn primary full" onclick="closeModal()">Done</button></div></div></div>
+
+  <div class="modal-back" id="m-wc"><div class="modal" style="max-width:420px"><div class="row between"><h4>WalletConnect</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="qr" style="margin-bottom:8px"></div><p class="small center">Scan QR from your dApp, or paste URI:</p><input class="input" placeholder="wc:1234abcd@2..."><button class="btn primary full" style="margin-top:6px" onclick="closeModal();alert('Connect (mock)')">Connect</button></div></div>
+
+  <div class="modal-back" id="m-notif"><div class="modal" style="max-width:420px"><div class="row between"><h4>Notifications</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><div class="list"><div class="li"><div class="li-l"><div class="token">↙</div><div><div>+500 DAI received</div><div class="small">2 min</div></div></div></div><div class="li"><div class="li-l"><div class="token">!</div><div><div>Price alert: ETH +5%</div><div class="small">10 min</div></div></div></div><div class="li"><div class="li-l"><div class="token">🛡</div><div><div>Risky approval revoked</div><div class="small">2d</div></div></div></div></div></div></div>
+
+  <div class="modal-back" id="m-add-net"><div class="modal" style="max-width:420px"><div class="row between"><h4>Add custom network</h4><button class="icon-btn" onclick="closeModal()">✕</button></div><label>Name</label><input class="input"><label>RPC URL</label><input class="input"><label>Chain ID</label><input class="input"><label>Currency Symbol</label><input class="input"><label>Block Explorer</label><input class="input"><button class="btn primary full" style="margin-top:6px" onclick="closeModal()">Save</button></div></div>
+
+</div>
+
+<script>
+const screens=document.querySelectorAll('.screen');
+const titles={dash:'Portfolio',tokens:'Tokens',nfts:'NFTs',defi:'DeFi / Earn',swap:'Swap',bridge:'Bridge',send:'Send',receive:'Receive',buy:'Buy / Sell',activity:'Activity',approvals:'Token Approvals',security:'Security',connected:'Connected Sites',settings:'Settings',lock:'Locked'};
+function nav(name,el){
+  closeModal();
+  screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.nav===name));
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+}
+function openModal(id){document.querySelectorAll('.modal-back').forEach(m=>m.classList.remove('show'));const e=document.getElementById(id);if(e)e.classList.add('show')}
+function closeModal(){document.querySelectorAll('.modal-back').forEach(m=>m.classList.remove('show'))}
+function setNet(n){document.getElementById('netLabel').textContent=n;closeModal()}
+function setAcct(n){document.getElementById('acctLabel').textContent=n;closeModal()}
+document.querySelectorAll('.modal-back').forEach(mb=>mb.addEventListener('click',e=>{if(e.target===mb)closeModal()}));
+
+const words=['ocean','table','river','candle','forest','silver','planet','marble','tiger','window','quiet','bridge'];
+const sr=document.getElementById('seedReveal');
+words.forEach((w,i)=>{const c=document.createElement('div');c.className='seed-cell';c.innerHTML='<span class="num">'+(i+1)+'.</span>'+w;sr.appendChild(c)});
+</script>
+</body>
+</html>

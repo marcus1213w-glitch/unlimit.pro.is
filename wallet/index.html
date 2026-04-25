@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlimit.pro Wallet — Platform Picker (Low-Fi)</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Courier New',Courier,monospace;background:#e9e9e9;color:#111;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .frame{width:100%;max-width:1000px;background:#fff;border:2px solid #111;border-radius:16px;box-shadow:6px 6px 0 #111;padding:28px}
+  header{border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .brand{font-weight:bold;letter-spacing:1px}
+  .meta{font-size:12px;color:#666}
+  .meta a{color:#111}
+  h1{margin:0 0 6px;font-size:24px}
+  p.lead{margin:0 0 20px;font-size:13px;color:#444}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  .card{border:2px solid #111;border-radius:12px;padding:16px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px;background:#fff;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .card:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #111;background:#fafafa}
+  .thumb{height:160px;border:2px dashed #111;border-radius:8px;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,#eee 0 8px,#fff 8px 16px);position:relative;overflow:hidden}
+  .mock{background:#fff;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-size:10px;color:#333}
+  .mock.web{width:82%;height:74%;border-radius:6px}
+  .mock.ext{width:48%;height:84%;border-radius:6px}
+  .mock.mob{width:30%;height:92%;border-radius:18px}
+  .card h2{margin:0;font-size:16px;border-bottom:1.5px solid #111;padding-bottom:4px}
+  .card p{margin:0;font-size:12px;color:#444;line-height:1.5}
+  .cta{align-self:flex-start;border:2px solid #111;background:#111;color:#fff;padding:6px 12px;border-radius:999px;font-size:11px;letter-spacing:.5px}
+  .badge{display:inline-block;border:1.5px solid #111;border-radius:999px;padding:1px 8px;font-size:10px;background:#111;color:#fff}
+  footer{margin-top:24px;border-top:2px solid #111;padding-top:12px;font-size:11px;color:#666;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+  ul.feat{font-size:11px;color:#444;margin:0;padding-left:16px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="frame">
+  <header>
+    <div>
+      <div class="brand">UNLIMIT.PRO · WALLET</div>
+      <div class="meta">Self-custody wallet · Low-Fi wireframes</div>
+    </div>
+    <div class="meta"><a href="../index.html">← Back to projects</a></div>
+  </header>
+
+  <h1>Pick a platform</h1>
+  <p class="lead">Three click-through prototypes of the same self-custody wallet across surfaces. Each version is feature-complete: key/recovery management, multi-chain, dApp connect, swap/bridge, NFTs, staking, approvals manager and security center. Inspired by MetaMask, Phantom, Rabby, Trust, Rainbow, Coinbase Wallet, Zerion, Argent, Ledger Live.</p>
+
+  <div class="grid">
+    <a class="card" href="./webapp/index.html">
+      <div class="thumb"><div class="mock web">[ dashboard ]</div></div>
+      <h2>Web App <span class="badge">LIVE</span></h2>
+      <p>Desktop dashboard with sidebar nav, portfolio charts, DeFi positions, large activity tables, WalletConnect pairing.</p>
+      <ul class="feat">
+        <li>Portfolio · Earn · Swap · Bridge · NFTs</li>
+        <li>Approvals · Security · WalletConnect</li>
+        <li>Hardware wallet · Multi-account</li>
+      </ul>
+      <span class="cta">OPEN WEBAPP →</span>
+    </a>
+
+    <a class="card" href="./extension/index.html">
+      <div class="thumb"><div class="mock ext">[ popup ]</div></div>
+      <h2>Web Extension <span class="badge">LIVE</span></h2>
+      <p>Browser popup simulated inside a Chrome frame. Built around dApp connect, signing, and confirm-tx flows.</p>
+      <ul class="feat">
+        <li>Connect site · Sign · Confirm tx</li>
+        <li>Tx simulation · Phishing warnings</li>
+        <li>Expand to full tab · Pin / pop-out</li>
+      </ul>
+      <span class="cta">OPEN EXTENSION →</span>
+    </a>
+
+    <a class="card" href="./mobile/index.html">
+      <div class="thumb"><div class="mock mob">[ phone ]</div></div>
+      <h2>Mobile App <span class="badge">LIVE</span></h2>
+      <p>Phone frame with bottom nav, biometric unlock, in-app dApp browser, QR scanner and push notifications.</p>
+      <ul class="feat">
+        <li>Seed · Import key · HW pair · Watch-only</li>
+        <li>Send · Receive · Swap · Bridge · Buy</li>
+        <li>dApp browser · Notifications · Backup</li>
+      </ul>
+      <span class="cta">OPEN MOBILE →</span>
+    </a>
+  </div>
+
+  <footer>
+    <span>Black &amp; white wireframe · selective color for status (green = ok, amber = warn, red = danger)</span>
+    <span>v0.2</span>
+  </footer>
+</div>
+</body>
+</html>

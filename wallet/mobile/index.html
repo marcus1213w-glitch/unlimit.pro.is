@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlimit.pro Wallet · Mobile (Low-Fi)</title>
+<link rel="stylesheet" href="../lowfi.css">
+<style>
+  body{background:var(--paper);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;gap:12px}
+  .topbar{width:100%;max-width:1200px;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .stage{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .phone{width:380px;height:720px;background:#fff;border:2px solid #111;border-radius:30px;overflow:hidden;display:flex;flex-direction:column;box-shadow:6px 6px 0 #111;position:relative}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:18px;background:#111;border-radius:0 0 14px 14px;z-index:60}
+  .legend{width:280px;border:2px dashed #111;border-radius:10px;padding:12px;font-size:11px;line-height:1.6;background:#fff}
+  .legend h4{margin:0 0 6px;font-size:12px}
+  .legend ul{margin:0 0 8px;padding-left:16px}
+
+  /* app shell */
+  .appbar{display:flex;align-items:center;justify-content:space-between;padding:24px 12px 8px;border-bottom:2px solid #111;gap:6px;background:#fff}
+  .appbar strong{font-size:13px}
+  .screen{flex:1;overflow-y:auto;padding:12px;display:none;flex-direction:column;gap:10px;padding-bottom:70px}
+  .screen.active{display:flex}
+
+  .nav-bot{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);border-top:2px solid #111;background:#fff;z-index:30}
+  .nb{text-align:center;padding:8px 0;cursor:pointer;font-size:10px;border-right:2px solid #111}
+  .nb:last-child{border-right:none}
+  .nb.active{background:#111;color:#fff}
+  .nb .ico{display:block;font-size:14px;margin-bottom:1px}
+
+  .balance{border:2px solid #111;border-radius:10px;padding:12px;text-align:center;background:var(--softer)}
+  .balance .big{font-size:26px;font-weight:bold}
+  .actions{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .act{border:2px solid #111;border-radius:8px;padding:8px 2px;text-align:center;cursor:pointer;background:#fff;font-size:10px}
+  .act:hover{background:var(--soft)}
+  .act .ico{display:block;font-size:14px;margin-bottom:2px}
+
+  .acct-pill,.net-pill{display:inline-flex;align-items:center;gap:6px;border:2px solid #111;border-radius:999px;padding:3px 8px;background:#fff;font-size:11px;cursor:pointer}
+
+  .ascii{font-family:monospace;white-space:pre;text-align:center;font-size:9px;line-height:1.1;border:2px dashed #111;padding:6px;border-radius:6px}
+
+  .drawer{position:absolute;top:0;left:0;bottom:0;width:80%;background:#fff;border-right:2px solid #111;padding:14px;overflow-y:auto;z-index:45}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:2px solid #111;border-radius:14px 14px 0 0;padding:12px;max-height:75%;overflow-y:auto;display:none;z-index:50}
+  .sheet.show{display:block}
+  .sheet-back{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;z-index:48}
+  .sheet-back.show{display:block}
+
+  /* scanner mock */
+  .scan{height:240px;border:2px solid #111;border-radius:10px;background:#000;position:relative;overflow:hidden}
+  .scan::before{content:"";position:absolute;inset:30px;border:2px dashed #fff;border-radius:8px}
+  .scan::after{content:"";position:absolute;left:30px;right:30px;top:50%;height:2px;background:#fff;animation:sweep 2s ease-in-out infinite alternate}
+  @keyframes sweep{from{top:35%}to{top:65%}}
+
+  /* in-app browser bar */
+  .browser{display:flex;align-items:center;gap:6px;border:2px solid #111;border-radius:8px;padding:5px 8px;background:#fff;font-size:11px}
+
+  /* notification dot */
+  .ndot{width:8px;height:8px;background:var(--err);border-radius:50%;display:inline-block;margin-left:4px;border:1px solid #111}
+
+  @media(max-width:760px){.legend{display:none}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../index.html">← Wallet platforms</a>
+  <span>Mobile · Low-Fi Prototype</span>
+  <span>v0.2</span>
+</div>
+
+<div class="stage">
+<div class="phone" id="phone">
+<div class="notch"></div>
+
+<!-- ========= ONBOARDING ========= -->
+<section class="screen active" data-screen="welcome">
+  <div style="margin:auto;text-align:center;display:flex;flex-direction:column;gap:14px;padding:20px">
+    <div class="ascii">  _   _ _    _ __  __ _____ _______
+ | | | | |  | |  \/  |_   _|__   __|
+ | | | | |  | | \  / | | |    | |
+ | |_| | |__| | |\/| |_| |_   | |
+  \___/ \____/|_|  |_|_____|  |_|
+        ~ Unlimit.pro 0.2 ~</div>
+    <h2 style="margin:0">Self-Custody Wallet</h2>
+    <p class="small">Multi-chain · Multi-account · Hardware ready</p>
+    <button class="btn primary full" onclick="go('terms')">Create New Wallet</button>
+    <button class="btn full" onclick="go('import-pick')">I already have a wallet</button>
+    <button class="btn full" onclick="go('watch-add')">Add Watch-only</button>
+    <p class="small">By continuing you agree to the Terms.</p>
+  </div>
+</section>
+
+<section class="screen" data-screen="terms">
+  <div class="appbar"><button class="icon-btn" onclick="go('welcome')">←</button><strong>Terms &amp; Privacy</strong><span></span></div>
+  <div class="stack">
+    <div style="border:2px solid #111;border-radius:8px;padding:8px;height:280px;overflow-y:auto;font-size:11px;line-height:1.5">
+      <p><b>Self-custody.</b> You alone hold the keys. We never see your seed phrase.</p>
+      <p><b>Risks.</b> Crypto is volatile. Transactions are irreversible.</p>
+      <p><b>Privacy.</b> RPC providers may log IP. Use Tor / privacy mode for stricter privacy.</p>
+      <p><b>Phishing.</b> We will never ask for your seed phrase. Verify URLs.</p>
+      <p><b>Updates.</b> Auto-updates may modify behavior. Review changelog.</p>
+      <p><b>Liability.</b> Provided as-is, without warranty.</p>
+    </div>
+    <label class="row"><span class="checkbox" onclick="this.classList.toggle('on')"></span><span class="small">I have read and agree</span></label>
+    <label class="row"><span class="checkbox" onclick="this.classList.toggle('on')"></span><span class="small">Send anonymous analytics (optional)</span></label>
+    <button class="btn primary full" onclick="go('create-pwd')">Continue</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="create-pwd">
+  <div class="appbar"><button class="icon-btn" onclick="go('terms')">←</button><strong>Create Password</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Unlocks the wallet on this device. Cannot be recovered — only your seed phrase can.</p>
+    <div class="group"><label>Password (8+ chars, 1 number)</label><input class="input" type="password" placeholder="••••••••"></div>
+    <div class="group"><label>Confirm</label><input class="input" type="password" placeholder="••••••••"></div>
+    <div class="row between"><span class="small">Use Face ID / Biometrics</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span class="small">Auto-lock after 5 min</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <button class="btn primary full" onclick="go('seed-intro')">Continue</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="seed-intro">
+  <div class="appbar"><button class="icon-btn" onclick="go('create-pwd')">←</button><strong>Recovery Phrase</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Your 12-word phrase is the master key. <span class="badge warn">DO NOT SHARE</span></p>
+    <div style="border:2px solid #111;border-radius:8px;padding:10px">
+      <p class="small"><b>Store offline.</b> Paper or metal plate.</p>
+      <p class="small"><b>Never type online.</b> No screenshots, no cloud (unless encrypted backup).</p>
+      <p class="small"><b>Lost = funds gone.</b> Self-custody is your responsibility.</p>
+    </div>
+    <button class="btn primary full" onclick="go('seed-reveal')">Reveal Phrase</button>
+    <button class="btn full" onclick="go('cloud-backup')">Encrypted Cloud Backup</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="seed-reveal">
+  <div class="appbar"><button class="icon-btn" onclick="go('seed-intro')">←</button><strong>Write This Down</strong><button class="icon-btn" onclick="alert('Hide')">👁</button></div>
+  <div class="stack">
+    <div class="seed-grid" id="seedReveal"></div>
+    <div class="row gap"><button class="btn full" onclick="alert('Copied (mock)')">Copy</button><button class="btn primary full" onclick="go('seed-confirm')">Next</button></div>
+    <p class="small center">Never share these words.</p>
+  </div>
+</section>
+
+<section class="screen" data-screen="seed-confirm">
+  <div class="appbar"><button class="icon-btn" onclick="go('seed-reveal')">←</button><strong>Confirm Phrase</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Tap words 3, 7 and 11 in order.</p>
+    <div class="seed-grid">
+      <div class="seed-cell"><span class="num">3.</span>______</div>
+      <div class="seed-cell"><span class="num">7.</span>______</div>
+      <div class="seed-cell"><span class="num">11.</span>______</div>
+    </div>
+    <div class="hr"></div>
+    <div class="seed-grid" id="seedShuffle"></div>
+    <button class="btn primary full" onclick="go('done')">Confirm</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="cloud-backup">
+  <div class="appbar"><button class="icon-btn" onclick="go('seed-intro')">←</button><strong>Encrypted Backup</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Encrypt your seed with a password and store on iCloud / Google Drive. Provider can never read it.</p>
+    <div class="group"><label>Encryption Password</label><input class="input" type="password" placeholder="••••••••"></div>
+    <div class="group"><label>Confirm</label><input class="input" type="password" placeholder="••••••••"></div>
+    <button class="btn primary full" onclick="alert('Uploaded to iCloud (mock)');go('done')">Backup to iCloud</button>
+    <button class="btn full" onclick="alert('Uploaded to Drive (mock)');go('done')">Backup to Google Drive</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="done">
+  <div style="margin:auto;text-align:center;display:flex;flex-direction:column;gap:14px;padding:20px">
+    <div style="font-size:48px">✓</div>
+    <h3 style="margin:0">Wallet Ready</h3>
+    <p class="small">Account 1 created on Ethereum, Polygon, Arbitrum, Optimism, Base, Solana, Bitcoin.</p>
+    <button class="btn primary full" onclick="go('home')">Open Wallet</button>
+  </div>
+</section>
+
+<!-- ========= IMPORT ========= -->
+<section class="screen" data-screen="import-pick">
+  <div class="appbar"><button class="icon-btn" onclick="go('welcome')">←</button><strong>Import Wallet</strong><span></span></div>
+  <div class="stack">
+    <div class="li" onclick="go('import-seed')"><div class="li-l"><div class="token">↩</div><div><div>Recovery Phrase</div><div class="small">12/24 words BIP-39</div></div></div><span>›</span></div>
+    <div class="li" onclick="go('import-pk')"><div class="li-l"><div class="token">🔑</div><div><div>Private Key</div><div class="small">Single account hex string</div></div></div><span>›</span></div>
+    <div class="li" onclick="go('import-json')"><div class="li-l"><div class="token">{}</div><div><div>JSON Keystore</div><div class="small">Encrypted v3 file</div></div></div><span>›</span></div>
+    <div class="li" onclick="go('import-hw')"><div class="li-l"><div class="token">HW</div><div><div>Hardware Wallet</div><div class="small">Ledger · Trezor · Keystone</div></div></div><span>›</span></div>
+    <div class="li" onclick="go('import-restore')"><div class="li-l"><div class="token">☁</div><div><div>Restore from Cloud</div><div class="small">Encrypted iCloud / Drive backup</div></div></div><span>›</span></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="import-seed">
+  <div class="appbar"><button class="icon-btn" onclick="go('import-pick')">←</button><strong>Recovery Phrase</strong><button class="icon-btn" onclick="go('scan')">⌖</button></div>
+  <div class="stack">
+    <textarea class="input" rows="4" placeholder="word1 word2 word3 ..."></textarea>
+    <div class="group"><label>Optional 25th word (passphrase)</label><input class="input" placeholder="advanced"></div>
+    <div class="group"><label>New Password</label><input class="input" type="password"></div>
+    <button class="btn primary full" onclick="go('home')">Import</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="import-pk">
+  <div class="appbar"><button class="icon-btn" onclick="go('import-pick')">←</button><strong>Private Key</strong><span></span></div>
+  <div class="stack">
+    <p class="small"><span class="badge warn">Note</span> Imported keys are NOT covered by your recovery phrase.</p>
+    <div class="group"><label>Private Key (hex)</label><textarea class="input" rows="3" placeholder="0xabc..."></textarea></div>
+    <div class="group"><label>Account Name</label><input class="input" placeholder="Imported 1"></div>
+    <button class="btn primary full" onclick="go('home')">Import</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="import-json">
+  <div class="appbar"><button class="icon-btn" onclick="go('import-pick')">←</button><strong>JSON Keystore</strong><span></span></div>
+  <div class="stack">
+    <div class="ph-img" style="height:80px;display:flex;align-items:center;justify-content:center;font-size:11px">[ Drop file or pick ]</div>
+    <button class="btn full" onclick="alert('File picker (mock)')">Choose File</button>
+    <div class="group"><label>File Password</label><input class="input" type="password"></div>
+    <button class="btn primary full" onclick="go('home')">Import</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="import-hw">
+  <div class="appbar"><button class="icon-btn" onclick="go('import-pick')">←</button><strong>Hardware Wallet</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Pair via Bluetooth or USB-OTG.</p>
+    <div class="list">
+      <div class="li" onclick="go('hw-pair')"><div class="li-l"><div class="token">L</div>Ledger Nano X</div><span class="badge ok">BLE</span></div>
+      <div class="li" onclick="go('hw-pair')"><div class="li-l"><div class="token">T</div>Trezor Model T</div><span class="badge">USB</span></div>
+      <div class="li" onclick="go('hw-pair')"><div class="li-l"><div class="token">K</div>Keystone 3 Pro</div><span class="badge">QR</span></div>
+      <div class="li" onclick="go('hw-pair')"><div class="li-l"><div class="token">G</div>GridPlus Lattice1</div><span class="badge">USB</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" data-screen="hw-pair">
+  <div class="appbar"><button class="icon-btn" onclick="go('import-hw')">←</button><strong>Pair Device</strong><span></span></div>
+  <div class="stack center">
+    <div class="ph-dash" style="height:120px;display:flex;align-items:center;justify-content:center">[ device illustration ]</div>
+    <p class="small">1. Unlock device   2. Open Ethereum app   3. Approve on screen</p>
+    <button class="btn primary full" onclick="go('hw-accounts')">Connect</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="hw-accounts">
+  <div class="appbar"><button class="icon-btn" onclick="go('hw-pair')">←</button><strong>Select Accounts</strong><span></span></div>
+  <div class="stack">
+    <div class="group"><label>Derivation Path</label><select class="input"><option>m/44'/60'/0'/0 (Default)</option><option>m/44'/60'/0' (Legacy)</option><option>Custom</option></select></div>
+    <div class="list">
+      <div class="li"><div class="li-l"><span class="checkbox on"></span><span>Acct #0 · 0xAa..1f</span></div><span class="small">$1,240</span></div>
+      <div class="li"><div class="li-l"><span class="checkbox on"></span><span>Acct #1 · 0xBb..2e</span></div><span class="small">$0</span></div>
+      <div class="li"><div class="li-l"><span class="checkbox"></span><span>Acct #2 · 0xCc..3d</span></div><span class="small">$0</span></div>
+    </div>
+    <button class="btn primary full" onclick="go('home')">Add Selected</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="import-restore">
+  <div class="appbar"><button class="icon-btn" onclick="go('import-pick')">←</button><strong>Cloud Restore</strong><span></span></div>
+  <div class="stack">
+    <button class="btn full" onclick="alert('Found iCloud backup (mock)')">Restore from iCloud</button>
+    <button class="btn full" onclick="alert('Found Drive backup (mock)')">Restore from Google Drive</button>
+    <div class="group"><label>Decryption Password</label><input class="input" type="password"></div>
+    <button class="btn primary full" onclick="go('home')">Restore</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="watch-add">
+  <div class="appbar"><button class="icon-btn" onclick="go('welcome')">←</button><strong>Add Watch-only</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Track any address without holding keys. Cannot send.</p>
+    <div class="group"><label>Address or ENS / SNS</label><input class="input" placeholder="vitalik.eth"></div>
+    <div class="group"><label>Label</label><input class="input" placeholder="Vitalik"></div>
+    <button class="btn primary full" onclick="go('home')">Add</button>
+  </div>
+</section>
+
+<!-- ========= LOCK ========= -->
+<section class="screen" data-screen="lock">
+  <div style="margin:auto;text-align:center;display:flex;flex-direction:column;gap:12px;padding:24px;width:100%">
+    <div style="font-size:36px">🔒</div>
+    <h3 style="margin:0">Wallet Locked</h3>
+    <input class="input" type="password" placeholder="Password">
+    <button class="btn primary full" onclick="go('home')">Unlock</button>
+    <button class="btn full" onclick="alert('Face ID prompt (mock)');go('home')">Unlock with Face ID</button>
+    <a href="#" onclick="event.preventDefault();go('welcome')" class="small">Forgot password? Reset wallet</a>
+  </div>
+</section>
+
+<!-- ========= HOME ========= -->
+<section class="screen" data-screen="home">
+  <div class="appbar">
+    <button class="icon-btn" onclick="openDrawer()">☰</button>
+    <div class="row gap">
+      <button class="net-pill" onclick="openSheet('s-net')"><span class="dot k"></span><span id="netLabel">Ethereum</span> ▾</button>
+      <button class="acct-pill" onclick="openSheet('s-acc')"><span class="avatar"></span><span id="acctLabel">Acct 1</span> ▾</button>
+    </div>
+    <button class="icon-btn" onclick="go('notify')">🔔<span class="ndot"></span></button>
+  </div>
+  <div class="stack">
+    <div class="balance">
+      <div class="small">Total Net Worth</div>
+      <div class="big">$ 12,438.19</div>
+      <div class="small" id="addrLine">brendan.eth · 0xAb12…9F0e <a href="#" onclick="event.preventDefault();alert('Copied')">Copy</a></div>
+      <div class="row gap" style="justify-content:center;margin-top:6px">
+        <span class="badge ok">+2.1% 24h</span>
+        <span class="badge">All time +18.4%</span>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="act" onclick="go('send')"><span class="ico">↗</span>Send</div>
+      <div class="act" onclick="go('receive')"><span class="ico">↙</span>Receive</div>
+      <div class="act" onclick="go('swap')"><span class="ico">⇄</span>Swap</div>
+      <div class="act" onclick="go('bridge')"><span class="ico">≋</span>Bridge</div>
+      <div class="act" onclick="go('buy')"><span class="ico">＄</span>Buy</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="setTab(this,'t-tok')">Tokens</div>
+      <div class="tab" onclick="setTab(this,'t-nft')">NFTs</div>
+      <div class="tab" onclick="setTab(this,'t-defi')">DeFi</div>
+      <div class="tab" onclick="setTab(this,'t-act')">Activity</div>
+    </div>
+
+    <div id="t-tok" class="list">
+      <div class="li" onclick="openSheet('s-tok')"><div class="li-l"><div class="token">ETH</div><div><div>Ethereum</div><div class="small">2.34 ETH</div></div></div><div class="li-r"><div>$7,820.10</div><div class="small">+1.4%</div></div></div>
+      <div class="li" onclick="openSheet('s-tok')"><div class="li-l"><div class="token">USDC</div><div><div>USD Coin</div><div class="small">3,200 USDC</div></div></div><div class="li-r"><div>$3,200.00</div><div class="small">0.0%</div></div></div>
+      <div class="li" onclick="openSheet('s-tok')"><div class="li-l"><div class="token">SOL</div><div><div>Solana</div><div class="small">12.4 SOL</div></div></div><div class="li-r"><div>$1,240.00</div><div class="small">+3.2%</div></div></div>
+      <div class="li" onclick="openSheet('s-tok')"><div class="li-l"><div class="token">BTC</div><div><div>Bitcoin</div><div class="small">0.012 BTC</div></div></div><div class="li-r"><div>$780.00</div><div class="small">+0.4%</div></div></div>
+      <button class="btn full" onclick="openSheet('s-add-tok')">+ Import / Manage Tokens</button>
+    </div>
+
+    <div id="t-nft" class="list" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="li" style="flex-direction:column;align-items:flex-start" onclick="openSheet('s-nft')"><div class="ph-img" style="width:100%;height:90px"></div><div class="small">Foxes #042</div></div>
+        <div class="li" style="flex-direction:column;align-items:flex-start" onclick="openSheet('s-nft')"><div class="ph-dash" style="width:100%;height:90px"></div><div class="small">Punks #777</div></div>
+        <div class="li" style="flex-direction:column;align-items:flex-start" onclick="openSheet('s-nft')"><div class="ph-img" style="width:100%;height:90px"></div><div class="small">ENS · brendan.eth</div></div>
+        <div class="li" style="flex-direction:column;align-items:flex-start" onclick="openSheet('s-nft')"><div class="ph-dash" style="width:100%;height:90px"></div><div class="small">Ordinal #1729</div></div>
+      </div>
+      <div class="row gap"><button class="btn full" onclick="alert('Hide spam (mock)')">Hide Spam</button><button class="btn full" onclick="alert('Import NFT (mock)')">+ Import</button></div>
+    </div>
+
+    <div id="t-defi" class="list" style="display:none">
+      <div class="li"><div class="li-l"><div class="token">Lido</div><div><div>Staked ETH</div><div class="small">stETH · 3.4% APR</div></div></div><div class="li-r"><div>1.2 stETH</div><div class="small">$4,000</div></div></div>
+      <div class="li"><div class="li-l"><div class="token">Aave</div><div><div>Lending</div><div class="small">USDC supply · 5.1%</div></div></div><div class="li-r"><div>2,000</div><div class="small">$2,000</div></div></div>
+      <div class="li"><div class="li-l"><div class="token">Uni</div><div><div>LP</div><div class="small">ETH/USDC v3</div></div></div><div class="li-r"><div>—</div><div class="small">$1,150</div></div></div>
+      <button class="btn full" onclick="go('earn')">Explore Earn</button>
+    </div>
+
+    <div id="t-act" class="list" style="display:none">
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">↗</div><div><div>Send · ETH</div><div class="small">2 min ago</div></div></div><span class="badge ok">OK</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">⇄</div><div><div>Swap · ETH→USDC</div><div class="small">1h ago</div></div></div><span class="badge warn">Pending</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">≋</div><div><div>Bridge · ETH→Base</div><div class="small">3h ago</div></div></div><span class="badge ok">OK</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">!</div><div><div>Approval · USDC</div><div class="small">2d ago</div></div></div><span class="badge err">Failed</span></div>
+    </div>
+  </div>
+  <nav class="nav-bot">
+    <div class="nb active" onclick="go('home')"><span class="ico">⌂</span>Home</div>
+    <div class="nb" onclick="go('browser')"><span class="ico">⌬</span>Browser</div>
+    <div class="nb" onclick="go('earn')"><span class="ico">%</span>Earn</div>
+    <div class="nb" onclick="go('activity')"><span class="ico">≡</span>Activity</div>
+    <div class="nb" onclick="go('settings')"><span class="ico">⚙</span>Settings</div>
+  </nav>
+</section>
+
+<!-- SEND / RECEIVE / SWAP / BRIDGE / BUY -->
+<section class="screen" data-screen="send">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Send</strong><button class="icon-btn" onclick="go('scan')">⌖</button></div>
+  <div class="stack">
+    <div class="group"><label>Recipient</label><input class="input" placeholder="0x… / ENS / SNS"></div>
+    <div class="row gap"><button class="btn full" onclick="go('contacts')">Contacts</button><button class="btn full" onclick="go('scan')">Scan</button><button class="btn full" onclick="alert('Pasted')">Paste</button></div>
+    <div class="group"><label>Asset</label><select class="input"><option>ETH — 2.34</option><option>USDC — 3,200</option><option>SOL — 12.4</option></select></div>
+    <div class="group"><label>Amount</label><input class="input" placeholder="0.00"><div class="small">≈ $0.00 · <a href="#" onclick="event.preventDefault();">Max</a></div></div>
+    <div class="hr"></div>
+    <div class="kv"><span class="k">Network fee</span><span>~ 0.0012 ETH</span></div>
+    <div class="kv"><span class="k">Speed</span><span><a href="#" onclick="event.preventDefault();openSheet('s-gas')">Edit</a></span></div>
+    <div class="kv"><span class="k">Address check</span><span class="badge ok">No risks found</span></div>
+    <button class="btn primary full" onclick="openSheet('s-confirm')">Review</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="receive">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Receive</strong><span></span></div>
+  <div class="stack center">
+    <div class="qr"></div>
+    <div class="small" style="word-break:break-all">0xAb12 3456 7890 abcd ef01 9F0e</div>
+    <div class="row gap" style="justify-content:center"><button class="btn full" onclick="alert('Copied')">Copy</button><button class="btn full" onclick="alert('Share sheet (mock)')">Share</button></div>
+    <div class="group"><label>Network</label><select class="input"><option>Ethereum</option><option>Polygon</option><option>Solana</option><option>Bitcoin</option></select></div>
+    <p class="small">Only send Ethereum-network assets to this address.</p>
+  </div>
+</section>
+
+<section class="screen" data-screen="swap">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Swap</strong><button class="icon-btn" onclick="openSheet('s-slip')">⚙</button></div>
+  <div class="stack">
+    <div style="border:2px solid #111;border-radius:8px;padding:8px"><div class="small">From</div><div class="row between"><input class="input" placeholder="0.0" style="border:none;font-size:18px"><button class="btn sm" onclick="openSheet('s-pick')">ETH ▾</button></div><div class="small">Bal 2.34 · <a href="#" onclick="event.preventDefault();">Max</a></div></div>
+    <div class="center">⇅</div>
+    <div style="border:2px solid #111;border-radius:8px;padding:8px"><div class="small">To</div><div class="row between"><input class="input" placeholder="0.0" style="border:none;font-size:18px"><button class="btn sm" onclick="openSheet('s-pick')">USDC ▾</button></div><div class="small">Bal 3,200</div></div>
+    <div class="kv"><span class="k">Rate</span><span>1 ETH ≈ 3,340 USDC</span></div>
+    <div class="kv"><span class="k">Slippage</span><span>0.5%</span></div>
+    <div class="kv"><span class="k">Provider</span><span>MetaSwap (best of 5)</span></div>
+    <div class="kv"><span class="k">Network fee</span><span>~ $4.20</span></div>
+    <div class="kv"><span class="k">Price impact</span><span class="badge ok">0.04%</span></div>
+    <button class="btn primary full" onclick="openSheet('s-confirm')">Get Quote</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="bridge">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Bridge</strong><span></span></div>
+  <div class="stack">
+    <div class="group"><label>From</label><select class="input"><option>Ethereum</option><option>Polygon</option><option>Arbitrum</option><option>Base</option></select></div>
+    <div class="group"><label>To</label><select class="input"><option>Base</option><option>Polygon</option><option>Arbitrum</option><option>Optimism</option></select></div>
+    <div class="group"><label>Asset &amp; Amount</label><input class="input" placeholder="0.0 ETH"></div>
+    <div class="kv"><span class="k">Route</span><span>Across Bridge</span></div>
+    <div class="kv"><span class="k">Time</span><span>~ 45 sec</span></div>
+    <div class="kv"><span class="k">Fee</span><span>~ $1.10</span></div>
+    <button class="btn primary full" onclick="openSheet('s-confirm')">Review Bridge</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="buy">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Buy / Sell</strong><span></span></div>
+  <div class="stack">
+    <div class="tabs"><div class="tab active">Buy</div><div class="tab">Sell</div></div>
+    <div class="group"><label>Pay With</label><select class="input"><option>USD · Apple Pay</option><option>USD · Card</option><option>EUR · Bank</option></select></div>
+    <div class="group"><label>Amount</label><input class="input" placeholder="$ 100"></div>
+    <div class="group"><label>Receive</label><select class="input"><option>ETH</option><option>USDC</option><option>BTC</option><option>SOL</option></select></div>
+    <div class="list">
+      <div class="li"><div class="li-l">MoonPay</div><div class="li-r">≈ 0.0299 ETH</div></div>
+      <div class="li"><div class="li-l">Transak</div><div class="li-r">≈ 0.0297 ETH</div></div>
+      <div class="li"><div class="li-l">Coinbase Pay</div><div class="li-r">≈ 0.0301 ETH</div></div>
+      <div class="li"><div class="li-l">Robinhood Connect</div><div class="li-r">≈ 0.0300 ETH</div></div>
+    </div>
+    <button class="btn primary full" onclick="alert('Continue to provider (mock)')">Continue</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="scan">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Scan QR</strong><button class="icon-btn" onclick="alert('Toggle flash')">⚡</button></div>
+  <div class="stack">
+    <div class="scan"></div>
+    <p class="small center">Scan an address, WalletConnect URI or recovery phrase.</p>
+    <button class="btn full" onclick="alert('From gallery')">Pick from Gallery</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="contacts">
+  <div class="appbar"><button class="icon-btn" onclick="go('send')">←</button><strong>Contacts</strong><button class="icon-btn" onclick="alert('Add contact (mock)')">+</button></div>
+  <div class="stack">
+    <input class="input" placeholder="Search">
+    <div class="list">
+      <div class="li" onclick="go('send')"><div class="li-l"><span class="avatar"></span><div><div>Alice</div><div class="small">alice.eth · 0x12..a91</div></div></div><span>›</span></div>
+      <div class="li" onclick="go('send')"><div class="li-l"><span class="avatar"></span><div><div>Bob</div><div class="small">0x9c..f3a</div></div></div><span>›</span></div>
+      <div class="li" onclick="go('send')"><div class="li-l"><span class="avatar"></span><div><div>Coinbase Hot</div><div class="small">0x77..b22</div></div></div><span class="badge">CEX</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- BROWSER -->
+<section class="screen" data-screen="browser">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>dApp Browser</strong><button class="icon-btn" onclick="openSheet('s-conn')">⚭</button></div>
+  <div class="stack">
+    <div class="browser"><span>🔒</span><span style="flex:1">app.uniswap.org</span><span class="badge ok">Verified</span></div>
+    <input class="input" placeholder="Search or type URL">
+    <div class="small">Featured</div>
+    <div class="list">
+      <div class="li" onclick="openSheet('s-conn')"><div class="li-l"><div class="token">U</div>Uniswap</div><span class="small">DEX</span></div>
+      <div class="li" onclick="openSheet('s-conn')"><div class="li-l"><div class="token">O</div>OpenSea</div><span class="small">NFT</span></div>
+      <div class="li" onclick="openSheet('s-conn')"><div class="li-l"><div class="token">A</div>Aave</div><span class="small">Lending</span></div>
+      <div class="li" onclick="openSheet('s-conn')"><div class="li-l"><div class="token">L</div>Lido</div><span class="small">Staking</span></div>
+      <div class="li" onclick="openSheet('s-conn')"><div class="li-l"><div class="token">J</div>Jupiter</div><span class="small">SOL DEX</span></div>
+    </div>
+    <div class="small">Bookmarks</div>
+    <div class="list">
+      <div class="li"><div class="li-l">debank.com</div><span class="small">Portfolio</span></div>
+      <div class="li"><div class="li-l">defillama.com</div><span class="small">DeFi</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EARN -->
+<section class="screen" data-screen="earn">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Earn</strong><span></span></div>
+  <div class="stack">
+    <div class="balance"><div class="small">Earning</div><div class="big">$ 5,150.00</div><div class="small">+$12.40 today</div></div>
+    <div class="small">Stake</div>
+    <div class="list">
+      <div class="li" onclick="openSheet('s-stake')"><div class="li-l"><div class="token">ETH</div><div><div>Lido stETH</div><div class="small">3.4% APR · Liquid</div></div></div><button class="btn sm">Stake</button></div>
+      <div class="li" onclick="openSheet('s-stake')"><div class="li-l"><div class="token">SOL</div><div><div>Marinade mSOL</div><div class="small">6.8% APR</div></div></div><button class="btn sm">Stake</button></div>
+      <div class="li" onclick="openSheet('s-stake')"><div class="li-l"><div class="token">MAT</div><div><div>Polygon Stake</div><div class="small">4.1% APR</div></div></div><button class="btn sm">Stake</button></div>
+    </div>
+    <div class="small">Lend</div>
+    <div class="list">
+      <div class="li"><div class="li-l"><div class="token">A</div><div><div>Aave USDC</div><div class="small">5.1% supply</div></div></div><button class="btn sm">Supply</button></div>
+      <div class="li"><div class="li-l"><div class="token">C</div><div><div>Compound DAI</div><div class="small">4.2%</div></div></div><button class="btn sm">Supply</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTIVITY -->
+<section class="screen" data-screen="activity">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Activity</strong><button class="icon-btn" onclick="alert('Filter (mock)')">⌕</button></div>
+  <div class="stack">
+    <div class="tabs"><div class="tab active">All</div><div class="tab">Pending</div><div class="tab">Done</div></div>
+    <input class="input" placeholder="Search by hash, address, dApp">
+    <div class="list">
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">↗</div><div><div>Send · 0.12 ETH</div><div class="small">to bob.eth · 2 min</div></div></div><span class="badge ok">OK</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">⇄</div><div><div>Swap ETH → USDC</div><div class="small">Uniswap · 1h</div></div></div><span class="badge warn">Pending</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">≋</div><div><div>Bridge ETH → Base</div><div class="small">Across · 3h</div></div></div><span class="badge ok">OK</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">✓</div><div><div>Approve USDC</div><div class="small">Aave · 1d</div></div></div><span class="badge ok">OK</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">!</div><div><div>Approve revert</div><div class="small">Suspicious site · 2d</div></div></div><span class="badge err">Failed</span></div>
+      <div class="li" onclick="openSheet('s-tx')"><div class="li-l"><div class="token">N</div><div><div>NFT receive</div><div class="small">Foxes #042 · 3d</div></div></div><span class="badge ok">OK</span></div>
+    </div>
+    <button class="btn full" onclick="alert('Export CSV (mock)')">Export CSV</button>
+  </div>
+</section>
+
+<!-- NOTIFICATIONS -->
+<section class="screen" data-screen="notify">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Notifications</strong><button class="icon-btn" onclick="alert('Mark all read')">✓</button></div>
+  <div class="stack">
+    <div class="li"><div class="li-l"><div class="token">↙</div><div><div>+500 DAI received</div><div class="small">2 min ago</div></div></div><span class="ndot"></span></div>
+    <div class="li"><div class="li-l"><div class="token">!</div><div><div>Price alert: ETH +5%</div><div class="small">10 min ago</div></div></div><span></span></div>
+    <div class="li"><div class="li-l"><div class="token">⚭</div><div><div>uniswap.org connected</div><div class="small">1h ago</div></div></div></div>
+    <div class="li"><div class="li-l"><div class="token">🛡</div><div><div>Risky approval revoked</div><div class="small">2d ago</div></div></div></div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="screen" data-screen="settings">
+  <div class="appbar"><button class="icon-btn" onclick="go('home')">←</button><strong>Settings</strong><span></span></div>
+  <div class="stack">
+    <div class="li"><div class="li-l"><span class="avatar lg"></span><div><div>Account 1</div><div class="small">brendan.eth · 0xAb12…9F0e</div></div></div><button class="btn sm" onclick="openSheet('s-acc')">Switch</button></div>
+    <div class="list">
+      <div class="li" onclick="go('s-general')"><div>General</div><span>›</span></div>
+      <div class="li" onclick="go('s-security')"><div>Security &amp; Privacy</div><span>›</span></div>
+      <div class="li" onclick="go('s-networks')"><div>Networks</div><span>›</span></div>
+      <div class="li" onclick="go('s-approvals')"><div>Token Approvals</div><span class="badge warn">2 risky</span></div>
+      <div class="li" onclick="go('s-connected')"><div>Connected Sites</div><span>3</span></div>
+      <div class="li" onclick="go('s-contacts')"><div>Contacts &amp; Address Book</div><span>›</span></div>
+      <div class="li" onclick="go('s-backup')"><div>Backups</div><span>›</span></div>
+      <div class="li" onclick="go('s-experimental')"><div>Experimental (Snaps, AA)</div><span>›</span></div>
+      <div class="li" onclick="go('s-about')"><div>About &amp; Help</div><span>›</span></div>
+      <div class="li" onclick="go('lock')"><div>Lock Wallet</div><span>🔒</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-general">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>General</strong><span></span></div>
+  <div class="stack">
+    <div class="row between"><span>Currency</span><select class="input" style="width:auto"><option>USD</option><option>EUR</option><option>JPY</option><option>BTC</option></select></div>
+    <div class="row between"><span>Language</span><select class="input" style="width:auto"><option>English</option><option>Español</option><option>中文</option></select></div>
+    <div class="row between"><span>Theme</span><select class="input" style="width:auto"><option>System</option><option>Light</option><option>Dark</option></select></div>
+    <div class="row between"><span>Show test networks</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Hide zero balances</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Privacy mode (hide $)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-security">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Security &amp; Privacy</strong><span></span></div>
+  <div class="stack">
+    <button class="btn full" onclick="go('seed-reveal')">Reveal Recovery Phrase</button>
+    <button class="btn full" onclick="alert('Show private key (mock)')">Show Private Keys</button>
+    <button class="btn full" onclick="alert('Export keystore JSON (mock)')">Export Keystore JSON</button>
+    <div class="hr"></div>
+    <div class="row between"><span>Face ID / Biometrics</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Auto-lock (5 min)</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Phishing &amp; scam shield</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Address-poisoning warnings</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Tx simulation (Blockaid)</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Hide balance on lock screen</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Use Tor / private RPC</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="hr"></div>
+    <button class="btn danger full" onclick="confirm('Reset wallet?')">Reset Wallet</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-networks">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Networks</strong><button class="icon-btn" onclick="openSheet('s-add-net')">+</button></div>
+  <div class="stack">
+    <input class="input" placeholder="Search">
+    <div class="list">
+      <div class="li"><div class="li-l"><span class="dot"></span>Ethereum Mainnet</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot k"></span>Polygon</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot warn"></span>BNB Smart Chain</div><span class="badge">Off</span></div>
+      <div class="li"><div class="li-l"><span class="dot"></span>Arbitrum One</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot k"></span>Optimism</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot"></span>Base</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot k"></span>Solana</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot"></span>Bitcoin</div><span class="badge ok">On</span></div>
+      <div class="li"><div class="li-l"><span class="dot warn"></span>Sepolia (test)</div><span class="badge">Off</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-approvals">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Token Approvals</strong><span></span></div>
+  <div class="stack">
+    <p class="small">Active spending allowances. Revoke any you no longer need.</p>
+    <div class="list">
+      <div class="li"><div class="li-l"><div class="token">U</div><div><div>USDC → Uniswap V3</div><div class="small">Unlimited · ~$3,200 at risk</div></div></div><button class="btn sm danger" onclick="alert('Revoked (mock)')">Revoke</button></div>
+      <div class="li"><div class="li-l"><div class="token">A</div><div><div>USDC → Aave</div><div class="small">100 · safe</div></div></div><button class="btn sm" onclick="alert('Revoked')">Revoke</button></div>
+      <div class="li"><div class="li-l"><div class="token">!</div><div><div>USDT → unknown contract</div><div class="small">Unlimited · <span class="badge err">Risky</span></div></div></div><button class="btn sm danger">Revoke</button></div>
+      <div class="li"><div class="li-l"><div class="token">N</div><div><div>NFT setApprovalForAll → OpenSea</div><div class="small">All tokens</div></div></div><button class="btn sm">Revoke</button></div>
+    </div>
+    <button class="btn full" onclick="alert('Revoked all (mock)')">Revoke All</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-connected">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Connected Sites</strong><span></span></div>
+  <div class="stack">
+    <div class="list">
+      <div class="li"><div class="li-l"><span class="dot ok"></span>uniswap.org</div><button class="btn sm" onclick="alert('Disconnected')">Disconnect</button></div>
+      <div class="li"><div class="li-l"><span class="dot ok"></span>opensea.io</div><button class="btn sm" onclick="alert('Disconnected')">Disconnect</button></div>
+      <div class="li"><div class="li-l"><span class="dot ok"></span>app.aave.com</div><button class="btn sm" onclick="alert('Disconnected')">Disconnect</button></div>
+    </div>
+    <button class="btn full" onclick="alert('All disconnected')">Disconnect All</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-contacts">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Contacts</strong><button class="icon-btn">+</button></div>
+  <div class="stack">
+    <div class="li"><div class="li-l"><span class="avatar"></span><div><div>Alice</div><div class="small">alice.eth</div></div></div><span>›</span></div>
+    <div class="li"><div class="li-l"><span class="avatar"></span><div><div>Bob</div><div class="small">0x9c..f3a</div></div></div><span>›</span></div>
+    <div class="li"><div class="li-l"><span class="avatar"></span><div><div>Coinbase Hot</div><div class="small">0x77..b22</div></div></div><span class="badge">CEX</span></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-backup">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Backups</strong><span></span></div>
+  <div class="stack">
+    <div class="li"><div class="li-l"><div class="token">☁</div><div><div>iCloud Encrypted</div><div class="small">Last: 2 days ago</div></div></div><span class="badge ok">On</span></div>
+    <div class="li"><div class="li-l"><div class="token">☁</div><div><div>Google Drive Encrypted</div><div class="small">Off</div></div></div><span class="badge">Off</span></div>
+    <button class="btn full" onclick="go('cloud-backup')">Backup Now</button>
+    <button class="btn full" onclick="go('seed-reveal')">View Recovery Phrase</button>
+    <button class="btn full" onclick="alert('Shamir split (mock)')">Shamir Backup (Split)</button>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-experimental">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>Experimental</strong><span></span></div>
+  <div class="stack">
+    <div class="row between"><span>Snaps (plugins)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Smart Account (EIP-7702)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Gasless tx (relayer)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Petnames for addresses</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Inscriptions / Ordinals</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+    <div class="row between"><span>Account Recovery (social)</span><span class="toggle" onclick="this.classList.toggle('on')"></span></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="s-about">
+  <div class="appbar"><button class="icon-btn" onclick="go('settings')">←</button><strong>About &amp; Help</strong><span></span></div>
+  <div class="stack center">
+    <div class="ascii"> Unlimit.pro
+   v 0.2</div>
+    <div>Unlimit.pro Wallet</div>
+    <div class="small">Version 0.2.0 (low-fidelity)</div>
+    <button class="btn full">Help Center</button>
+    <button class="btn full">Contact Support</button>
+    <button class="btn full">Privacy Policy</button>
+    <button class="btn full">Terms of Use</button>
+    <button class="btn full">Open Source Licenses</button>
+  </div>
+</section>
+
+<!-- ============= SHEETS ============= -->
+<div class="sheet-back" id="sheet-back" onclick="closeSheet()"></div>
+
+<div class="sheet" id="s-net">
+  <div class="row between"><h4>Networks</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <input class="input" placeholder="Search">
+  <div class="list" style="margin-top:8px">
+    <div class="li" onclick="setNet('Ethereum')"><div class="li-l"><span class="dot"></span>Ethereum Mainnet</div><span class="small">ETH</span></div>
+    <div class="li" onclick="setNet('Polygon')"><div class="li-l"><span class="dot k"></span>Polygon</div><span class="small">MATIC</span></div>
+    <div class="li" onclick="setNet('Arbitrum')"><div class="li-l"><span class="dot"></span>Arbitrum One</div><span class="small">ETH</span></div>
+    <div class="li" onclick="setNet('Base')"><div class="li-l"><span class="dot"></span>Base</div><span class="small">ETH</span></div>
+    <div class="li" onclick="setNet('Solana')"><div class="li-l"><span class="dot k"></span>Solana</div><span class="small">SOL</span></div>
+    <div class="li" onclick="setNet('Bitcoin')"><div class="li-l"><span class="dot"></span>Bitcoin</div><span class="small">BTC</span></div>
+    <div class="li" onclick="setNet('BNB')"><div class="li-l"><span class="dot warn"></span>BNB Smart Chain</div><span class="small">BNB</span></div>
+  </div>
+  <button class="btn full" style="margin-top:6px" onclick="closeSheet();go('s-networks')">Manage Networks</button>
+</div>
+
+<div class="sheet" id="s-acc">
+  <div class="row between"><h4>Accounts</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <input class="input" placeholder="Search">
+  <div class="list" style="margin-top:8px">
+    <div class="li" onclick="setAcct('Acct 1')"><div class="li-l"><span class="avatar"></span><div><div>Account 1</div><div class="small">brendan.eth · $12,438</div></div></div><span class="badge ok">Active</span></div>
+    <div class="li" onclick="setAcct('Acct 2')"><div class="li-l"><span class="avatar"></span><div><div>Account 2</div><div class="small">0x77b2..3c1a · $452</div></div></div><span>›</span></div>
+    <div class="li" onclick="setAcct('Trezor')"><div class="li-l"><span class="avatar"></span><div><div>Trezor 1</div><div class="small">0xff..001 · $0</div></div></div><span class="badge">HW</span></div>
+    <div class="li" onclick="setAcct('Watch')"><div class="li-l"><span class="avatar"></span><div><div>Vitalik (watch)</div><div class="small">vitalik.eth</div></div></div><span class="badge">👁</span></div>
+  </div>
+  <div class="row gap" style="margin-top:6px"><button class="btn full" onclick="alert('New (mock)')">+ New</button><button class="btn full" onclick="closeSheet();go('import-pick')">Import</button></div>
+</div>
+
+<div class="sheet" id="s-tok">
+  <div class="row between"><h4>Token Detail</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="balance"><div class="small">Ethereum (ETH)</div><div class="big">2.34 ETH</div><div class="small">≈ $7,820.10</div></div>
+  <div class="actions" style="margin-top:8px"><div class="act" onclick="closeSheet();go('send')"><span class="ico">↗</span>Send</div><div class="act" onclick="closeSheet();go('receive')"><span class="ico">↙</span>Receive</div><div class="act" onclick="closeSheet();go('swap')"><span class="ico">⇄</span>Swap</div><div class="act" onclick="closeSheet();go('buy')"><span class="ico">＄</span>Buy</div><div class="act" onclick="closeSheet();go('earn')"><span class="ico">%</span>Earn</div></div>
+  <div class="chart" style="margin-top:8px"></div>
+  <div class="kv"><span class="k">Market cap</span><span>$ 410B</span></div>
+  <div class="kv"><span class="k">24h vol</span><span>$ 18B</span></div>
+</div>
+
+<div class="sheet" id="s-add-tok">
+  <div class="row between"><h4>Manage Tokens</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="tabs"><div class="tab active">Search</div><div class="tab">Custom</div></div>
+  <input class="input" placeholder="Token name / symbol / address" style="margin-top:6px">
+  <div class="list" style="margin-top:6px">
+    <div class="li"><div class="li-l"><div class="token">UNI</div>Uniswap</div><button class="btn sm">Add</button></div>
+    <div class="li"><div class="li-l"><div class="token">LDO</div>Lido</div><button class="btn sm">Add</button></div>
+    <div class="li"><div class="li-l"><div class="token">SHB</div>Shiba</div><button class="btn sm">Add</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="s-pick">
+  <div class="row between"><h4>Select Token</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <input class="input" placeholder="Search">
+  <div class="list" style="margin-top:6px">
+    <div class="li" onclick="closeSheet()"><div class="li-l"><div class="token">ETH</div>Ethereum</div><span class="small">2.34</span></div>
+    <div class="li" onclick="closeSheet()"><div class="li-l"><div class="token">USDC</div>USD Coin</div><span class="small">3,200</span></div>
+    <div class="li" onclick="closeSheet()"><div class="li-l"><div class="token">DAI</div>Dai</div><span class="small">1,418</span></div>
+  </div>
+</div>
+
+<div class="sheet" id="s-slip">
+  <div class="row between"><h4>Swap Settings</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <label>Slippage</label>
+  <div class="row gap"><button class="btn sm">0.1%</button><button class="btn sm primary">0.5%</button><button class="btn sm">1%</button><input class="input" placeholder="Custom %"></div>
+  <label style="margin-top:6px">Deadline (min)</label>
+  <input class="input" value="20">
+  <div class="row between" style="margin-top:6px"><span class="small">MEV protection</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+</div>
+
+<div class="sheet" id="s-gas">
+  <div class="row between"><h4>Edit Gas</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="list" style="margin-top:6px">
+    <div class="li"><div>Low</div><div class="small">~30s · 0.0008 ETH</div></div>
+    <div class="li" style="background:#f2f2f2"><div>Market</div><div class="small">~15s · 0.0012 ETH</div></div>
+    <div class="li"><div>Aggressive</div><div class="small">~5s · 0.0019 ETH</div></div>
+    <div class="li"><div>Custom (advanced)</div><div class="small">Edit gas price &amp; limit</div></div>
+  </div>
+</div>
+
+<div class="sheet" id="s-confirm">
+  <div class="row between"><h4>Confirm Transaction</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="kv"><span class="k">From</span><span>Account 1</span></div>
+  <div class="kv"><span class="k">To</span><span>0x9c..f3a</span></div>
+  <div class="kv"><span class="k">Amount</span><span>0.12 ETH</span></div>
+  <div class="kv"><span class="k">Network fee</span><span>0.0012 ETH</span></div>
+  <div class="kv"><span class="k">Total</span><span>0.1212 ETH</span></div>
+  <div class="hr"></div>
+  <div class="kv"><span class="k">Simulation</span><span class="badge ok">Will succeed</span></div>
+  <div class="kv"><span class="k">Risk</span><span class="badge ok">No risks found</span></div>
+  <div class="row gap" style="margin-top:6px"><button class="btn full" onclick="closeSheet()">Reject</button><button class="btn primary full" onclick="closeSheet();openSheet('s-tx-pending')">Confirm</button></div>
+</div>
+
+<div class="sheet" id="s-tx-pending">
+  <div class="center">
+    <h4>Transaction Submitted</h4>
+    <div style="font-size:32px">⌛</div>
+    <p class="small">Waiting for confirmation…</p>
+    <div class="kv"><span class="k">Hash</span><span>0xabc…123</span></div>
+    <button class="btn full" onclick="alert('Explorer (mock)')">View on Explorer</button>
+    <button class="btn primary full" onclick="closeSheet()">Close</button>
+  </div>
+</div>
+
+<div class="sheet" id="s-tx">
+  <div class="row between"><h4>Transaction</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="kv"><span class="k">Status</span><span class="badge ok">Confirmed</span></div>
+  <div class="kv"><span class="k">From</span><span>0xAb12…9F0e</span></div>
+  <div class="kv"><span class="k">To</span><span>0x9c..f3a</span></div>
+  <div class="kv"><span class="k">Value</span><span>0.12 ETH</span></div>
+  <div class="kv"><span class="k">Gas Used</span><span>21,000</span></div>
+  <div class="kv"><span class="k">Nonce</span><span>42</span></div>
+  <div class="kv"><span class="k">Hash</span><span>0xabc…123</span></div>
+  <div class="row gap" style="margin-top:6px"><button class="btn full" onclick="alert('Speed up')">Speed Up</button><button class="btn full" onclick="alert('Cancel')">Cancel</button><button class="btn full" onclick="alert('Explorer')">Explorer</button></div>
+</div>
+
+<div class="sheet" id="s-nft">
+  <div class="row between"><h4>CryptoFox #042</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="ph-img" style="height:160px;margin-top:6px"></div>
+  <div class="kv"><span class="k">Collection</span><span>CryptoFoxes</span></div>
+  <div class="kv"><span class="k">Token ID</span><span>42</span></div>
+  <div class="kv"><span class="k">Standard</span><span>ERC-721</span></div>
+  <div class="kv"><span class="k">Floor</span><span>0.4 ETH</span></div>
+  <div class="row gap" style="margin-top:6px"><button class="btn full" onclick="closeSheet();go('send')">Send</button><button class="btn full" onclick="alert('OpenSea')">Marketplace</button><button class="btn full" onclick="alert('Hide')">Hide</button></div>
+</div>
+
+<div class="sheet" id="s-conn">
+  <div class="row between"><h4>Connect to dApp</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="kv"><span class="k">Site</span><span>app.uniswap.org</span></div>
+  <div class="kv"><span class="k">Risk</span><span class="badge ok">Verified</span></div>
+  <div class="kv"><span class="k">Account</span><span>Account 1</span></div>
+  <p class="small">This site is requesting to:</p>
+  <ul style="font-size:11px;margin:0;padding-left:16px"><li>See address, balance, activity</li><li>Request transaction approvals</li></ul>
+  <div class="row gap" style="margin-top:6px"><button class="btn full" onclick="closeSheet()">Cancel</button><button class="btn primary full" onclick="closeSheet();openSheet('s-sign')">Connect</button></div>
+</div>
+
+<div class="sheet" id="s-sign">
+  <div class="row between"><h4>Signature Request</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="small">app.uniswap.org</div>
+  <div style="border:2px solid #111;border-radius:6px;padding:8px;font-size:11px;margin-top:6px">Welcome to Uniswap!<br>Sign to verify ownership.<br>Nonce: 1729384756</div>
+  <div class="kv"><span class="k">Type</span><span>personal_sign · No transaction</span></div>
+  <div class="row gap" style="margin-top:6px"><button class="btn full" onclick="closeSheet()">Reject</button><button class="btn primary full" onclick="closeSheet()">Sign</button></div>
+</div>
+
+<div class="sheet" id="s-stake">
+  <div class="row between"><h4>Stake ETH on Lido</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <div class="group" style="margin-top:6px"><label>Amount</label><input class="input" placeholder="0.0 ETH"></div>
+  <div class="kv"><span class="k">APR</span><span>3.4%</span></div>
+  <div class="kv"><span class="k">You receive</span><span>stETH (liquid)</span></div>
+  <div class="kv"><span class="k">Network fee</span><span>~ $4.20</span></div>
+  <button class="btn primary full" style="margin-top:6px" onclick="closeSheet();openSheet('s-confirm')">Stake</button>
+</div>
+
+<div class="sheet" id="s-add-net">
+  <div class="row between"><h4>Add Custom Network</h4><button class="icon-btn" onclick="closeSheet()">✕</button></div>
+  <label>Name</label><input class="input">
+  <label>RPC URL</label><input class="input" placeholder="https://...">
+  <label>Chain ID</label><input class="input">
+  <label>Currency</label><input class="input">
+  <label>Block Explorer</label><input class="input">
+  <button class="btn primary full" style="margin-top:6px" onclick="closeSheet()">Save</button>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-back" id="drawer-back" onclick="closeDrawer(event)">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="row between"><h4 style="margin:0">Menu</h4><button class="icon-btn" onclick="closeDrawer()">✕</button></div>
+    <div class="hr"></div>
+    <div class="list">
+      <div class="li" onclick="closeDrawer();openSheet('s-acc')"><div class="li-l"><span class="avatar"></span>Switch Account</div><span>›</span></div>
+      <div class="li" onclick="closeDrawer();openSheet('s-net')">Networks</div>
+      <div class="li" onclick="closeDrawer();go('browser')">dApp Browser</div>
+      <div class="li" onclick="closeDrawer();go('s-connected')">Connected Sites</div>
+      <div class="li" onclick="closeDrawer();go('s-approvals')">Approvals</div>
+      <div class="li" onclick="closeDrawer();go('s-contacts')">Contacts</div>
+      <div class="li" onclick="closeDrawer();go('s-backup')">Backups</div>
+      <div class="li" onclick="closeDrawer();go('s-security')">Security</div>
+      <div class="li" onclick="closeDrawer();go('s-about')">About &amp; Help</div>
+      <div class="li" onclick="closeDrawer();go('lock')">Lock</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /phone -->
+
+<div class="legend">
+  <h4>Mobile prototype</h4>
+  <p style="margin:0 0 8px">Phone-frame simulation. Tap anything — every flow is wired up.</p>
+  <h4>Try</h4>
+  <ul>
+    <li>Onboarding ▸ Seed reveal &amp; confirm</li>
+    <li>Import: Seed / Private Key / JSON / HW / Cloud</li>
+    <li>Add Watch-only address</li>
+    <li>Send · Receive · Swap · Bridge · Buy</li>
+    <li>QR scan, Contacts, dApp browser</li>
+    <li>Earn (Stake / Lend), DeFi tab</li>
+    <li>Approvals manager (revoke risky)</li>
+    <li>Settings → Security · Backups · Networks</li>
+    <li>Lock wallet</li>
+  </ul>
+  <h4>Color cases</h4>
+  <ul><li>Green = OK, Amber = warn, Red = danger</li></ul>
+</div>
+</div>
+
+<script>
+const screens=document.querySelectorAll('.screen');
+function go(n){closeSheet();closeDrawer();screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===n))}
+function setTab(el,id){el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');['t-tok','t-nft','t-defi','t-act'].forEach(t=>{const n=document.getElementById(t);if(n)n.style.display=t===id?'':'none'})}
+function openSheet(id){closeSheet();const e=document.getElementById(id);if(e){e.classList.add('show');document.getElementById('sheet-back').classList.add('show')}}
+function closeSheet(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));document.getElementById('sheet-back').classList.remove('show')}
+function openDrawer(){document.getElementById('drawer-back').classList.add('show')}
+function closeDrawer(e){if(e&&e.target&&e.target.closest&&e.target.closest('.drawer'))return;document.getElementById('drawer-back').classList.remove('show')}
+function setNet(n){document.getElementById('netLabel').textContent=n;closeSheet()}
+function setAcct(n){document.getElementById('acctLabel').textContent=n;closeSheet()}
+
+const words=['ocean','table','river','candle','forest','silver','planet','marble','tiger','window','quiet','bridge'];
+const sr=document.getElementById('seedReveal');
+words.forEach((w,i)=>{const c=document.createElement('div');c.className='seed-cell';c.innerHTML='<span class="num">'+(i+1)+'.</span>'+w;sr.appendChild(c)});
+const ss=document.getElementById('seedShuffle');
+[...words].sort(()=>Math.random()-.5).forEach(w=>{const c=document.createElement('div');c.className='seed-cell';c.style.cursor='pointer';c.textContent=w;ss.appendChild(c)});
+</script>
+</body>
+</html>
