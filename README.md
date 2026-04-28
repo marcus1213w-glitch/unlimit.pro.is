@@ -4,9 +4,65 @@ A workspace of click-through, low-fidelity UI prototypes. All screens are
 intentionally black & white wireframes — with a few special-case colors for
 status (green / amber / red) — so flows can be reviewed without visual-design bias.
 
+> **Latest Release**: v2.1.0 (April 28, 2026) — Copy Trading feature, improved stats labeling, wallet connection gating
+
+## Quick FAQ (v2.1.0 Updates)
+
+### 1. How is versioning tracked? Where's the history?
+
+All version history is documented in:
+- **HTML Comments**: `intelligent-system/index.html` lines 1–40 contain a detailed changelog with dates, features, and breaking changes
+- **CHANGELOG.md**: Full formatted changelog with sections for v2.1.0 (April 28), v2.0.0 (April 15), design principles, and roadmap
+- **Version Badge**: Latest release version shown at top of this README
+
+To view diff details, compare the HTML comments section or reference CHANGELOG.md for detailed feature changes.
+
+### 2. Why does Copy Trading require both Pro subscription AND wallet connection?
+
+**Strategic Reasoning:**
+- **Pro subscription**: Copy trading is a premium feature with real-money implications; restricts access to paying customers
+- **Wallet connection**: Trades execute directly to user's wallet; requires active custody control and security ownership
+  - Protects both user (no custody required) and platform (accountability)
+  - Prevents accidental trading without active wallet setup
+  - Aligns with blockchain security best practices (user = wallet owner)
+
+**UX Implementation:**
+1. **Free tier users** → Upgrade modal (Pro plan, 14-day trial CTA)
+2. **Pro tier, no wallet** → Connect wallet modal (security assurance: "Your private keys stay secure")
+3. **Pro + wallet connected** → Full feature access
+
+Wallet drawer shows context-aware CTA at every step, ensuring users always see the immediate next action.
+
+### 3. What exactly is "Market Momentum" (formerly "Top 100 Gainers")?
+
+**Definition:**
+A market sentiment metric showing what percentage of the top 100 Solana tokens by market cap had positive 24h price change.
+
+**In the Overview widget:**
+- **Stat Value**: "61 / 100" (61 assets positive out of top 100)
+- **Metric**: Average change across those 61 → "+3.2%"
+- **Label**: "Market Momentum · 24h" (scoped to last 24 hours)
+
+**Why renamed?**
+- "Top 100 Gainers" implied a leaderboard of best performers
+- "Market Momentum" better describes the metric: **market's directional strength** (bullish = many assets up, bearish = many down)
+- Clarity: Ambiguous old name didn't signal the denominator (61 out of 100)
+
+**Interpretation Guide:**
+- **80%+ positive** → Strong bullish momentum (whales buying, retail following)
+- **50–79%** → Mixed sentiment (sector rotation, selective buying)
+- **<50%** → Bearish pressure (market-wide selling, flight to stablecoins)
+
+**Uses:**
+- Analysts cross-reference with "Active Alerts" to gauge news impact
+- Traders check momentum before opening positions (high momentum = tailwind)
+- Risk managers monitor for sudden reversals (80% to <50% = warning sign)
+
 ## Open the prototypes
 
 Open `index.html` in any browser to use the launcher, or open a prototype directly.
+
+**📋 See [CHANGELOG.md](CHANGELOG.md) for detailed version history and feature roadmap.**
 
 | Project              | Path                                       | Status |
 | -------------------- | ------------------------------------------ | ------ |
@@ -235,13 +291,25 @@ smooth-scrolling it into view — a Dune-style dashboard pattern.
   - Win-rate bar visualization
   - External-link icon per row → Solscan/Birdeye toast
   - **Click any row** → opens the **Wallet Detail drawer** (slide-over panel)
+- **🐋 Copy Trading (Pro + Wallet Connected)**
+  - NEW in v2.1.0: Mirror trades from elite wallets in real time
+  - Requires both Pro subscription AND connected Solana wallet
+  - Per-wallet configuration: allocation per trade ($50–$1K or % of portfolio),
+    daily budget cap, slippage tolerance (0.5%–5%), execution mode (Auto / Confirm)
+  - Follow button on wallet drawer or Copy Trading page
+  - Copy trade history with PnL tracking (BUY/SELL, amount, USD value, outcome)
+  - Summary stats: Following count, Total Copied Trades, Copy PnL with win rate, Total Volume
+  - Risk disclaimer at bottom
 - **Live Elite Signals panel** — pulsing real-time indicator, BUY/SELL tags,
   wallet address (clickable → opens drawer for that wallet), token chip
   (clickable → toast for Birdeye), "Just now" timestamps. Note about
   "WebSocket push within 5s of block finalization" is shown inline.
 - **🪟 Wallet Detail drawer** (right slide-over, `Esc` to close)
   - Full wallet address as primary monospace title
-  - **Copy Address** (📋) and **Edit Label** (✏️) icon buttons next to it
+  - **Copy Address** (📋) and **Copy Trading CTA** (New v2.1.0)
+    - Follow & Copy button if Pro + Wallet connected
+    - Upgrade button if Free tier
+    - Connect Wallet button if unconnected
   - Full-length address shown verbatim below for transparency
   - **External link badges**: Solscan · Birdeye · Helius
   - **Top 3 Profitable Positions** as token chips with profit highlighted
@@ -264,6 +332,53 @@ smooth-scrolling it into view — a Dune-style dashboard pattern.
   - **Search** by title or token symbol; filter pills
     **All · Bullish · Bearish · High Impact**
   - Hover state on cards and source link
+
+### Updated v2.1.0 Flows
+
+```
+Sidebar: Dashboard (Overview)
+   ├─ Stats Bar
+   │   ├─ Market Sentiment (24h Fear & Greed Index + delta)
+   │   ├─ Active Alerts (high-impact stories in 24h)
+   │   ├─ Active Elite Wallets (traded in 24h vs total)
+   │   └─ Market Momentum (% of top 100 positive in 24h)
+   │
+   ├─ Smart Money Table  ──────── click row ──────┐
+   ├─ Live Signals       ──────── click wallet ──┤────► Wallet Detail Drawer
+   │                                               │      (Esc / ✕ closes)
+   │                                               │      ├─ Copy Trading CTA
+   │                                               │      ├─ Portfolio
+   │                                               │      └─ Txn History
+   └─ Intelligence Feed  ───────► click card ──────┘──► News Detail Drawer
+
+Sidebar: Copy Trading (Pro + Wallet Connected)
+   ├─ Summary Stats (Following, Copied Trades, Copy PnL, Volume)
+   ├─ Elite Wallets List
+   │   ├─ Follow & Copy button (enabled)
+   │   └─ Configuration (allocation, daily cap, slippage, mode)
+   ├─ Copy Trade History (BUY/SELL, wallet, token, PnL, time)
+   └─ Risk Disclaimer
+
+Sidebar: Copy Trading (Free tier OR unconnected)
+   └─ Gate page with upgrade/connect CTA
+
+Sidebar: Settings  ──►  Billing · API Keys · Profile · Notifications
+   ├─ Billing
+   │   ├─ Plan management
+   │   ├─ Subscription plans table
+   │   └─ Billing history
+   ├─ API Keys
+   │   ├─ Create / revoke keys
+   │   └─ Security: CORS & IP whitelist
+   ├─ Profile
+   │   ├─ Account info (username, email, avatar)
+   │   ├─ Linked wallet (connect / disconnect)
+   │   ├─ Current plan (upgrade / downgrade)
+   │   └─ Account Actions (sign out)
+   └─ Notifications
+       ├─ 3 alert types (togglable)
+       └─ 2 delivery channels (browser push, email digest)
+```
 
 ### Flow
 
