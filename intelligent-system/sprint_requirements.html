@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Requirements: IS-339 / IS-366 / IS-368 / IS-365 / IS-367 / IS-370 — Intelligent System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #000000; line-height: 1.6; min-height: 100vh; }
+
+        .app-header {
+            background: #f0f0f0;
+            border-bottom: 2px solid #000;
+            padding: 0 16px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            gap: 12px;
+        }
+        .proto-badge { font-size: 10px; font-weight: 700; color: #999; border: 1px solid #ccc; padding: 3px 8px; border-radius: 3px; }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { width: 36px; height: 36px; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        a.nav-link { font-size: 11px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #000; background: #fff; font-weight: 600; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 24px 20px 48px; }
+
+        .sprint-header {
+            background: #000;
+            color: #fff;
+            padding: 28px 24px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+        .sprint-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .sprint-header .sub { font-size: 13px; color: #ccc; }
+        .sprint-meta { display: flex; gap: 16px; margin-top: 12px; }
+        .sprint-meta span { font-size: 11px; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .task-card {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+        }
+        .task-id { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #666; }
+        .task-title { font-size: 14px; font-weight: 700; margin-left: 12px; }
+        .task-type { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 3px; border: 1px solid; }
+        .type-feature { background: #f0f0f0; border-color: #666; color: #333; }
+        .type-service { background: #fff; border-color: #000; color: #000; }
+        .type-design { background: #f5f5f5; border-color: #999; color: #555; }
+
+        .task-body { padding: 18px; }
+        .task-desc { font-size: 13px; color: #444; margin-bottom: 16px; line-height: 1.6; }
+
+        .ac-section { margin-bottom: 16px; }
+        .ac-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+        .ac-list { list-style: none; padding: 0; }
+        .ac-list li { font-size: 12px; color: #444; padding: 6px 0; border-bottom: 1px solid #f5f5f5; display: flex; align-items: flex-start; gap: 8px; }
+        .ac-list li:last-child { border-bottom: none; }
+        .ac-check { width: 16px; height: 16px; border: 1px solid #ccc; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
+        .ac-check.done { background: #000; border-color: #000; }
+
+        .tech-section { margin-bottom: 16px; }
+        .tech-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 8px; }
+        .tech-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tech-tag { font-size: 11px; font-weight: 600; padding: 4px 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 3px; color: #444; }
+
+        .dep-section { margin-bottom: 16px; }
+        .dep-item { font-size: 12px; color: #666; padding: 4px 0; }
+
+        .priority-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+        .priority-high { background: #000; color: #fff; }
+        .priority-medium { background: #f5f5f5; color: #444; border: 1px solid #ccc; }
+        .priority-low { background: #fff; color: #999; border: 1px solid #ddd; }
+
+        .scope-note {
+            background: #f8f8f8;
+            border: 1px solid #ccc;
+            border-left: 4px solid #000;
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-top: 24px;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .progress-section { margin-bottom: 24px; }
+        .progress-bar { width: 100%; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #000; border-radius: 4px; transition: width .3s; }
+        .progress-meta { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-top: 6px; }
+
+        footer { background: #f0f0f0; border-top: 1px solid #ccc; padding: 14px 20px; text-align: center; font-size: 11px; color: #666; }
+        .footer-links { margin-top: 8px; display: flex; justify-content: center; gap: 16px; }
+        .footer-links a { color: #000; text-decoration: none; font-size: 11px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div style="font-size:14px;font-weight:700;">Unlimit · Intelligent System</div>
+        <div class="header-actions">
+            <span class="proto-badge">Sprint Requirements</span>
+            <a href="index_d.html" class="nav-link">← Current Prototype</a>
+            <a href="index_v6.html" class="nav-link">v6 Prototype →</a>
+            <a href="../index.html" class="nav-link">← Board</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="sprint-header">
+            <h1>Sprint: Intelligent System — New Features</h1>
+            <div class="sub">Widget builder, token discovery, heatmap, AI assistant, copy trading</div>
+            <div class="sprint-meta">
+                <span>6 tasks</span>
+                <span>IS-339 → IS-370</span>
+                <span>Target: v6 prototype</span>
+                <span>Platform: Solana</span>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Sprint Progress</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+            <div class="progress-meta"><span>0 of 6 tasks complete</span><span>Prototype: index_v6.html</span></div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- IS-339 Feature Design: New Widget for Tailor-Made Pages -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-339</span>
+                    <span class="task-title">Feature Design: New Widget for Tailor-Made Pages</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <span class="task-type type-design">DESIGN</span>
+                    <span class="priority-badge priority-medium">Medium</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">
+                    Design and implement a widget system that allows users to compose custom dashboard pages by selecting, arranging, and configuring individual widgets (charts, tables, feeds, heatmaps). Each widget is an isolated, self-contained UI module that can be added, removed, resized, and repositioned on a user's personal page layout. Users can save multiple page configurations and switch between them.
+                </div>
+
+                <div class="ac-section">
+                    <div class="ac-label">Acceptance Criteria</div>
+                    <ul class="ac-list">
+                        <li><div class="ac-check"></div> Widget catalog panel with searchable list of available widget types (Leaderboard, Token Table, Heatmap, Feed, Signals, Chatbot, Portfolio Summary)</li>
+                        <li><div class="ac-check"></div> Drag-and-drop or click-to-add widget placement on a grid-based page canvas</li>
+                        <li><div class="ac-check"></div> Each widget renders independently with its own data source, refresh interval, and configuration options</li>
+                        <li><div class="ac-check"></div> Widget configuration modal per widget type (e.g., Token Table: select columns; Heatmap: select timeframe; Feed: select filters)</li>
+                        <li><div class="ac-check"></div> Page layout persistence — saved per user with unique page name, restorable on login</li>
+                        <li><div class="ac-check"></div> Multiple page support — users can create, rename, duplicate, and delete custom pages</li>
+                        <li><div class="ac-check"></div> Widget removal via close button or context menu; page resets to default layout option available</li>
+                        <li><div class="ac-check"></div> Responsive layout — widgets reflow on smaller screens (≤1024px stacks to single column)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Grid Layout (CSS Grid)</span>
+                        <span class="tech-tag">localStorage</span>
+                        <span class="tech-tag">Widget Registry Pattern</span>
+                        <span class="tech-tag">Per-widget Data Isolation</span>
+                    </div>
+                </div>
+
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-365 (Heatmap widget type) · IS-368 (Feed widget type) · IS-367 (Chatbot widget type) · IS-370 (Copy Trading widget type)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- IS-366 New Token Discovery Service -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-366</span>
+                    <span class="task-title">New Token Discovery Service</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <span class="task-type type-service">SERVICE</span>
+                    <span class="priority-badge priority-high">High</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">
+                    Build a backend service that continuously monitors the Solana blockchain for newly minted tokens (SPL Token-2022 standard), collects metadata (name, symbol, supply, creator, mint authority), and classifies them by risk level (verified / unverified / suspicious). The service exposes an API endpoint for the frontend to query recently discovered tokens with filtering and sorting capabilities.
+                </div>
+
+                <div class="ac-section">
+                    <div class="ac-label">Acceptance Criteria</div>
+                    <ul class="ac-list">
+                        <li><div class="ac-check"></div> Service polls Solana RPC (or Helius DAS API) for new SPL Token-2022 mints at ≤30s intervals</li>
+                        <li><div class="ac-check"></div> Token metadata extraction: name, symbol, decimals, supply, mint authority, creator wallet, creation timestamp</li>
+                        <li><div class="ac-check"></div> Risk classification engine — verified (known creator / audited), unverified (new / no audit), suspicious (honeypot patterns / rug-pull flags)</li>
+                        <li><div class="ac-check"></div> REST API endpoint: GET /api/tokens/discovered with params: limit, offset, risk_level, sort (by_age, by_volume, by_market_cap), search (symbol/name)</li>
+                        <li><div class="ac-check"></div> WebSocket push for real-time new token notifications (payload: token metadata + risk badge + initial liquidity estimate)</li>
+                        <li><div class="ac-check"></div> Data stored in indexed cache (Redis or similar) with TTL — stale entries (>7d without activity) purged</li>
+                        <li><div class="ac-check"></div> Integration with existing Top 100 token pipeline — newly discovered tokens that meet volume/mcap thresholds auto-promoted to Top 100 list</li>
+                    </ul>
+                </div>
+
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Solana RPC / Helius DAS</span>
+                        <span class="tech-tag">SPL Token-2022</span>
+                        <span class="tech-tag">REST API</span>
+                        <span class="tech-tag">WebSocket Push</span>
+                        <span class="tech-tag">Redis Cache</span>
+                        <span class="tech-tag">Risk Classification Engine</span>
+                    </div>
+                </div>
+
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-368 (Discovery Feed UI consumes this service API) · Existing Top 100 token pipeline</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- IS-368 New Token Discovery Feed & Live Monitor -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-368</span>
+                    <span class="task-title">New Token Discovery Feed &amp; Live Monitor</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <span class="task-type type-feature">FEATURE</span>
+                    <span class="priority-badge priority-high">High</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">
+                    Frontend UI that displays a live, auto-updating feed of newly discovered tokens with real-time WebSocket monitoring. The feed shows each new token as a card/row with metadata, risk badge, initial liquidity, and quick-action links (view details, add to watchlist, open in explorer). A sidebar "Live Monitor" panel provides a condensed real-time stream of mint events.
+                </div>
+
+                <div class="ac-section">
+                    <div class="ac-label">Acceptance Criteria</div>
+                    <ul class="ac-list">
+                        <li><div class="ac-check"></div> Discovery Feed page — full-page view with sortable, filterable table of newly discovered tokens (columns: age, symbol, name, risk, liquidity, volume, creator)</li>
+                        <li><div class="ac-check"></div> Risk badge per token: ✓ Verified (green), ⚠ Unverified (amber), ✗ Suspicious (red) — clickable to view risk report details</li>
+                        <li><div class="ac-check"></div> Live Monitor sidebar widget — compact scrollable stream showing newest mints in real-time (auto-updates via WebSocket)</li>
+                        <li><div class="ac-check"></div> Filter pills: All / Verified Only / Unverified / Suspicious; sort by: Newest / Highest Liquidity / Most Volume</li>
+                        <li><div class="ac-check"></div> Search input for filtering by token symbol or name</li>
+                        <li><div class="ac-check"></div> Quick actions per token row: Add to watchlist, View token detail, Open Solscan/SolanaFM explorer link</li>
+                        <li><div class="ac-check"></div> Token detail drawer (extends existing token drawer pattern) — shows full metadata, risk report, initial holders, creator wallet link</li>
+                        <li><div class="ac-check"></div> Live Monitor auto-pauses when user scrolls up (resume on scroll-to-bottom or explicit "Resume" button)</li>
+                        <li><div class="ac-check"></div> Feed entries older than 24h collapsed into "Earlier today" section; older than 7d moved to archive view</li>
+                    </ul>
+                </div>
+
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">IS-366 API + WebSocket</span>
+                        <span class="tech-tag">Existing Token Drawer Pattern</span>
+                        <span class="tech-tag">Existing Signal Card Pattern</span>
+                        <span class="tech-tag">Live-dot + WS indicator</span>
+                    </div>
+                </div>
+
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-366 (Discovery Service API) · Existing token drawer / signal card UI patterns</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- IS-365 Fund Flow Heatmap Visualization (Top 100 Tokens) -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-365</span>
+                    <span class="task-title">Fund Flow Heatmap Visualization (Top 100 Tokens)</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <span class="task-type type-feature">FEATURE</span>
+                    <span class="priority-badge priority-high">High</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">
+                    A heatmap grid visualization showing fund flow intensity for the Top 100 Solana tokens. Each cell represents a token, sized by market cap and colored by net fund flow (inflows = green shades, outflows = red shades, neutral = gray). The heatmap updates in real-time and provides time-range selectors (1h, 4h, 24h, 7d). Hovering a cell shows a tooltip with detailed flow data.
+                </div>
+
+                <div class="ac-section">
+                    <div class="ac-label">Acceptance Criteria</div>
+                    <ul class="ac-list">
+                        <li><div class="ac-check"></div> Heatmap grid layout — 10×10 grid (or treemap layout) where each cell = 1 token from Top 100</li>
+                        <li><div class="ac-check"></div> Cell sizing proportional to market cap (treemap style) or equal-size grid cells with mcap indicator</li>
+                        <li><div class="ac-check"></div> Cell coloring: net fund flow direction — inflow gradient (green: oklch 58% 0.16 152 range), outflow gradient (red: oklch 58% 0.20 25 range), neutral (gray/muted)</li>
+                        <li><div class="ac-check"></div> Time range selector pills: 1h / 4h / 24h / 7d — changes the flow calculation window</li>
+                        <li><div class="ac-check"></div> Hover tooltip per cell: token name, symbol, price, 24h change, net flow ($), inflow ($), outflow ($), flow ratio</li>
+                        <li><div class="ac-check"></div> Click on cell opens existing token detail drawer with fund flow section added</li>
+                        <li><div class="ac-check"></div> Legend bar at top explaining color scale (max inflow → neutral → max outflow) with dollar amounts</li>
+                        <li><div class="ac-check"></div> Real-time refresh indicator (live-dot + "WS" badge) — cells animate on data update</li>
+                        <li><div class="ac-check"></div> Responsive: on ≤768px, heatmap switches to a scrollable list view with color-coded rows</li>
+                    </ul>
+                </div>
+
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">CSS Grid / Treemap Layout</span>
+                        <span class="tech-tag">oklch Color Tokens</span>
+                        <span class="tech-tag">Existing Top 100 Data Pipeline</span>
+                        <span class="tech-tag">Fund Flow Aggregation Service</span>
+                        <span class="tech-tag">WebSocket Real-time Updates</span>
+                    </div>
+                </div>
+
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">Existing Top 100 token data · Fund flow aggregation data source (new backend service or third-party API) · IS-339 (Widget embedding)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- IS-367 AI Market Assistant (RAG Chatbot Service) -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-367</span>
+                    <span class="task-title">AI Market Assistant (RAG Chatbot Service)</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <span class="task-type type-service">SERVICE</span>
+                    <span class="priority-badge priority-high">High</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">
+                    An AI-powered market assistant chatbot that uses Retrieval-Augmented Generation (RAG) to answer user questions about market conditions, specific tokens, wallet activities, and news events. The chatbot pulls from on-chain data (elite wallet transactions, token metrics) and news intelligence (AI-enriched news feed) to provide contextual, data-backed responses. Presented as a floating chat panel accessible from any page.
+                </div>
+
+                <div class="ac-section">
+                    <div class="ac-label">Acceptance Criteria</div>
+                    <ul class="ac-list">
+                        <li><div class="ac-check"></div> Floating chat button (bottom-right corner) — clickable to expand chat panel overlay</li>
+                        <li><div class="ac-check"></div> Chat panel: message input field, conversation history scroll, suggested prompts, close/minimize button</li>
+                        <li><div class="ac-check"></div> Suggested prompt starters: "What's happening with SOL today?", "Which wallets are accumulating JUP?", "Summarize the latest high-impact news", "Compare WIF vs BONK performance"</li>
+                        <li><div class="ac-check"></div> RAG backend retrieves from: (1) on-chain data — elite wallet PnL, recent transactions, token metrics; (2) news intelligence — AI-enriched news feed items, sentiment data</li>
+                        <li><div class="ac-check"></div> Responses include inline data references (clickable links to token pages, wallet drawers, news items)</li>
+                        <li><div class="ac-check"></div> Response formatting: structured answers with headers, bullet points, data callouts, and source attribution</li>
+                        <li><div class="ac-check"></div> Streaming response display (token-by-token as generated) with typing indicator</li>
+                        <li><div class="ac-check"></div> Context awareness — chatbot knows current page context (e.g., if user is on Token page for SOL, pre-fills context)</li>
+                        <li><div class="ac-check"></div> PRO badge on chat button for Free-tier users — prompts upgrade modal on click</li>
+                        <li><div class="ac-check"></div> Chat history persistence per user session (localStorage or backend)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">RAG Architecture</span>
+                        <span class="tech-tag">LLM API (OpenAI / Anthropic / local)</span>
+                        <span class="tech-tag">Vector DB (on-chain + news embeddings)</span>
+                        <span class="tech-tag">Streaming SSE</span>
+                        <span class="tech-tag">Existing Data Sources</span>
+                        <span class="tech-tag">PRO Tier Gate</span>
+                    </div>
+                </div>
+
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">Elite wallet data · News intelligence feed · Token metrics pipeline · IS-339 (Widget embedding) · PRO subscription system</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- IS-370 Copy Trading Feature -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="div:flex;align-items:center;">
+                    <div style="display:flex;align-items:center;">
+                        <span class="task-id">IS-370</span>
+                        <span class="task-title">Copy Trading Feature</span>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <span class="task-type type-feature">FEATURE</span>
+                        <span class="priority-badge priority-high">High</span>
+                    </div>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">
+                    A copy trading system that allows users to select elite wallets to follow and automatically mirror their trades (with configurable parameters: allocation amount, max position size, slippage tolerance, enabled/disabled tokens). Includes a portfolio dashboard showing followed wallets, copy trading history, aggregated PnL, and per-wallet performance metrics. Trades are executed via Jupiter Aggregator API with user's connected wallet.
+                </div>
+
+                <div class="ac-section">
+                    <div class="ac-label">Acceptance Criteria</div>
+                    <ul class="ac-list">
+                        <li><div class="ac-check"></div> Copy Trading page (replaces existing Portfolio nav) — shows followed wallets list with status, allocation, and PnL per wallet</li>
+                        <li><div class="ac-check"></div> Follow wallet action — from any wallet drawer or leaderboard, "Copy Trade" button adds wallet to followed list</li>
+                        <li><div class="ac-check"></div> Copy configuration per followed wallet: allocation amount (SOL/USDC), max position size, slippage tolerance, token whitelist/blacklist, stop-loss threshold</li>
+                        <li><div class="ac-check"></div> Aggregated PnL dashboard — total copy trading PnL, win rate, number of mirrored trades, active positions</li>
+                        <li><div class="ac-check"></div> Copy trading history table — timestamp, source wallet, token, action (BUY/SELL), amount, your amount, status (completed/failed/pending)</li>
+                        <li><div class="ac-check"></div> Trade execution via Jupiter Aggregator API — automatic swap execution when followed wallet makes a trade</li>
+                        <li><div class="ac-check"></div> Real-time signal → trade pipeline: WebSocket detects elite wallet trade → matches copy config → executes swap via Jupiter → records in history</li>
+                        <li><div class="ac-check"></div> Pause/Resume per wallet — user can pause copy trading for a specific wallet without unfollowing</li>
+                        <li><div class="ac-check"></div> PRO badge — Copy Trading is a Pro feature; Free-tier users see upgrade prompt</li>
+                        <li><div class="ac-check"></div> Risk disclosure banner on Copy Trading page — "Copy trading involves risk. Past performance does not guarantee future results."</li>
+                    </ul>
+                </div>
+
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Jupiter Aggregator API</span>
+                        <span class="tech-tag">WebSocket Signal Pipeline</span>
+                        <span class="tech-tag">Existing Copy Trading Nav/UI</span>
+                        <span class="tech-tag">PRO Tier Gate</span>
+                        <span class="tech-tag">Existing Wallet Drawer</span>
+                    </div>
+                </div>
+
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">Jupiter Aggregator API · Elite wallet WebSocket signals · Connected wallet (auth flow) · PRO subscription · IS-339 (Widget embedding)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scope-note">
+            <strong>Sprint Scope Summary:</strong>
+            IS-339 Widget system (design foundation) · IS-366 Token Discovery backend service · IS-368 Discovery Feed & Live Monitor UI · IS-365 Fund Flow Heatmap · IS-367 AI Market Assistant (RAG Chatbot) · IS-370 Copy Trading (full feature). Prototype implementation in <a href="index_v6.html" style="color:#000;font-weight:700;">index_v6.html</a>.
+        </div>
+
+    </div>
+
+    <footer>
+        Intelligent System Sprint Requirements · IS-339 / IS-366 / IS-368 / IS-365 / IS-367 / IS-370 · Low-Fidelity Specification
+        <div class="footer-links">
+            <a href="../index.html">← Project Board</a>
+            <a href="index_d.html">v5 Prototype (index_d)</a>
+            <a href="index_v6.html">v6 Prototype →</a>
+        </div>
+    </footer>
+
+</body>
+</html>

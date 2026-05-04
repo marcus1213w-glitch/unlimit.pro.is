@@ -469,13 +469,7 @@
       z-index: 100;
     }
     .dash-logo { font-size: 20px; font-weight: 700; }
-    .dash-net {
-      font-size: 12px;
-      padding: 4px 12px;
-      border: 1px solid #cccccc;
-      border-radius: 20px;
-      background: #ffffff;
-    }
+    
     .dash-body { max-width: 900px; margin: 0 auto; padding: 28px 20px; }
     .scope-note {
       border: 1px solid #cccccc;
@@ -725,15 +719,7 @@
         <div class="input-hint">3 – 30 characters</div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="wallet-net">Primary Network</label>
-        <select id="wallet-net" class="form-select">
-          <option value="mainnet">Solana Mainnet</option>
-          <option value="devnet">Solana Devnet</option>
-          <option value="testnet">Solana Testnet</option>
-        </select>
-        <div class="input-hint">You can switch clusters later in Settings → Networks.</div>
-      </div>
+      
 
       <div class="btn-row">
         <button class="btn" onclick="go('scr-choose')">Back</button>
@@ -939,10 +925,7 @@
         <span class="sum-key">Wallet Name</span>
         <span class="sum-val" id="cs-name">My Wallet</span>
       </div>
-      <div class="sum-row">
-        <span class="sum-key">Network</span>
-        <span class="sum-val" id="cs-net">Solana Mainnet</span>
-      </div>
+      
       <div class="sum-row">
         <span class="sum-key">Address</span>
         <span class="sum-val" style="font-size:11px;">
@@ -1025,14 +1008,7 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="i-net">Cluster</label>
-        <select id="i-net" class="form-select">
-          <option>Solana Mainnet</option>
-          <option>Solana Devnet</option>
-          <option>Solana Testnet</option>
-        </select>
-      </div>
+      
 
       <div class="form-group">
         <label class="form-label" for="i-name">Wallet Name</label>
@@ -1118,10 +1094,7 @@
         <span class="sum-key">Wallet Name</span>
         <span class="sum-val" id="is-name">My Imported Wallet</span>
       </div>
-      <div class="sum-row">
-        <span class="sum-key">Network</span>
-        <span class="sum-val" id="is-net">Solana Mainnet</span>
-      </div>
+      
       <div class="sum-row">
         <span class="sum-key">Address</span>
         <span class="sum-val" style="font-size:11px;">FMi7…9cXq</span>
@@ -1151,7 +1124,7 @@
         <option id="dash-wallet-name">My Wallet</option>
       </select>
     </div>
-    <div class="dash-net" id="dash-network">Solana Mainnet</div>
+    
     <div style="display:flex;gap:8px;">
       <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="showToast('Notifications — Sprint 4 feature')">🔔</button>
       <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="showToast('Settings — Sprint 4 feature')">⚙</button>
@@ -1172,10 +1145,7 @@
       <div class="balance-lbl">Total Balance (USD)</div>
       <div class="balance-amt">$12,547.32</div>
       <div class="balance-meta">
-        <div class="meta-item">
-          <div class="meta-key">Network</div>
-          <div class="meta-val" id="dash-net-card">Solana Mainnet</div>
-        </div>
+        
         <div class="meta-item">
           <div class="meta-key">Address</div>
           <div class="meta-val" style="font-size:11px;">7xKX…Bb3q</div>
@@ -1504,31 +1474,22 @@
   /* ── Populate success summary ─────────────────────────────── */
   function populateCreateSummary() {
     const nameEl = document.getElementById('wallet-name');
-    const netEl  = document.getElementById('wallet-net');
     const n = document.getElementById('cs-name');
-    const k = document.getElementById('cs-net');
     if (n && nameEl) n.textContent = nameEl.value || 'My Wallet';
-    if (k && netEl)  k.textContent = netEl.options[netEl.selectedIndex]?.text || 'Ethereum Mainnet';
   }
 
   function populateImportSummary() {
     const nameEl = document.getElementById('i-name');
-    const netEl  = document.getElementById('i-net');
     const n = document.getElementById('is-name');
-    const k = document.getElementById('is-net');
     if (n && nameEl) n.textContent = nameEl.value || 'My Imported Wallet';
-    if (k && netEl)  k.textContent = netEl.options[netEl.selectedIndex]?.text || 'Ethereum Mainnet';
   }
 
-  /* ── Onboarding completion ────────────────────────────────── */
   function completeOnboarding(type) {
     try {
       localStorage.setItem('onboarding_complete', 'true');
       localStorage.setItem('wallet_type', type);
       const name = document.getElementById(type === 'create' ? 'wallet-name' : 'i-name')?.value || 'My Wallet';
-      const net  = document.getElementById(type === 'create' ? 'wallet-net' : 'i-net');
       localStorage.setItem('wallet_name', name);
-      localStorage.setItem('wallet_network', net ? net.options[net.selectedIndex]?.text : 'Ethereum Mainnet');
     } catch(e) {}
     /* Redirect to full interactive dashboard (Sprint 2) */
     window.location.href = 'sprint2.html';

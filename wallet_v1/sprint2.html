@@ -86,55 +86,7 @@
         }
         .wd-footer a:hover { background: #fafafa; }
 
-        /* Center: Network pill */
-        .net-zone { position: relative; }
-        .net-pill {
-            display: flex; align-items: center; gap: 6px;
-            padding: 6px 12px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px; font-weight: 700;
-        }
-        .net-pill:hover { background: #f0f0f0; }
-        .net-dot { width: 8px; height: 8px; background: #000; border-radius: 50%; }
-        .net-caret { font-size: 10px; color: #666; }
-
-        /* Network switcher overlay */
-        .net-panel {
-            display: none;
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 50%;
-            transform: translateX(-50%);
-            width: 240px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            z-index: 300;
-        }
-        .net-panel.open { display: block; }
-        .np-header { padding: 10px 14px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #999; border-bottom: 1px solid #eee; }
-        .np-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 11px 14px;
-            cursor: pointer;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        .np-item:last-child { border-bottom: none; }
-        .np-item:hover { background: #fafafa; }
-        .np-item.active { background: #f5f5f5; }
-        .np-dot { width: 10px; height: 10px; border: 2px solid #000; border-radius: 50%; flex-shrink: 0; }
-        .np-dot.filled { background: #000; }
-        .np-info { flex: 1; }
-        .np-name { font-size: 12px; font-weight: 700; }
-        .np-id { font-size: 10px; color: #999; }
-        .np-check { font-size: 14px; }
-        .np-footer { border-top: 1px solid #eee; padding: 10px 14px; }
-        .np-footer a { font-size: 11px; font-weight: 600; color: #000; text-decoration: none; }
-        .np-footer a:hover { text-decoration: underline; }
+        
 
         /* Right: Icon buttons */
         .header-actions { display: flex; align-items: center; gap: 8px; }
@@ -579,33 +531,7 @@
             </div>
         </div>
 
-        <!-- Center: Network pill -->
-        <div class="net-zone">
-            <button class="net-pill" onclick="togglePanel('netPanel')">
-                <span class="net-dot"></span>
-                Solana
-                <span class="net-caret">▾</span>
-            </button>
-
-            <!-- Network switcher -->
-            <div class="net-panel" id="netPanel">
-                <div class="np-header">Select Cluster</div>
-                <div class="np-item active" onclick="switchNetwork(this,'Solana Mainnet')">
-                    <div class="np-dot filled"></div>
-                    <div class="np-info"><div class="np-name">Solana Mainnet</div><div class="np-id">mainnet-beta</div></div>
-                    <span class="np-check">✓</span>
-                </div>
-                <div class="np-item" onclick="switchNetwork(this,'Solana Devnet')">
-                    <div class="np-dot"></div>
-                    <div class="np-info"><div class="np-name">Solana Devnet</div><div class="np-id">devnet</div></div>
-                </div>
-                <div class="np-item" onclick="switchNetwork(this,'Solana Testnet')">
-                    <div class="np-dot"></div>
-                    <div class="np-info"><div class="np-name">Solana Testnet</div><div class="np-id">testnet</div></div>
-                </div>
-                <div class="np-footer"><a href="#">＋ Add Custom RPC Endpoint →</a></div>
-            </div>
-        </div>
+        
 
         <!-- Right: Icon buttons -->
         <div class="header-actions">
@@ -768,7 +694,7 @@
         </div>
 
         <div class="scope-note">
-            <strong>Sprint 2 Scope (WLT-101 – WLT-115):</strong> Phantom/Solflare-inspired app header with wallet selector dropdown, Solana cluster switcher (Mainnet/Devnet/Testnet), notification bell with pending signature badge, balance card (SOL + USD, 24h change, address copy), sortable SPL token list with filter, 3-step Send modal (recipient → Solana priority fee tiers → confirm + broadcast), Receive modal with QR placeholder, Jupiter Swap modal. Sprint 3 adds full TX history, filters, analytics, and settings.
+            <strong>Sprint 2 Scope (WLT-101 – WLT-115):</strong> Phantom/Solflare-inspired app header with wallet selector dropdown, notification bell with pending signature badge, balance card (SOL + USD, 24h change, address copy), sortable SPL token list with filter, 3-step Send modal (recipient → Solana priority fee tiers → confirm + broadcast), Receive modal with QR placeholder, Jupiter Swap modal. Sprint 3 adds full TX history, filters, analytics, and settings.
         </div>
     </div>
 
@@ -904,14 +830,7 @@
                 <button class="modal-close" onclick="closeModal('receiveModal')">×</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Cluster</label>
-                    <select class="form-input">
-                        <option>Solana Mainnet</option>
-                        <option>Solana Devnet</option>
-                        <option>Solana Testnet</option>
-                    </select>
-                </div>
+                
                 <!-- QR Code placeholder (20×20 CSS checkerboard) -->
                 <div class="qr-grid" id="qrGrid"></div>
                 <div class="form-group">
@@ -1132,28 +1051,7 @@
     // Close open panels on outside click
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.wallet-zone')) document.getElementById('walletDropdown').classList.remove('open');
-        if (!e.target.closest('.net-zone')) document.getElementById('netPanel').classList.remove('open');
     });
-
-    // ── Network switcher ───────────────────────────────────────
-    function switchNetwork(item, name) {
-        document.querySelectorAll('.np-item').forEach(i => {
-            i.classList.remove('active');
-            i.querySelector('.np-dot').classList.remove('filled');
-            const ck = i.querySelector('.np-check');
-            if (ck) ck.remove();
-        });
-        item.classList.add('active');
-        item.querySelector('.np-dot').classList.add('filled');
-        if (!item.querySelector('.np-check')) {
-            const ck = document.createElement('span');
-            ck.className = 'np-check'; ck.textContent = '✓';
-            item.appendChild(ck);
-        }
-        document.querySelector('.net-pill').innerHTML = '<span class="net-dot"></span>' + name + ' <span class="net-caret">▾</span>';
-        document.getElementById('netPanel').classList.remove('open');
-        showToast('Switched to ' + name);
-    }
 
     // ── Copy address ───────────────────────────────────────────
     function copyAddr() {
