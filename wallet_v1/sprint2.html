@@ -1,1248 +1,291 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint 2: Core Solana Wallet — Low-Fidelity Prototype</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #000000; line-height: 1.5; min-height: 100vh; }
-
-        /* ── App Header (MetaMask-style) ─────────────────────── */
-        .app-header {
-            background: #f0f0f0;
-            border-bottom: 2px solid #000000;
-            padding: 0 16px;
-            height: 52px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 200;
-            gap: 12px;
-        }
-
-        /* Left: Wallet selector */
-        .wallet-zone { display: flex; align-items: center; gap: 0; position: relative; }
-        .wallet-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 10px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .wallet-btn:hover { background: #f5f5f5; }
-        .wallet-avatar {
-            width: 26px; height: 26px;
-            background: #000000;
-            color: #ffffff;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 700;
-            flex-shrink: 0;
-        }
-        .wallet-caret { font-size: 10px; color: #666; }
-
-        /* Wallet dropdown panel */
-        .wallet-dropdown {
-            display: none;
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            width: 260px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            z-index: 300;
-        }
-        .wallet-dropdown.open { display: block; }
-        .wd-header { padding: 10px 14px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #999; border-bottom: 1px solid #eee; }
-        .wd-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px;
-            cursor: pointer;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        .wd-item:hover { background: #fafafa; }
-        .wd-item.active { background: #f5f5f5; }
-        .wd-info { flex: 1; }
-        .wd-name { font-size: 12px; font-weight: 700; }
-        .wd-addr { font-size: 10px; color: #999; font-family: 'Courier New', monospace; }
-        .wd-check { font-size: 14px; }
-        .wd-footer { border-top: 1px solid #eee; }
-        .wd-footer a {
-            display: flex; align-items: center; gap: 8px;
-            padding: 10px 14px;
-            font-size: 12px; font-weight: 600;
-            color: #000; text-decoration: none;
-            border-bottom: 1px solid #f5f5f5;
-        }
-        .wd-footer a:hover { background: #fafafa; }
-
-        
-
-        /* Right: Icon buttons */
-        .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn {
-            position: relative;
-            width: 36px; height: 36px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .icon-btn:hover { background: #f0f0f0; }
-        .badge-count {
-            position: absolute;
-            top: -4px; right: -4px;
-            background: #000;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 1px 5px;
-            border-radius: 10px;
-            min-width: 16px;
-            text-align: center;
-        }
-        .proto-badge {
-            font-size: 10px;
-            font-weight: 700;
-            color: #999;
-            border: 1px solid #cccccc;
-            padding: 3px 8px;
-            border-radius: 3px;
-        }
-
-        /* ── Page layout ─────────────────────────────────────── */
-        .container { max-width: 860px; margin: 0 auto; padding: 24px 20px 48px; }
-        .page-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #555; margin-bottom: 20px; }
-
-        /* ── Balance card ────────────────────────────────────── */
-        .balance-card {
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        .bal-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 4px; }
-        .bal-value { font-size: 32px; font-weight: 700; font-family: 'Courier New', monospace; margin-bottom: 4px; }
-        .bal-change { font-size: 12px; color: #333; margin-bottom: 12px; }
-        .bal-change .up { font-weight: 700; }
-        .addr-row {
-            display: flex; align-items: center; gap: 8px;
-            padding: 8px 10px;
-            background: #f5f5f5;
-            border: 1px solid #e0e0e0;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            margin-bottom: 16px;
-        }
-        .addr-row span { flex: 1; }
-        .copy-btn {
-            background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 4px;
-        }
-        .copy-btn:hover { background: #e0e0e0; border-radius: 3px; }
-
-        /* ── Quick actions ────────────────────────────────────── */
-        .action-row {
-            display: flex; gap: 8px; flex-wrap: wrap;
-        }
-        .action-btn {
-            flex: 1; min-width: 80px;
-            padding: 10px 8px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px; font-weight: 700;
-            text-align: center;
-        }
-        .action-btn:hover:not(:disabled) { background: #f5f5f5; }
-        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .action-btn .ab-icon { font-size: 18px; display: block; margin-bottom: 3px; }
-
-        /* ── Asset section ────────────────────────────────────── */
-        .section-card {
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-        .section-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px;
-            border-bottom: 1px solid #eeeeee;
-            background: #fafafa;
-        }
-        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .section-actions { display: flex; gap: 8px; align-items: center; }
-        .asset-filter-input {
-            padding: 5px 8px;
-            border: 1px solid #cccccc;
-            border-radius: 3px;
-            font-size: 11px;
-            width: 140px;
-        }
-        .asset-filter-input:focus { outline: none; border-color: #000; }
-        .btn-small {
-            padding: 5px 10px;
-            background: #000;
-            color: #fff;
-            border: 1px solid #000;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .btn-small:hover { background: #333; }
-        .btn-small-outline {
-            padding: 5px 10px;
-            background: #fff;
-            color: #000;
-            border: 1px solid #cccccc;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .btn-small-outline:hover { background: #f5f5f5; }
-        .asset-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .asset-tbl th {
-            background: #f5f5f5;
-            border-bottom: 1px solid #cccccc;
-            padding: 9px 14px;
-            text-align: left;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #666;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-        }
-        .asset-tbl th:hover { background: #eeeeee; }
-        .asset-tbl th .sort-arrow { margin-left: 4px; opacity: 0.4; }
-        .asset-tbl th.sorted .sort-arrow { opacity: 1; }
-        .asset-tbl td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; }
-        .asset-tbl tr:last-child td { border-bottom: none; }
-        .asset-tbl tr:hover td { background: #fafafa; }
-        .asset-name { font-weight: 700; }
-        .asset-ticker { font-size: 10px; color: #999; display: block; }
-        .asset-change { font-size: 11px; }
-        .asset-change.up { font-weight: 700; }
-        .asset-change.down { font-style: italic; }
-
-        /* ── Pending TX banner ───────────────────────────────── */
-        .pending-banner {
-            background: #f5f5f5;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            padding: 10px 14px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-        }
-        .pending-banner .pb-dot { width: 8px; height: 8px; background: #000; border-radius: 50%; animation: pulse 1.5s infinite; flex-shrink: 0; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        .pending-banner .pb-text { flex: 1; }
-        .pending-banner .pb-actions { display: flex; gap: 6px; }
-
-        /* ── TX list ─────────────────────────────────────────── */
-        .tx-list { }
-        .tx-item {
-            display: grid;
-            grid-template-columns: 36px 1fr auto auto;
-            gap: 10px;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-        }
-        .tx-item:last-child { border-bottom: none; }
-        .tx-item:hover { background: #fafafa; }
-        .tx-icon-wrap {
-            width: 36px; height: 36px;
-            border: 1px solid #cccccc;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .tx-details { }
-        .tx-type { font-size: 12px; font-weight: 700; }
-        .tx-sub { font-size: 10px; color: #999; font-family: 'Courier New', monospace; }
-        .tx-amount { font-size: 12px; font-weight: 700; font-family: 'Courier New', monospace; text-align: right; }
-        .tx-status-pill {
-            font-size: 10px; font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 12px;
-            border: 1px solid;
-            white-space: nowrap;
-        }
-        .status-confirmed { background: #f0f0f0; border-color: #666; color: #333; }
-        .status-pending { background: #fff; border-color: #000; color: #000; }
-        .status-failed { background: #f5f5f5; border-color: #999; color: #666; text-decoration: line-through; }
-
-        /* ── Scope note ──────────────────────────────────────── */
-        .scope-note {
-            background: #f8f8f8;
-            border: 1px solid #cccccc;
-            border-left: 4px solid #000;
-            border-radius: 4px;
-            padding: 10px 14px;
-            margin-top: 24px;
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
-        /* ── Modals ──────────────────────────────────────────── */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-box {
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            width: 90%;
-            max-width: 440px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        }
-        .modal-head {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 18px;
-            border-bottom: 1px solid #eeeeee;
-        }
-        .modal-title { font-size: 15px; font-weight: 700; }
-        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #999; line-height: 1; }
-        .modal-body { padding: 18px; }
-        .modal-foot {
-            padding: 14px 18px;
-            border-top: 1px solid #eeeeee;
-            display: flex; gap: 8px; justify-content: flex-end;
-        }
-        .modal-foot.full .btn-primary { flex: 1; }
-
-        /* Step indicator */
-        .step-indicator {
-            display: flex; gap: 6px; align-items: center; justify-content: center;
-            margin-bottom: 18px;
-        }
-        .step-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            border: 2px solid #cccccc;
-            background: #fff;
-        }
-        .step-dot.active { background: #000; border-color: #000; }
-        .step-dot.done { background: #555; border-color: #555; }
-        .step-label { font-size: 11px; color: #999; text-align: center; margin-bottom: 14px; }
-
-        /* Form elements */
-        .form-group { margin-bottom: 14px; }
-        .form-label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #555; margin-bottom: 5px; letter-spacing: 0.3px; }
-        .form-input {
-            width: 100%; padding: 9px 10px;
-            border: 1px solid #cccccc; border-radius: 3px;
-            font-size: 12px; font-family: inherit;
-        }
-        .form-input:focus { outline: none; border-color: #000; }
-        .form-input:disabled { background: #f5f5f5; color: #999; }
-        .form-row { display: flex; gap: 8px; align-items: flex-end; }
-        .form-row .form-group { flex: 1; }
-        .form-hint { font-size: 10px; color: #999; margin-top: 4px; }
-        .form-note {
-            background: #f5f5f5; border: 1px solid #e0e0e0;
-            border-radius: 3px; padding: 8px 10px;
-            font-size: 11px; color: #555; margin-bottom: 14px;
-        }
-
-        /* Gas tier cards */
-        .gas-tiers { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-        .gas-tier {
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            padding: 12px 14px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .gas-tier:hover { background: #fafafa; }
-        .gas-tier.selected { border: 2px solid #000; background: #fafafa; }
-        .gas-tier-left { }
-        .gas-tier-name { font-size: 13px; font-weight: 700; }
-        .gas-tier-time { font-size: 11px; color: #999; }
-        .gas-tier-cost { font-size: 13px; font-weight: 700; font-family: 'Courier New', monospace; }
-
-        /* Receive QR */
-        .qr-grid {
-            display: grid;
-            grid-template-columns: repeat(20, 1fr);
-            gap: 1px;
-            width: 160px; height: 160px;
-            margin: 0 auto 14px;
-            border: 2px solid #000;
-            padding: 8px;
-            background: #ffffff;
-        }
-        .qr-cell { background: #ffffff; }
-        .qr-cell.b { background: #000000; }
-
-        /* Confirm summary */
-        .confirm-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 12px;
-        }
-        .confirm-row:last-child { border-bottom: none; }
-        .confirm-label { color: #666; }
-        .confirm-value { font-weight: 700; font-family: 'Courier New', monospace; font-size: 11px; }
-        .confirm-total { font-size: 14px; font-weight: 700; }
-
-        /* TX detail */
-        .tx-detail-row {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 12px;
-        }
-        .tx-detail-row:last-child { border-bottom: none; }
-        .tx-detail-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #999; margin-bottom: 2px; }
-        .tx-detail-value { font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; }
-        .tx-detail-value.mono-lg { font-size: 16px; font-weight: 700; }
-
-        /* Broadcast states */
-        .broadcast-pending { text-align: center; padding: 24px 0; }
-        .broadcast-spinner { font-size: 32px; animation: spin 1s linear infinite; display: block; margin-bottom: 10px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .broadcast-success { text-align: center; padding: 20px 0; }
-        .broadcast-success .bs-icon { font-size: 40px; margin-bottom: 8px; }
-        .broadcast-success .bs-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-        .broadcast-success .bs-hash { font-family: 'Courier New', monospace; font-size: 10px; color: #666; }
-
-        /* Buttons */
-        .btn-primary {
-            padding: 9px 18px;
-            background: #000; color: #fff;
-            border: 1px solid #000; border-radius: 3px;
-            cursor: pointer; font-size: 12px; font-weight: 700;
-        }
-        .btn-primary:hover { background: #333; }
-        .btn-secondary {
-            padding: 9px 18px;
-            background: #fff; color: #000;
-            border: 1px solid #cccccc; border-radius: 3px;
-            cursor: pointer; font-size: 12px; font-weight: 600;
-        }
-        .btn-secondary:hover { background: #f5f5f5; }
-        .btn-link {
-            background: none; border: none;
-            font-size: 11px; color: #000;
-            cursor: pointer; text-decoration: underline; padding: 0;
-        }
-
-        /* Swap */
-        .swap-arrow-btn {
-            display: block; width: 32px; height: 32px;
-            margin: -4px auto;
-            background: #fff; border: 1px solid #cccccc;
-            border-radius: 50%;
-            font-size: 16px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1; position: relative;
-        }
-        .swap-arrow-btn:hover { background: #f0f0f0; }
-        .rate-row {
-            background: #f5f5f5; border: 1px solid #e0e0e0;
-            border-radius: 3px; padding: 8px 10px;
-            font-size: 11px; display: flex; justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        /* Footer */
-        footer {
-            background: #f0f0f0; border-top: 1px solid #cccccc;
-            padding: 14px 20px; text-align: center;
-            font-size: 11px; color: #666;
-        }
-        .footer-links { margin-top: 8px; display: flex; justify-content: center; gap: 16px; }
-        .footer-links a { color: #000; text-decoration: none; font-size: 11px; font-weight: 600; }
-        .footer-links a:hover { text-decoration: underline; }
-
-        @media (max-width: 600px) {
-            .action-row .action-btn .ab-icon { display: none; }
-            .asset-tbl th:nth-child(4), .asset-tbl td:nth-child(4) { display: none; }
-            .tx-item { grid-template-columns: 36px 1fr auto; }
-            .tx-item .tx-status-pill { display: none; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlimit Wallet — Sprint 2: Invisible Token Manager</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;color:#000;line-height:1.5;min-height:100vh}
+.app-header{background:#f0f0f0;border-bottom:2px solid #000;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;gap:12px}
+.wallet-zone{display:flex;align-items:center;position:relative}
+.wallet-btn{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:13px;font-weight:700}
+.wallet-btn:hover{background:#f5f5f5}
+.wallet-avatar{width:26px;height:26px;background:#000;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.wallet-caret{font-size:10px;color:#666}
+.wallet-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;width:260px;background:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:300}
+.wallet-dropdown.open{display:block}
+.wd-header{padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;color:#999;border-bottom:1px solid #eee}
+.wd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5}
+.wd-item:hover{background:#fafafa}.wd-item.active{background:#f5f5f5}
+.wd-info{flex:1}.wd-name{font-size:12px;font-weight:700}.wd-addr{font-size:10px;color:#999;font-family:'Courier New',monospace}
+.wd-footer a{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;font-weight:600;color:#000;text-decoration:none;border-bottom:1px solid #f5f5f5}
+.wd-footer a:hover{background:#fafafa}
+.header-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#000}
+.icon-btn:hover{background:#f5f5f5}
+.cluster-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#fff;border:1px solid #ccc;font-size:11px;font-weight:700;color:#000}
+.cluster-dot{width:6px;height:6px;border-radius:50%;background:#000}
+.container{max-width:600px;margin:0 auto;padding:24px 20px 48px}
+.balance-card{background:#fff;border:1px solid #ccc;border-radius:6px;padding:24px;margin-bottom:16px}
+.bal-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:4px}
+.bal-value{font-size:36px;font-weight:700;font-family:'Courier New',monospace;margin-bottom:4px}
+.bal-usd{font-size:16px;color:#666;margin-bottom:8px}
+.bal-change{font-size:12px;margin-bottom:14px}
+.bal-up{color:#444}.bal-down{color:#444}
+.addr-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-family:'Courier New',monospace;font-size:11px;color:#666;margin-bottom:16px}
+.addr-row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;color:#999}
+.copy-btn:hover{color:#000}
+.action-row{display:flex;gap:8px;flex-wrap:wrap}
+.action-btn{flex:1;min-width:80px;padding:12px 8px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;text-align:center}
+.action-btn:hover:not(:disabled){background:#f0f0f0}
+.action-btn .ab-icon{font-size:20px;display:block;margin-bottom:3px}
+.section-card{background:#fff;border:1px solid #ccc;border-radius:6px;overflow:hidden;margin-bottom:16px}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee;background:#fafafa}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.asset-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.asset-tbl th{background:#f5f5f5;border-bottom:1px solid #ccc;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:#666;white-space:nowrap}
+.asset-tbl td{padding:12px 14px;border-bottom:1px solid #f0f0f0}
+.asset-tbl tr:last-child td{border-bottom:none}
+.asset-tbl tr:hover td{background:#fafafa}
+.asset-name{font-weight:700}
+.asset-ticker{font-size:10px;color:#999;display:block}
+.asset-change-up{color:#444}.asset-change-down{color:#444}
+.auto-prov-banner{padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:4px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:11px;color:#666}
+.auto-prov-banner .ap-icon{font-size:16px;color:#000}
+.auto-prov-banner strong{color:#000}
+.activity-list{list-style:none}
+.activity-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;cursor:pointer}
+.activity-item:hover{background:#fafafa}
+.activity-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid #000}
+.aicon-send{background:#f0f0f0}.aicon-receive{background:#f0f0f0}.aicon-swap{background:#f0f0f0}.aicon-auto{background:#f0f0f0}
+.activity-info{flex:1}.activity-type{font-size:12px;font-weight:700}.activity-amount{font-size:11px;color:#666}
+.activity-status{font-size:10px}.status-confirmed{color:#444}.status-pending{color:#999;font-style:italic}
+.activity-right{text-align:right}.activity-value{font-size:13px;font-weight:700}.activity-fiat{font-size:10px;color:#999}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.3)}
+.modal.active{display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-content{background:#fff;border:1px solid #ccc;border-radius:6px;padding:0;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px 14px;border-bottom:1px solid #eee}
+.modal-title{font-weight:700;font-size:16px}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#999}.modal-close:hover{color:#000}
+.modal-body{padding:20px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#444;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:4px;font-size:13px;font-family:inherit;background:#fff;color:#000}
+.form-input:focus,.form-select:focus{outline:none;border-color:#000}
+.btn-primary{width:100%;padding:12px;background:#000;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-primary:hover{background:#333}.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-secondary{width:100%;padding:12px;background:#fff;color:#000;border:1px solid #ccc;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-secondary:hover{background:#f5f5f5}
+.btn-small{padding:6px 12px;background:#000;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700}.btn-small:hover{background:#333}
+.btn-small-outline{padding:6px 12px;background:#fff;color:#000;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600}.btn-small-outline:hover{background:#f5f5f5}
+.btn-row{display:flex;gap:10px}.btn-row .btn-primary,.btn-row .btn-secondary{flex:1}
+.success-icon{width:60px;height:60px;border-radius:50%;background:#000;color:#fff;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.text-center{text-align:center}
+.gas-tiers{display:flex;gap:8px;margin-bottom:14px}
+.gas-tier{flex:1;padding:12px 10px;background:#fff;border:1.5px solid #ccc;border-radius:4px;cursor:pointer;text-align:center}
+.gas-tier:hover{border-color:#999}.gas-tier.selected{border-color:#000;background:#f5f5f5}
+.gas-tier-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.gas-tier-time{font-size:10px;color:#666;margin-bottom:2px}
+.gas-tier-cost{font-size:10px;color:#999}
+.gas-tier.best::after{content:'RECOMMENDED';display:block;font-size:9px;font-weight:700;margin-top:2px}
+.broadcast-anim{text-align:center;padding:30px}
+.broadcast-spinner{width:48px;height:48px;margin:0 auto 16px;border:3px solid #eee;border-top-color:#000;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.broadcast-text{font-size:13px;color:#666}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.nav-link{padding:6px 12px;background:#fff;border:1px solid #ccc;border-radius:4px;font-size:11px;font-weight:600;color:#000;text-decoration:none}.nav-link:hover{background:#f5f5f5}
+.qr-grid{display:grid;grid-template-columns:repeat(21,1fr);gap:2px;margin:0 auto;width:180px;height:180px}
+.qr-cell{aspect-ratio:1;border-radius:2px}.qr-cell.b{background:#000}
+.auto-created-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;background:#f5f5f5;border:1px solid #ccc;font-size:9px;font-weight:700;color:#000}
+.tx-hint{font-size:10px;margin-left:6px}
+.tx-hint-green{color:#444}
+.zero-failure-info{padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:4px;font-size:11px;color:#666;line-height:1.6;margin-bottom:14px}
+.zero-failure-info strong{color:#000}
+.token-sort{background:none;border:none;cursor:pointer;color:#999;font-size:10px;font-weight:700;text-transform:uppercase}.token-sort:hover{color:#000}.token-sort.active{color:#000;text-decoration:underline}
+</style>
 </head>
 <body>
 
-    <!-- ────────────────────────────────────────────────────── -->
-    <!-- APP HEADER (MetaMask-style)                           -->
-    <!-- ────────────────────────────────────────────────────── -->
-    <div class="app-header">
+<header class="app-header">
+<div class="wallet-zone">
+<button class="wallet-btn" onclick="document.getElementById('walletDropdown').classList.toggle('open')">
+<div class="wallet-avatar">U</div><span>Unlimit Wallet</span><span class="wallet-caret">▾</span>
+</button>
+<div class="wallet-dropdown" id="walletDropdown">
+<div class="wd-header">My Wallets</div>
+<div class="wd-item active"><div class="wallet-avatar">U</div><div class="wd-info"><div class="wd-name">Unlimit Wallet</div><div class="wd-addr">DRos...xk8r</div></div><span>✓</span></div>
+<div class="wd-footer"><a href="sprint1.html">+ Add / Import Wallet</a></div>
+</div>
+</div>
+<div class="header-actions">
+<span class="cluster-pill"><span class="cluster-dot"></span> Mainnet</span>
+<button class="icon-btn" onclick="showToast('0 new alerts')">🔔</button>
+<button class="icon-btn" onclick="window.location.href='sprint3.html'" title="Intelligence">⚙</button>
+</div>
+</header>
 
-        <!-- Left: Wallet selector -->
-        <div class="wallet-zone">
-            <button class="wallet-btn" onclick="togglePanel('walletDropdown')">
-                <div class="wallet-avatar">MW</div>
-                My Wallet
-                <span class="wallet-caret">▾</span>
-            </button>
+<div class="container">
 
-            <!-- Wallet dropdown panel -->
-            <div class="wallet-dropdown" id="walletDropdown">
-                <div class="wd-header">My Wallets</div>
-                <div class="wd-item active">
-                    <div class="wallet-avatar" style="width:28px;height:28px;font-size:9px;">MW</div>
-                    <div class="wd-info">
-                        <div class="wd-name">My Wallet</div>
-                        <div class="wd-addr">7xKX...Bb3q</div>
-                    </div>
-                    <span class="wd-check">✓</span>
-                </div>
-                <div class="wd-item">
-                    <div class="wallet-avatar" style="width:28px;height:28px;font-size:9px;background:#555;">TW</div>
-                    <div class="wd-info">
-                        <div class="wd-name">Trading Wallet</div>
-                        <div class="wd-addr">FMi7...9cXq</div>
-                    </div>
-                </div>
-                <div class="wd-footer">
-                    <a href="sprint1.html">＋ Create New Wallet</a>
-                    <a href="sprint1.html">↓ Import Wallet</a>
-                    <a href="sprint1.html">👁 Watch an Address</a>
-                </div>
-            </div>
-        </div>
+<div class="balance-card">
+<div class="bal-label">Total Balance</div>
+<div class="bal-value">24.42 SOL</div>
+<div class="bal-usd">≈ $4,135.37</div>
+<div class="bal-change bal-up">▲ +2.4% (24h)</div>
+<div class="addr-row"><span>DRosGtEVv9XPxXBk8rPJmGgqGPY4dWUXa3YEeUUkxK8r</span><button class="copy-btn" onclick="navigator.clipboard.writeText('DRosGtEVv9XPxXBk8rPJmGgqGPY4dWUXa3YEeUUkxK8r');showToast('Address copied')">📋</button></div>
+<div class="action-row">
+<button class="action-btn" onclick="openModal('sendModal')"><span class="ab-icon">↑</span> Send</button>
+<button class="action-btn" onclick="openModal('receiveModal')"><span class="ab-icon">↓</span> Receive</button>
+<button class="action-btn" onclick="openModal('swapModal')"><span class="ab-icon">⇄</span> Swap</button>
+<button class="action-btn" onclick="showToast('Buy — coming in Sprint 3')"><span class="ab-icon">💳</span> Buy</button>
+</div>
+</div>
 
-        
+<div class="auto-prov-banner">
+<span class="ap-icon">⟳</span>
+<div><strong>Auto-Provisioning Active</strong> — New tokens are detected and ATA is created instantly. No "Add Token" button needed.</div>
+</div>
 
-        <!-- Right: Icon buttons -->
-        <div class="header-actions">
-            <button class="icon-btn" onclick="openModal('pendingPanel')" title="Pending Transactions">
-                ⏳
-                <span class="badge-count">1</span>
-            </button>
-            <button class="icon-btn" title="Settings">⚙</button>
-            <span class="proto-badge">Sprint 2</span>
-            <a href="management.html" class="btn-secondary" style="font-size:11px;padding:6px 10px;border:1px solid #ccc;border-radius:4px;text-decoration:none;color:#000;background:#fff;font-weight:600;">← Dashboard</a>
-        </div>
-    </div>
+<div class="section-card">
+<div class="section-header">
+<span class="section-title">Your Assets</span>
+<div style="display:flex;gap:10px">
+<button class="token-sort active" onclick="sortAssets('value',this)">By Value ▼</button>
+<button class="token-sort" onclick="sortAssets('name',this)">By Name</button>
+</div>
+</div>
+<table class="asset-tbl">
+<thead><tr><th>Asset</th><th style="text-align:right">Balance</th><th style="text-align:right">Value</th><th style="text-align:right">24h</th></tr></thead>
+<tbody id="asset-table-body"></tbody>
+</table>
+</div>
 
-    <!-- ────────────────────────────────────────────────────── -->
-    <!-- MAIN CONTENT                                          -->
-    <!-- ────────────────────────────────────────────────────── -->
-    <div class="container">
-        <p class="page-title">Wallet Dashboard — Sprint 2: Core Solana Wallet</p>
+<div class="section-card">
+<div class="section-header">
+<span class="section-title">Recent Activity</span>
+<a href="sprint3.html" class="btn-small-outline">View All →</a>
+</div>
+<div class="activity-list" id="activity-list"></div>
+</div>
 
-        <!-- Pending TX banner -->
-        <div class="pending-banner">
-            <div class="pb-dot"></div>
-            <div class="pb-text">
-                <strong>1 Pending Transaction</strong> — Sending 2.50 SOL · 2 min ago
-            </div>
-            <div class="pb-actions">
-                <button class="btn-small-outline" onclick="openModal('pendingPanel')">View</button>
-                <button class="btn-small" onclick="openModal('sendModal')">Speed Up</button>
-            </div>
-        </div>
+<div class="nav-links">
+<a href="management.html" class="nav-link">← Dashboard</a>
+<a href="sprint1.html" class="nav-link">← Onboarding</a>
+<a href="sprint3.html" class="nav-link">Intelligence →</a>
+<a href="sprint4.html" class="nav-link">Social Trading →</a>
+</div>
+</div>
 
-        <!-- Balance card -->
-        <div class="balance-card">
-            <div class="bal-label">Total Portfolio Value</div>
-            <div class="bal-value">$12,547.32</div>
-            <div class="bal-change">▲ <span class="up">+$234.50 (+1.90%)</span> · past 24 hours</div>
-            <div class="addr-row">
-                <span id="walletAddr">7xKX7PmFdRxGLXsP9aQ5dBkN3sYbFe4Wc…Bb3q</span>
-                <button class="copy-btn" onclick="copyAddr()" title="Copy address">⎘</button>
-            </div>
-            <div class="action-row">
-                <button class="action-btn" onclick="openModal('sendModal')">
-                    <span class="ab-icon">↑</span>Send
-                </button>
-                <button class="action-btn" onclick="openModal('receiveModal')">
-                    <span class="ab-icon">↓</span>Receive
-                </button>
-                <button class="action-btn" onclick="openModal('swapModal')">
-                    <span class="ab-icon">⇄</span>Swap
-                </button>
-                <button class="action-btn" onclick="showToast('Staking — Sprint 4 feature')">
-                    <span class="ab-icon">◎</span>Stake
-                </button>
-                <button class="action-btn" disabled>
-                    <span class="ab-icon">$</span>Buy
-                </button>
-            </div>
-        </div>
+<!-- MODAL: Send -->
+<div class="modal" id="sendModal"><div class="modal-content">
+<div class="modal-header"><div class="modal-title" id="sendTitle">Send — Step 1 of 3</div><button class="modal-close" onclick="closeModal('sendModal');resetSend()">✕</button></div>
+<div class="modal-body">
+<div id="send-step1">
+<div class="form-group"><label class="form-label">Recipient Address</label><input type="text" class="form-input" id="send-addr" placeholder="Solana address or .sol domain"></div>
+<div class="form-group"><label class="form-label">Asset</label><select class="form-select" id="send-asset"><option>SOL</option><option>USDC</option><option>USDT</option><option>BONK</option></select></div>
+<div class="form-group"><label class="form-label">Amount</label><input type="text" class="form-input" id="send-amount" placeholder="0.00"></div>
+<div class="zero-failure-info"><strong>✓ Zero-Failure Guarantee</strong> — If recipient doesn''t have a token box, we auto-create one. Your transfer will never fail due to missing ATA.</div>
+</div>
+<div id="send-step2" style="display:none">
+<label class="form-label">Choose Priority</label>
+<div class="gas-tiers">
+<div class="gas-tier" onclick="selectGas(this,'Slow')"><div class="gas-tier-name">🐢 Slow</div><div class="gas-tier-time">~15s</div><div class="gas-tier-cost">0.000005 SOL</div></div>
+<div class="gas-tier selected best" onclick="selectGas(this,'Medium')"><div class="gas-tier-name">🚀 Medium</div><div class="gas-tier-time">~5s</div><div class="gas-tier-cost">0.00001 SOL</div></div>
+<div class="gas-tier" onclick="selectGas(this,'Fast')"><div class="gas-tier-name">⚡ Fast</div><div class="gas-tier-time">~1s</div><div class="gas-tier-cost">0.00005 SOL</div></div>
+</div>
+</div>
+<div id="send-step3" style="display:none">
+<div class="text-center" style="margin-bottom:16px">
+<div style="font-size:24px;font-weight:700;margin-bottom:4px" id="confirm-amount">0.5 SOL</div>
+<div style="font-size:12px;color:#666">To: <span id="confirm-addr" style="font-family:'Courier New',monospace"></span></div>
+</div>
+<div style="padding:10px 14px;background:#f5f5f5;border-radius:4px;margin-bottom:12px;font-size:12px">
+<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#666">Gas Fee</span><span id="confirm-gas-cost">0.00001 SOL</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#666">Priority</span><span id="confirm-gas-label">Medium</span></div>
+<div style="display:flex;justify-content:space-between"><span style="color:#666">ATA Check</span><span>✓ Auto-create if needed</span></div>
+</div>
+</div>
+<div id="send-broadcasting" style="display:none"><div class="broadcast-anim"><div class="broadcast-spinner"></div><div class="broadcast-text">Broadcasting transaction...</div><div style="font-size:10px;color:#999;margin-top:4px">Checking recipient ATA · Bundling create if needed</div></div></div>
+<div id="send-success" style="display:none"><div class="text-center"><div class="success-icon">✓</div><div style="font-size:16px;font-weight:700;margin-bottom:4px">Sent Successfully</div><div style="font-size:12px;color:#666">Transaction confirmed on Solana</div><div style="font-size:10px;margin-top:6px">✓ Recipient ATA auto-created</div></div></div>
+<div class="btn-row" style="margin-top:16px" id="sendFoot">
+<button class="btn-secondary" id="sendBack" style="display:none" onclick="sendPrev()">← Back</button>
+<button class="btn-primary" id="sendNext" onclick="sendNext()">Continue →</button>
+</div>
+</div></div></div>
 
-        <!-- Token list -->
-        <div class="section-card">
-            <div class="section-header">
-                <span class="section-title">Assets</span>
-                <div class="section-actions">
-                    <input class="asset-filter-input" type="text" placeholder="Filter assets…" oninput="filterAssets(this.value)">
-                    <button class="btn-small" onclick="openModal('addTokenModal')">＋ Add Token</button>
-                </div>
-            </div>
-            <table class="asset-tbl" id="assetTable">
-                <thead>
-                    <tr>
-                        <th onclick="sortAssets(0,this)">Asset <span class="sort-arrow">↕</span></th>
-                        <th onclick="sortAssets(1,this)">Balance <span class="sort-arrow">↕</span></th>
-                        <th onclick="sortAssets(2,this)">Value (USD) <span class="sort-arrow">↕</span></th>
-                        <th onclick="sortAssets(3,this)">24h Change <span class="sort-arrow">↕</span></th>
-                    </tr>
-                </thead>
-                <tbody id="assetTbody">
-                    <tr>
-                        <td><div class="asset-name">Solana</div><span class="asset-ticker">SOL</span></td>
-                        <td>45.200 SOL</td>
-                        <td>$7,651.80</td>
-                        <td><span class="asset-change up">▲ +3.1%</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="asset-name">USD Coin</div><span class="asset-ticker">USDC</span></td>
-                        <td>2,500.00 USDC</td>
-                        <td>$2,500.00</td>
-                        <td><span class="asset-change">▲ +0.0%</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="asset-name">Tether</div><span class="asset-ticker">USDT</span></td>
-                        <td>1,200.00 USDT</td>
-                        <td>$1,200.00</td>
-                        <td><span class="asset-change up">▲ +0.1%</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="asset-name">Bonk</div><span class="asset-ticker">BONK</span></td>
-                        <td>12,000,000 BONK</td>
-                        <td>$360.00</td>
-                        <td><span class="asset-change down">▼ -4.2%</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<!-- MODAL: Receive -->
+<div class="modal" id="receiveModal"><div class="modal-content">
+<div class="modal-header"><div class="modal-title">Receive</div><button class="modal-close" onclick="closeModal('receiveModal')">✕</button></div>
+<div class="modal-body" style="text-align:center">
+<div class="qr-grid" id="qrGrid"></div>
+<div style="margin-top:16px;padding:10px 14px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-family:'Courier New',monospace;font-size:12px;color:#666;word-break:break-all">DRosGtEVv9XPxXBk8rPJmGgqGPY4dWUXa3YEeUUkxK8r</div>
+<button class="btn-small" style="margin-top:12px" onclick="navigator.clipboard.writeText('DRosGtEVv9XPxXBk8rPJmGgqGPY4dWUXa3YEeUUkxK8r');showToast('Address copied')">Copy Address</button>
+<div style="margin-top:10px;font-size:11px;color:#999">Any token sent here is auto-detected. No setup needed.</div>
+</div></div></div>
 
-        <!-- Recent Transactions (preview) -->
-        <div class="section-card">
-            <div class="section-header">
-                <span class="section-title">Recent Activity</span>
-                <a href="sprint3.html" style="font-size:11px;font-weight:600;color:#000;">View Full History →</a>
-            </div>
-            <div class="tx-list">
-                <div class="tx-item tx-sent" onclick="openModal('txDetailModal')">
-                    <div class="tx-icon-wrap">↑</div>
-                    <div class="tx-details">
-                        <div class="tx-type">Sent SOL</div>
-                        <div class="tx-sub">To: FMi7…9cXq · Jan 15, 2:32 PM</div>
-                    </div>
-                    <div class="tx-amount">-5.000 SOL</div>
-                    <span class="tx-status-pill status-confirmed">Confirmed ✓</span>
-                </div>
-                <div class="tx-item tx-received" onclick="openModal('txDetailModal')">
-                    <div class="tx-icon-wrap">↓</div>
-                    <div class="tx-details">
-                        <div class="tx-type">Received SOL</div>
-                        <div class="tx-sub">From: 3Yqx…7bPm · Jan 14, 9:15 AM</div>
-                    </div>
-                    <div class="tx-amount">+20.000 SOL</div>
-                    <span class="tx-status-pill status-confirmed">Confirmed ✓</span>
-                </div>
-                <div class="tx-item tx-pending" onclick="openModal('txDetailModal')">
-                    <div class="tx-icon-wrap" style="animation:pulse 1.5s infinite;">⋯</div>
-                    <div class="tx-details">
-                        <div class="tx-type">Sending SOL</div>
-                        <div class="tx-sub">To: 8nPq…4rZs · Jan 12, 11:20 AM</div>
-                    </div>
-                    <div class="tx-amount">-2.500 SOL</div>
-                    <span class="tx-status-pill status-pending">Pending ⏳</span>
-                </div>
-                <div class="tx-item tx-received" onclick="openModal('txDetailModal')">
-                    <div class="tx-icon-wrap">↓</div>
-                    <div class="tx-details">
-                        <div class="tx-type">Received USDC</div>
-                        <div class="tx-sub">From: Kj9L…2mQv · Jan 11, 8:00 AM</div>
-                    </div>
-                    <div class="tx-amount">+500.00 USDC</div>
-                    <span class="tx-status-pill status-confirmed">Confirmed ✓</span>
-                </div>
-                <div class="tx-item tx-failed" onclick="openModal('txDetailModal')">
-                    <div class="tx-icon-wrap" style="opacity:0.5;">✕</div>
-                    <div class="tx-details">
-                        <div class="tx-type">Failed Swap</div>
-                        <div class="tx-sub">DEX: Jupiter V6 · Jan 10, 6:30 PM</div>
-                    </div>
-                    <div class="tx-amount" style="opacity:0.5;">—</div>
-                    <span class="tx-status-pill status-failed">Failed ✗</span>
-                </div>
-            </div>
-        </div>
+<!-- MODAL: Swap -->
+<div class="modal" id="swapModal"><div class="modal-content">
+<div class="modal-header"><div class="modal-title">Swap</div><button class="modal-close" onclick="closeModal('swapModal')">✕</button></div>
+<div class="modal-body">
+<div class="form-group"><label class="form-label">You Pay</label>
+<div style="display:flex;gap:8px"><input type="text" class="form-input" id="swap-amount" placeholder="0.00" oninput="updateSwapRate()" style="flex:3"><select class="form-select" id="swap-from" onchange="updateSwapRate()" style="flex:2"><option>SOL</option><option>USDC</option><option>USDT</option><option>BONK</option></select></div></div>
+<div class="text-center" style="margin:8px 0"><button class="btn-small-outline" onclick="swapDirection()">⇅</button></div>
+<div class="form-group"><label class="form-label">You Receive</label>
+<div style="display:flex;gap:8px"><input type="text" class="form-input" id="swap-receive" placeholder="0.00" readonly style="flex:3"><select class="form-select" id="swap-to" onchange="updateSwapRate()" style="flex:2"><option>USDC</option><option>SOL</option><option>USDT</option><option>BONK</option></select></div></div>
+<div style="padding:10px 12px;background:#f5f5f5;border-radius:4px;margin-bottom:12px;font-size:12px">
+<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:#666">Rate</span><span id="swap-rate">1 SOL ≈ 169.44 USDC</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:#666">Slippage</span><span>0.5%</span></div>
+<div style="display:flex;justify-content:space-between"><span style="color:#666">Powered by</span><span style="font-weight:700">Jupiter</span></div>
+</div>
+<button class="btn-primary" onclick="doSwap()">Review Swap →</button>
+</div></div></div>
 
-        <div class="scope-note">
-            <strong>Sprint 2 Scope (WLT-101 – WLT-115):</strong> Phantom/Solflare-inspired app header with wallet selector dropdown, notification bell with pending signature badge, balance card (SOL + USD, 24h change, address copy), sortable SPL token list with filter, 3-step Send modal (recipient → Solana priority fee tiers → confirm + broadcast), Receive modal with QR placeholder, Jupiter Swap modal. Sprint 3 adds full TX history, filters, analytics, and settings.
-        </div>
-    </div>
+<script>
+var sendStep=1,selectedGas='Medium',selectedGasCost='0.00001 SOL';
+var assets=[{name:'Solana',ticker:'SOL',balance:'24.42',value:'$4,135.37',change:'+2.4%',up:true},{name:'USD Coin',ticker:'USDC',balance:'1,250.00',value:'$1,250.00',change:'0.0%',up:null},{name:'Tether',ticker:'USDT',balance:'500.00',value:'$500.00',change:'-0.1%',up:false},{name:'Bonk',ticker:'BONK',balance:'25,000,000',value:'$412.50',change:'+8.3%',up:true},{name:'Jito',ticker:'JTO',balance:'45.00',value:'$315.00',change:'-2.1%',up:false,auto:true},{name:'Pyth Network',ticker:'PYTH',balance:'520.00',value:'$208.00',change:'+5.7%',up:true,auto:true}];
+var activities=[{type:'Received',asset:'JTO',icon:'↓',cls:'aicon-receive',amount:'+10.0 JTO',value:'$70.00',status:'confirmed',detail:'Auto-detected & ATA created',auto:true},{type:'Sent',asset:'SOL',icon:'↑',cls:'aicon-send',amount:'-0.5 SOL',value:'-$84.67',status:'confirmed',detail:'To: 8xGt...9xYz'},{type:'Swap',asset:'SOL→USDC',icon:'⇄',cls:'aicon-swap',amount:'1.0 SOL → 169.44 USDC',value:'$169.44',status:'confirmed',detail:'Jupiter aggregator'},{type:'Received',asset:'PYTH',icon:'↓',cls:'aicon-receive',amount:'+520 PYTH',value:'$208.00',status:'confirmed',detail:'Auto-detected & ATA created',auto:true},{type:'Send (ZF)',asset:'USDC',icon:'↑',cls:'aicon-send',amount:'-100 USDC',value:'-$100.00',status:'confirmed',detail:'Recipient ATA auto-created',zf:true}];
 
+function renderAssets(){
+var t=document.getElementById('asset-table-body');t.innerHTML=assets.map(function(a){
+var ab=a.auto?'<span class="auto-created-pill">auto</span>':'';
+var ch=a.up===true?'asset-change-up':a.up===false?'asset-change-down':'';
+return '<tr><td><div class="asset-name">'+a.name+' '+ab+'</div><div class="asset-ticker">'+a.ticker+'</div></td><td style="text-align:right;font-weight:700">'+a.balance+'</td><td style="text-align:right;font-weight:700">'+a.value+'</td><td style="text-align:right;'+ch+'">'+a.change+'</td></tr>'
+}).join('')}
 
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- MODALS                                                  -->
-    <!-- ════════════════════════════════════════════════════════ -->
+function renderActivity(){
+var l=document.getElementById('activity-list');l.innerHTML=activities.map(function(a){
+var e='';if(a.auto)e='<span class="tx-hint tx-hint-green">auto-provisioned</span>';if(a.zf)e='<span class="tx-hint tx-hint-green">zero-failure</span>';
+return '<div class="activity-item" onclick="showToast(\''+a.type+': '+a.amount+' - '+a.status+'\')"><div class="activity-icon '+a.cls+'">'+a.icon+'</div><div class="activity-info"><div class="activity-type">'+a.type+' '+e+'</div><div class="activity-amount">'+a.detail+'</div></div><div class="activity-right"><div class="activity-value">'+a.amount+'</div><div class="activity-fiat">'+a.value+'</div><div class="activity-status status-'+a.status+'">'+a.status+'</div></div></div>'
+}).join('')}
 
-    <!-- ── SEND MODAL (3 steps) ─────────────────────────────── -->
-    <div id="sendModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <span class="modal-title" id="sendTitle">Send</span>
-                <button class="modal-close" onclick="closeModal('sendModal'); resetSend()">×</button>
-            </div>
-            <div class="modal-body">
+function openModal(id){document.getElementById(id).classList.add('active')}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+window.addEventListener('click',function(e){if(e.target.classList.contains('modal'))e.target.classList.remove('active');if(!e.target.closest('.wallet-zone')){var d=document.getElementById('walletDropdown');if(d)d.classList.remove('open')}});
 
-                <!-- Step 1: Details -->
-                <div id="send-step1">
-                    <div class="step-indicator">
-                        <div class="step-dot active" id="sd1"></div>
-                        <div class="step-dot" id="sd2"></div>
-                        <div class="step-dot" id="sd3"></div>
-                    </div>
-                    <p class="step-label">Step 1 of 3 — Recipient &amp; Amount</p>
-                    <div class="form-group">
-                        <label class="form-label">Recipient Address or .sol Domain</label>
-                        <input type="text" class="form-input" id="send-to" placeholder="Base58 address or alice.sol">
-                        <div class="form-hint">Tip: type a .sol name to resolve via Solana Name Service (SNS)</div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Asset</label>
-                        <select class="form-input" id="send-asset">
-                            <option value="SOL">SOL — Balance: 45.200 SOL</option>
-                            <option value="USDC">USDC — Balance: 2,500.00 USDC</option>
-                            <option value="USDT">USDT — Balance: 1,200.00 USDT</option>
-                            <option value="BONK">BONK — Balance: 12,000,000 BONK</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Amount</label>
-                        <div class="form-row">
-                            <div class="form-group" style="margin-bottom:0">
-                                <input type="number" class="form-input" id="send-amount" placeholder="0.0" step="0.000001" min="0">
-                            </div>
-                            <button class="btn-small-outline" onclick="document.getElementById('send-amount').value='44.9950'">Max</button>
-                        </div>
-                        <div class="form-hint">≈ $0.00 USD · Est. fee ~0.000005 SOL (base) + priority</div>
-                    </div>
-                </div>
+function sendNext(){
+if(sendStep===1){var a=document.getElementById('send-addr').value.trim(),m=document.getElementById('send-amount').value.trim();if(!a||!m){showToast('Fill in recipient and amount');return};showStep(2)}
+else if(sendStep===2){var m=document.getElementById('send-amount').value,a=document.getElementById('send-addr').value,as=document.getElementById('send-asset').value;document.getElementById('confirm-amount').textContent=m+' '+as;document.getElementById('confirm-addr').textContent=a.slice(0,8)+'...'+a.slice(-4);document.getElementById('confirm-gas-label').textContent=selectedGas;document.getElementById('confirm-gas-cost').textContent=selectedGasCost;showStep(3)}
+else if(sendStep===3)broadcast()}
+function sendPrev(){if(sendStep===2)showStep(1);else if(sendStep===3)showStep(2)}
+function showStep(n){
+sendStep=n;document.getElementById('send-step1').style.display=n===1?'':'none';document.getElementById('send-step2').style.display=n===2?'':'none';document.getElementById('send-step3').style.display=n===3?'':'none';document.getElementById('send-broadcasting').style.display='none';document.getElementById('send-success').style.display='none';document.getElementById('sendFoot').style.display='';document.getElementById('sendBack').style.display=n>1?'':'none';document.getElementById('sendNext').textContent=n===3?'Confirm & Send':'Continue →';document.getElementById('sendTitle').textContent='Send — Step '+n+' of 3'}
+function selectGas(card,tier){document.querySelectorAll('.gas-tier').forEach(function(c){c.classList.remove('selected')});card.classList.add('selected');selectedGas=tier;selectedGasCost=card.querySelector('.gas-tier-cost').textContent}
+function broadcast(){document.getElementById('send-step3').style.display='none';document.getElementById('sendFoot').style.display='none';document.getElementById('send-broadcasting').style.display='';setTimeout(function(){document.getElementById('send-broadcasting').style.display='none';document.getElementById('send-success').style.display='';var f=document.getElementById('sendFoot');f.style.display='';f.innerHTML='<button class="btn-primary" style="flex:1" onclick="closeModal(\'sendModal\');resetSend()">Close</button>'},2000)}
+function resetSend(){sendStep=1;showStep(1);document.getElementById('sendFoot').innerHTML='<button class="btn-secondary" id="sendBack" style="display:none" onclick="sendPrev()">← Back</button><button class="btn-primary" id="sendNext" onclick="sendNext()">Continue →</button>'}
 
-                <!-- Step 2: Gas -->
-                <div id="send-step2" style="display:none">
-                    <div class="step-indicator">
-                        <div class="step-dot done"></div>
-                        <div class="step-dot active"></div>
-                        <div class="step-dot"></div>
-                    </div>
-                    <p class="step-label">Step 2 of 3 — Select Priority Fee (Solana ComputeBudget)</p>
-                    <div class="gas-tiers" id="gasTiers">
-                        <div class="gas-tier selected" onclick="selectGas(this,'Normal')">
-                            <div class="gas-tier-left">
-                                <div class="gas-tier-name">Normal</div>
-                                <div class="gas-tier-time">~confirmed next slot · 0 microlamports/CU</div>
-                            </div>
-                            <div class="gas-tier-cost">~$0.0001</div>
-                        </div>
-                        <div class="gas-tier" onclick="selectGas(this,'High')">
-                            <div class="gas-tier-left">
-                                <div class="gas-tier-name">High</div>
-                                <div class="gas-tier-time">~priority slot · 10,000 microlamports/CU</div>
-                            </div>
-                            <div class="gas-tier-cost">~$0.0012</div>
-                        </div>
-                        <div class="gas-tier" onclick="selectGas(this,'Turbo')">
-                            <div class="gas-tier-left">
-                                <div class="gas-tier-name">Turbo</div>
-                                <div class="gas-tier-time">~immediate · 50,000 microlamports/CU</div>
-                            </div>
-                            <div class="gas-tier-cost">~$0.0060</div>
-                        </div>
-                    </div>
-                    <button class="btn-link">Advanced: set custom microlamports/CU ▾</button>
-                </div>
+var rates={SOL_USDC:169.44,SOL_USDT:169.31,SOL_BONK:4720000,USDC_SOL:0.00590,USDC_USDT:0.9998,USDC_BONK:27800,USDT_SOL:0.00591,USDT_USDC:1.0002,BONK_SOL:0.0000002118,BONK_USDC:0.0000360};
+function updateSwapRate(){var f=document.getElementById('swap-from').value,t=document.getElementById('swap-to').value,k=f+'_'+t,r=rates[k]||'--';document.getElementById('swap-rate').textContent='1 '+f+' ≈ '+r+' '+t;var a=parseFloat(document.getElementById('swap-amount').value)||0;document.getElementById('swap-receive').value=a?(a*r).toFixed(2)+' '+t:''}
+function swapDirection(){var fe=document.getElementById('swap-from'),te=document.getElementById('swap-to'),tmp=fe.value;for(var i=0;i<fe.options.length;i++){if(fe.options[i].value===te.value){fe.selectedIndex=i;break}}for(var i=0;i<te.options.length;i++){if(te.options[i].value===tmp){te.selectedIndex=i;break}}updateSwapRate()}
+function doSwap(){showToast('Swap submitted! Check activity.');closeModal('swapModal')}
 
-                <!-- Step 3: Confirm -->
-                <div id="send-step3" style="display:none">
-                    <div class="step-indicator">
-                        <div class="step-dot done"></div>
-                        <div class="step-dot done"></div>
-                        <div class="step-dot active"></div>
-                    </div>
-                    <p class="step-label">Step 3 of 3 — Review &amp; Confirm</p>
-                    <div class="confirm-row"><span class="confirm-label">To</span><span class="confirm-value">FMi7…9cXq</span></div>
-                    <div class="confirm-row"><span class="confirm-label">Asset</span><span class="confirm-value">SOL</span></div>
-                    <div class="confirm-row"><span class="confirm-label">Amount</span><span class="confirm-value">5.0000 SOL</span></div>
-                    <div class="confirm-row"><span class="confirm-label">Priority</span><span class="confirm-value" id="confirm-gas-label">Normal</span></div>
-                    <div class="confirm-row"><span class="confirm-label">Network Fee</span><span class="confirm-value" id="confirm-gas-cost">~$0.0001</span></div>
-                    <div class="confirm-row" style="padding-top:10px;margin-top:4px;border-top:2px solid #000;border-bottom:none;"><span class="confirm-label confirm-total">Total Cost</span><span class="confirm-value confirm-total">5.0001 SOL</span></div>
-                </div>
+function sortAssets(criteria,btn){document.querySelectorAll('.token-sort').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');showToast('Sorted by '+criteria)}
 
-                <!-- Broadcasting state -->
-                <div id="send-broadcasting" style="display:none">
-                    <div class="broadcast-pending">
-                        <span class="broadcast-spinner">◌</span>
-                        <strong>Broadcasting transaction…</strong>
-                        <p style="font-size:11px;color:#999;margin-top:6px;">Please wait, submitting to Solana network</p>
-                    </div>
-                </div>
+(function buildQR(){var g=document.getElementById('qrGrid');if(!g)return;var s=[1,0,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,0,1,0,1,0,1,1,0,1,1,0,0,1,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1];s.forEach(function(v){var c=document.createElement('div');c.className='qr-cell'+(v?' b':'');g.appendChild(c)})})();
 
-                <!-- Success state -->
-                <div id="send-success" style="display:none">
-                    <div class="broadcast-success">
-                        <div class="bs-icon">✓</div>
-                        <div class="bs-title">Transaction Submitted!</div>
-                        <div class="bs-hash">Sig: 4tHmQ…6wKr</div>
-                        <a href="#" style="display:block;margin-top:8px;font-size:11px;font-weight:600;color:#000;">View on Solscan ↗</a>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-foot" id="sendFoot">
-                <button class="btn-secondary" id="sendBack" style="display:none" onclick="sendPrev()">← Back</button>
-                <button class="btn-primary" id="sendNext" onclick="sendNext()">Continue →</button>
-            </div>
-        </div>
-    </div>
+function showToast(msg){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';Object.assign(t.style,{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',background:'#000',color:'#fff',padding:'8px 16px',borderRadius:'4px',fontSize:'12px',fontWeight:'700',zIndex:'9999',transition:'opacity 0.3s',pointerEvents:'none'});document.body.appendChild(t)}t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(function(){t.style.opacity='0'},2500)}
 
-    <!-- ── RECEIVE MODAL ─────────────────────────────────────── -->
-    <div id="receiveModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <span class="modal-title">Receive</span>
-                <button class="modal-close" onclick="closeModal('receiveModal')">×</button>
-            </div>
-            <div class="modal-body">
-                
-                <!-- QR Code placeholder (20×20 CSS checkerboard) -->
-                <div class="qr-grid" id="qrGrid"></div>
-                <div class="form-group">
-                    <label class="form-label">Your Solana Address</label>
-                    <div class="addr-row">
-                        <span style="font-size:9px;">7xKX7PmFdRxGLXsP9aQ5dBkN3sYbFe4WcBb3qHnJm5</span>
-                        <button class="copy-btn" onclick="copyAddr()" title="Copy">⎘</button>
-                    </div>
-                </div>
-                <div class="form-note">⚠ Only send <strong>Solana (SOL)</strong> and SPL tokens to this address. This address does not accept tokens from other blockchains.</div>
-                <div class="form-group" style="margin-bottom:0">
-                    <label class="form-label">.sol Domain</label>
-                    <div class="addr-row" style="font-size:12px;font-weight:700;">alice.sol <span style="font-size:10px;color:#999;margin-left:4px;">· Solana Name Service</span></div>
-                </div>
-            </div>
-            <div class="modal-foot modal-full" style="justify-content:stretch;">
-                <button class="btn-primary" style="flex:1;" onclick="copyAddr()">⎘ Copy Address</button>
-                <button class="btn-secondary" onclick="closeModal('receiveModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── SWAP MODAL ────────────────────────────────────────── -->
-    <div id="swapModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <span class="modal-title">Swap</span>
-                <button class="modal-close" onclick="closeModal('swapModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-note">Powered by <strong>Jupiter Aggregator</strong> · Best route across Solana DEXes</div>
-                <div class="form-group">
-                    <label class="form-label">From</label>
-                    <select class="form-input" id="swap-from" onchange="updateSwapRate()">
-                        <option value="SOL">SOL — 45.200 SOL ($7,651.80)</option>
-                        <option value="USDC">USDC — 2,500.00 USDC ($2,500.00)</option>
-                        <option value="USDT">USDT — 1,200.00 USDT ($1,200.00)</option>
-                        <option value="BONK">BONK — 12,000,000 BONK ($360.00)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Amount</label>
-                    <div class="form-row">
-                        <div class="form-group" style="margin-bottom:0">
-                            <input type="number" class="form-input" id="swap-amount" placeholder="0.0" oninput="updateSwapRate()">
-                        </div>
-                        <button class="btn-small-outline" onclick="document.getElementById('swap-amount').value='1'">Max</button>
-                    </div>
-                </div>
-                <button class="swap-arrow-btn" onclick="swapDirection()">⇄</button>
-                <div class="form-group" style="margin-top:4px;">
-                    <label class="form-label">To</label>
-                    <select class="form-input" id="swap-to" onchange="updateSwapRate()">
-                        <option value="USDC">USDC</option>
-                        <option value="SOL">SOL</option>
-                        <option value="USDT">USDT</option>
-                        <option value="BONK">BONK</option>
-                    </select>
-                </div>
-                <div class="rate-row">
-                    <span>Exchange Rate</span>
-                    <strong id="swap-rate">1 SOL ≈ 169.44 USDC</strong>
-                </div>
-                <div class="rate-row">
-                    <span>Max Slippage</span>
-                    <span>0.5% · <button class="btn-link">Edit</button></span>
-                </div>
-                <div class="rate-row">
-                    <span>Estimated Fee</span>
-                    <span>~0.000005 SOL (Normal priority)</span>
-                </div>
-                <div class="rate-row">
-                    <span>Route</span>
-                    <span style="font-size:10px;color:#666;">SOL → USDC via Raydium (Jupiter V6)</span>
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                    <label class="form-label">You Receive (estimated)</label>
-                    <input type="text" class="form-input" id="swap-receive" value="169.44 USDC" disabled>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn-secondary" onclick="getSwapQuote()">Get Quote ↻</button>
-                <button class="btn-primary" onclick="doSwap()">Swap →</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── PENDING TX PANEL ───────────────────────────────────── -->
-    <div id="pendingPanel" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <span class="modal-title">Pending Transactions (1)</span>
-                <button class="modal-close" onclick="closeModal('pendingPanel')">×</button>
-            </div>
-            <div class="modal-body">
-                <div style="border:1px solid #cccccc;border-radius:4px;padding:14px;margin-bottom:10px;">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                        <strong style="font-size:13px;">Sending ETH</strong>
-                        <span style="font-size:11px;color:#999;">2 min ago</span>
-                    </div>
-                    <div style="font-size:11px;color:#666;margin-bottom:4px;">To: 8nPq...4rZs</div>
-                    <div style="font-size:12px;font-family:'Courier New',monospace;margin-bottom:12px;">-2.500 SOL · Priority: Normal (~$0.0001)</div>
-                    <div style="display:flex;gap:8px;">
-                        <button class="btn-small" onclick="openModal('sendModal');closeModal('pendingPanel')">⚡ Speed Up</button>
-                        <button class="btn-small-outline" onclick="closeModal('pendingPanel')">✕ Cancel TX</button>
-                    </div>
-                </div>
-                <div class="form-note">Speed Up resubmits the transaction with a higher priority fee (more microlamports/CU). Drop cancels and frees the compute units.</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── ADD TOKEN MODAL ────────────────────────────────────── -->
-    <div id="addTokenModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <span class="modal-title">Add Custom Token</span>
-                <button class="modal-close" onclick="closeModal('addTokenModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-note">⚠ Anyone can create an SPL token with any name. Always verify the mint address on Solscan before importing.</div>
-                <div class="form-group">
-                    <label class="form-label">Mint Address</label>
-                    <input type="text" class="form-input" placeholder="Base58 mint address…" id="token-addr">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Token Symbol</label>
-                    <input type="text" class="form-input" placeholder="e.g., JUP" id="token-symbol">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Decimals</label>
-                    <input type="number" class="form-input" value="6" id="token-decimals">
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                    <label class="form-label">Popular SPL Tokens (quick add)</label>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
-                        <button class="btn-small-outline" onclick="quickAdd('JUP','JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN')">JUP</button>
-                        <button class="btn-small-outline" onclick="quickAdd('PYTH','HZ1JovNiVvGqswkfKaKfLkCB62fHNhMT4vLsqzJ5Rhs1')">PYTH</button>
-                        <button class="btn-small-outline" onclick="quickAdd('RAY','4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R')">RAY</button>
-                        <button class="btn-small-outline" onclick="quickAdd('MNGO','MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac')">MNGO</button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn-secondary" onclick="closeModal('addTokenModal')">Cancel</button>
-                <button class="btn-primary" onclick="importToken()">Import Token</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── TX DETAIL MODAL ───────────────────────────────────── -->
-    <div id="txDetailModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <span class="modal-title">Transaction Details</span>
-                <button class="modal-close" onclick="closeModal('txDetailModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div style="background:#f5f5f5;border:1px solid #cccccc;border-radius:3px;padding:12px;text-align:center;margin-bottom:14px;">
-                    <div style="font-size:24px;margin-bottom:4px;">✓</div>
-                    <div style="font-size:13px;font-weight:700;">Confirmed</div>
-                    <div style="font-size:11px;color:#666;">Slot 312,456,789 · 32 confirmations</div>
-                </div>
-                <div class="tx-detail-row">
-                    <div class="tx-detail-label">Type &amp; Amount</div>
-                    <div class="tx-detail-value mono-lg">↑ Sent 5.000 SOL</div>
-                    <div style="font-size:11px;color:#999;">≈ $847.00 at time of TX</div>
-                </div>
-                <div class="tx-detail-row">
-                    <div class="tx-detail-label">From</div>
-                    <div class="tx-detail-value">7xKX7PmFdRxGLXsP9aQ5dBkN3sYbFe4WcBb3qHnJm5 <button class="copy-btn">⎘</button></div>
-                </div>
-                <div class="tx-detail-row">
-                    <div class="tx-detail-label">To</div>
-                    <div class="tx-detail-value">FMi7LqXPmFdRxGLXsP9aQ5dBkN3sYbFe4Wc9cXqAb2 <button class="copy-btn">⎘</button></div>
-                </div>
-                <div class="tx-detail-row">
-                    <div class="tx-detail-label">Signature</div>
-                    <div class="tx-detail-value">4tHmQj9Pk3sYbLqR7xKX7PmFdRx6wKrGLXsP9aQ5dB <button class="copy-btn">⎘</button></div>
-                    <a href="#" style="font-size:10px;font-weight:600;color:#000;">View on Solscan ↗</a>
-                </div>
-                <div class="tx-detail-row">
-                    <div class="tx-detail-label">Fee</div>
-                    <div class="tx-detail-value">0.000005 SOL base + 0.000012 SOL priority fee</div>
-                    <div style="font-size:11px;color:#666;">Total fee: 0.000017 SOL (~$0.0029)</div>
-                </div>
-                <div class="tx-detail-row">
-                    <div class="tx-detail-label">Date &amp; Time</div>
-                    <div class="tx-detail-value" style="font-family:inherit;">Jan 15, 2025 · 2:32:07 PM UTC</div>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn-primary" style="flex:1;" onclick="closeModal('txDetailModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p>Sprint 2: Core Solana Wallet · Low-Fidelity Prototype · WLT-101 – WLT-115</p>
-        <div class="footer-links">
-            <a href="management.html">← Dashboard</a>
-            <a href="sprint1.html">Sprint 1: Onboarding</a>
-            <a href="sprint3.html">Sprint 3/4: Advanced →</a>
-        </div>
-    </footer>
-
-
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- JAVASCRIPT                                             -->
-    <!-- ════════════════════════════════════════════════════════ -->
-    <script>
-    // ── Panel toggles ──────────────────────────────────────────
-    function togglePanel(id) {
-        const el = document.getElementById(id);
-        el.classList.toggle('open');
-    }
-
-    // Close open panels on outside click
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.wallet-zone')) document.getElementById('walletDropdown').classList.remove('open');
-    });
-
-    // ── Copy address ───────────────────────────────────────────
-    function copyAddr() {
-        navigator.clipboard.writeText('7xKX7PmFdRxGLXsP9aQ5dBkN3sYbFe4WcBb3qHnJm5').catch(() => {});
-        showToast('Address copied!');
-    }
-
-    // ── Modal helpers ──────────────────────────────────────────
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    window.addEventListener('click', e => {
-        if (e.target.classList.contains('modal')) e.target.classList.remove('active');
-    });
-
-    // ── Asset filter ───────────────────────────────────────────
-    function filterAssets(q) {
-        document.querySelectorAll('#assetTbody tr').forEach(row => {
-            row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
-        });
-    }
-
-    // ── Asset sort ─────────────────────────────────────────────
-    let sortState = { col: -1, dir: 1 };
-    function sortAssets(col, th) {
-        document.querySelectorAll('.asset-tbl th').forEach(h => h.classList.remove('sorted'));
-        sortState.dir = (sortState.col === col) ? -sortState.dir : 1;
-        sortState.col = col;
-        th.classList.add('sorted');
-        th.querySelector('.sort-arrow').textContent = sortState.dir === 1 ? '↑' : '↓';
-        const tbody = document.getElementById('assetTbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a, b) => {
-            const av = a.cells[col].textContent.trim();
-            const bv = b.cells[col].textContent.trim();
-            return sortState.dir * av.localeCompare(bv, undefined, { numeric: true });
-        });
-        rows.forEach(r => tbody.appendChild(r));
-    }
-
-    // ── Send flow ──────────────────────────────────────────────
-    let sendStep = 1;
-    let selectedGas = 'Standard';
-    let selectedGasCost = '~$12.50';
-
-    function sendNext() {
-        if (sendStep === 1) {
-            showStep(2);
-        } else if (sendStep === 2) {
-            document.getElementById('confirm-gas-label').textContent = selectedGas;
-            document.getElementById('confirm-gas-cost').textContent = selectedGasCost;
-            showStep(3);
-        } else if (sendStep === 3) {
-            broadcast();
-        }
-    }
-
-    function sendPrev() {
-        if (sendStep === 2) showStep(1);
-        else if (sendStep === 3) showStep(2);
-    }
-
-    function showStep(n) {
-        sendStep = n;
-        document.getElementById('send-step1').style.display = n === 1 ? '' : 'none';
-        document.getElementById('send-step2').style.display = n === 2 ? '' : 'none';
-        document.getElementById('send-step3').style.display = n === 3 ? '' : 'none';
-        document.getElementById('send-broadcasting').style.display = 'none';
-        document.getElementById('send-success').style.display = 'none';
-        document.getElementById('sendFoot').style.display = '';
-        document.getElementById('sendBack').style.display = n > 1 ? '' : 'none';
-        document.getElementById('sendNext').textContent = n === 3 ? 'Confirm & Send' : 'Continue →';
-        document.getElementById('sendTitle').textContent = 'Send — Step ' + n + ' of 3';
-    }
-
-    function selectGas(card, tier) {
-        document.querySelectorAll('.gas-tier').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedGas = tier;
-        selectedGasCost = card.querySelector('.gas-tier-cost').textContent;
-    }
-
-    function broadcast() {
-        document.getElementById('send-step3').style.display = 'none';
-        document.getElementById('sendFoot').style.display = 'none';
-        document.getElementById('send-broadcasting').style.display = '';
-        setTimeout(() => {
-            document.getElementById('send-broadcasting').style.display = 'none';
-            document.getElementById('send-success').style.display = '';
-            const foot = document.getElementById('sendFoot');
-            foot.style.display = '';
-            foot.innerHTML = '<button class="btn-primary" style="flex:1;" onclick="closeModal(\'sendModal\');resetSend()">Close</button>';
-        }, 2000);
-    }
-
-    function resetSend() {
-        sendStep = 1;
-        showStep(1);
-        document.getElementById('sendFoot').innerHTML =
-            '<button class="btn-secondary" id="sendBack" style="display:none" onclick="sendPrev()">← Back</button>' +
-            '<button class="btn-primary" id="sendNext" onclick="sendNext()">Continue →</button>';
-    }
-
-    // ── Swap ───────────────────────────────────────────────────
-    const rates = { SOL_USDC: 169.44, SOL_USDT: 169.31, SOL_BONK: 4720000, USDC_SOL: 0.00590, USDC_USDT: 0.9998, USDC_BONK: 27800, USDT_SOL: 0.00591, USDT_USDC: 1.0002, BONK_SOL: 0.0000002118, BONK_USDC: 0.0000360 };
-    function updateSwapRate() {
-        const from = document.getElementById('swap-from').value;
-        const to = document.getElementById('swap-to').value;
-        const key = from + '_' + to;
-        const rate = rates[key] || '—';
-        document.getElementById('swap-rate').textContent = '1 ' + from + ' ≈ ' + rate + ' ' + to;
-        const amt = parseFloat(document.getElementById('swap-amount').value) || 0;
-        document.getElementById('swap-receive').value = amt ? (amt * rate).toFixed(2) + ' ' + to : '';
-    }
-    function swapDirection() {
-        const fromEl = document.getElementById('swap-from');
-        const toEl = document.getElementById('swap-to');
-        const tmp = fromEl.value;
-        for (let i = 0; i < fromEl.options.length; i++) {
-            if (fromEl.options[i].value === toEl.value) { fromEl.selectedIndex = i; break; }
-        }
-        for (let i = 0; i < toEl.options.length; i++) {
-            if (toEl.options[i].value === tmp) { toEl.selectedIndex = i; break; }
-        }
-        updateSwapRate();
-    }
-    function getSwapQuote() {
-        document.getElementById('swap-receive').value = 'Getting quote…';
-        setTimeout(updateSwapRate, 800);
-    }
-    function doSwap() {
-        showToast('Swap submitted! Check activity for status.');
-        closeModal('swapModal');
-    }
-
-    // ── Add Token ──────────────────────────────────────────────
-    function quickAdd(symbol, addr) {
-        document.getElementById('token-addr').value = addr;
-        document.getElementById('token-symbol').value = symbol;
-    }
-    function importToken() {
-        const sym = document.getElementById('token-symbol').value.trim();
-        if (!sym) { showToast('Enter a token symbol'); return; }
-        showToast(sym + ' added to your token list');
-        closeModal('addTokenModal');
-    }
-
-    // ── QR code placeholder generator ─────────────────────────
-    (function buildQR() {
-        const grid = document.getElementById('qrGrid');
-        if (!grid) return;
-        const seed = [1,0,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,0,1,0,1,0,1,1,0,1,1,0,0,1,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1];
-        seed.forEach((v, i) => {
-            const cell = document.createElement('div');
-            cell.className = 'qr-cell' + (v ? ' b' : '');
-            grid.appendChild(cell);
-        });
-    })();
-
-    // ── Toast ──────────────────────────────────────────────────
-    function showToast(msg) {
-        let t = document.getElementById('toast');
-        if (!t) {
-            t = document.createElement('div');
-            t.id = 'toast';
-            Object.assign(t.style, { position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)', background:'#000', color:'#fff', padding:'8px 16px', borderRadius:'4px', fontSize:'12px', fontWeight:'700', zIndex:'9999', transition:'opacity 0.3s', pointerEvents:'none' });
-            document.body.appendChild(t);
-        }
-        t.textContent = msg;
-        t.style.opacity = '1';
-        clearTimeout(t._timer);
-        t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
-    }
-
-    // ── Populate wallet name from localStorage ─────────────────
-    (function initFromStorage() {
-        try {
-            const n = localStorage.getItem('wallet_name');
-            const net = localStorage.getItem('wallet_network');
-            if (n) {
-                document.querySelectorAll('.wd-name').forEach((el, i) => { if(i===0) el.textContent = n; });
-                const walletBtns = document.querySelectorAll('.wallet-btn');
-                walletBtns.forEach(btn => {
-                    const nameSpan = btn.querySelector('span:not(.wallet-caret):not(.wallet-avatar)');
-                    if (!nameSpan) {
-                        const txt = btn.childNodes;
-                        txt.forEach(node => { if(node.nodeType === 3 && node.textContent.trim()) node.textContent = ' ' + n + ' '; });
-                    }
-                });
-            }
-        } catch(e) {}
-    })();
-    </script>
+(function init(){try{var n=localStorage.getItem('wallet_name');if(n){document.querySelectorAll('.wd-name').forEach(function(e){e.textContent=n});var bt=document.querySelector('.wallet-btn');if(bt){var sp=bt.querySelector('span:not(.wallet-caret):not(.wallet-avatar)');if(sp)sp.textContent=n}}}catch(e){}try{if(localStorage.getItem('onboarding_complete')!=='true')window.location.href='sprint1.html'}catch(e){}renderAssets();renderActivity()})();
+</script>
 </body>
 </html>

@@ -1,1522 +1,340 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint 3/4: Advanced Solana Features — Low-Fidelity Prototype</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #000000; line-height: 1.5; min-height: 100vh; }
-
-        /* ── App Header (same as Sprint 2) ───────────────────── */
-        .app-header { background: #f0f0f0; border-bottom: 2px solid #000; padding: 0 16px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 200; gap: 12px; }
-        .wallet-zone { display: flex; align-items: center; gap: 0; position: relative; }
-        .wallet-btn { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 700; }
-        .wallet-btn:hover { background: #f5f5f5; }
-        .wallet-avatar { width: 26px; height: 26px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
-        .wallet-caret { font-size: 10px; color: #666; }
-        .wallet-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; width: 260px; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 300; }
-        .wallet-dropdown.open { display: block; }
-        .wd-header { padding: 10px 14px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #999; border-bottom: 1px solid #eee; }
-        .wd-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f5f5f5; }
-        .wd-item:hover { background: #fafafa; }
-        .wd-item.active { background: #f5f5f5; }
-        .wd-info { flex: 1; }
-        .wd-name { font-size: 12px; font-weight: 700; }
-        .wd-addr { font-size: 10px; color: #999; font-family: 'Courier New', monospace; }
-        .wd-footer a { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: #000; text-decoration: none; border-bottom: 1px solid #f5f5f5; border-top: 1px solid #eee; }
-        .wd-footer a:hover { background: #fafafa; }
-        
-        .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { position: relative; width: 36px; height: 36px; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { background: #f0f0f0; }
-        .proto-badge { font-size: 10px; font-weight: 700; color: #999; border: 1px solid #ccc; padding: 3px 8px; border-radius: 3px; }
-
-        /* ── Main tabs ───────────────────────────────────────── */
-        .main-tabs { display: flex; border-bottom: 2px solid #000; background: #f5f5f5; position: sticky; top: 52px; z-index: 150; }
-        .main-tab { flex: 1; padding: 12px; background: transparent; border: none; cursor: pointer; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; }
-        .main-tab:hover { background: #eeeeee; }
-        .main-tab.active { color: #000; border-bottom-color: #000; background: #fff; }
-
-        /* ── Layout ──────────────────────────────────────────── */
-        .tab-view { display: none; }
-        .tab-view.active { display: block; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 24px 20px 48px; }
-
-        /* ── Reused from Sprint 2 ──────────────────────────── */
-        .balance-card { background: #fff; border: 1px solid #ccc; border-radius: 4px; padding: 20px; margin-bottom: 16px; }
-        .bal-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #999; margin-bottom: 4px; }
-        .bal-value { font-size: 32px; font-weight: 700; font-family: 'Courier New', monospace; margin-bottom: 4px; }
-        .bal-change { font-size: 12px; color: #333; margin-bottom: 12px; }
-        .addr-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 11px; margin-bottom: 16px; }
-        .addr-row span { flex: 1; }
-        .copy-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 4px; }
-        .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .action-btn { flex: 1; min-width: 80px; padding: 10px 8px; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; text-align: center; }
-        .action-btn:hover:not(:disabled) { background: #f5f5f5; }
-        .action-btn:disabled { opacity: .4; cursor: not-allowed; }
-        .action-btn .ab-icon { font-size: 18px; display: block; margin-bottom: 3px; }
-        .section-card { background: #fff; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #eee; background: #fafafa; }
-        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-        .asset-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .asset-tbl th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; white-space: nowrap; }
-        .asset-tbl td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; }
-        .asset-tbl tr:last-child td { border-bottom: none; }
-        .asset-tbl tr:hover td { background: #fafafa; }
-        .asset-name { font-weight: 700; }
-        .asset-ticker { font-size: 10px; color: #999; display: block; }
-        .btn-small { padding: 5px 10px; background: #000; color: #fff; border: 1px solid #000; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 700; }
-        .btn-small:hover { background: #333; }
-        .btn-small-outline { padding: 5px 10px; background: #fff; color: #000; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .btn-small-outline:hover { background: #f5f5f5; }
-
-        /* ── TX History ──────────────────────────────────────── */
-        .filter-zone { padding: 14px 16px; border-bottom: 1px solid #eee; background: #fafafa; display: flex; flex-direction: column; gap: 8px; }
-        .filter-pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
-        .filter-pill { padding: 5px 12px; background: #fff; border: 1px solid #ccc; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 700; white-space: nowrap; }
-        .filter-pill.active { background: #000; color: #fff; border-color: #000; }
-        .filter-pill:hover:not(.active) { background: #f0f0f0; }
-        .filter-inputs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .filter-input { padding: 6px 9px; border: 1px solid #ccc; border-radius: 3px; font-size: 11px; font-family: inherit; }
-        .filter-input:focus { outline: none; border-color: #000; }
-        .filter-sep { color: #999; font-size: 11px; }
-        .filter-reset { font-size: 11px; font-weight: 600; color: #000; cursor: pointer; text-decoration: underline; background: none; border: none; margin-left: auto; }
-        .results-count { font-size: 11px; color: #666; padding: 8px 16px; border-bottom: 1px solid #eee; background: #fff; }
-        .tx-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .tx-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; white-space: nowrap; }
-        .tx-table td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-        .tx-table tr:last-child td { border-bottom: none; }
-        .tx-table tr:hover td { background: #fafafa; cursor: pointer; }
-        .tx-type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; border: 1px solid; white-space: nowrap; }
-        .badge-sent { background: #f5f5f5; border-color: #666; color: #333; }
-        .badge-received { background: #fff; border-color: #000; color: #000; }
-        .badge-swap { background: #f0f0f0; border-color: #888; color: #444; }
-        .badge-pending { background: #fff; border-color: #000; color: #000; font-style: italic; }
-        .badge-failed { background: #f5f5f5; border-color: #999; color: #999; text-decoration: line-through; }
-        .tx-hash-cell { font-family: 'Courier New', monospace; font-size: 10px; color: #999; }
-        .tx-hash-cell a { color: #000; font-weight: 700; }
-        .status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; border: 1px solid; white-space: nowrap; }
-        .pill-confirmed { background: #f0f0f0; border-color: #666; }
-        .pill-pending { background: #fff; border-color: #000; }
-        .pill-failed { opacity: .6; border-color: #999; }
-        .pagination { display: flex; justify-content: center; gap: 8px; padding: 14px; border-top: 1px solid #eee; }
-        .page-btn { padding: 5px 10px; background: #fff; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .page-btn.active { background: #000; color: #fff; border-color: #000; }
-        .page-btn:hover:not(.active) { background: #f0f0f0; }
-
-        /* ── Settings panel ──────────────────────────────────── */
-        .settings-layout { display: grid; grid-template-columns: 180px 1fr; gap: 0; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
-        @media (max-width: 640px) { .settings-layout { grid-template-columns: 1fr; } }
-        .settings-nav { background: #f5f5f5; border-right: 1px solid #eee; }
-        .settings-nav-item { display: flex; align-items: center; gap: 8px; padding: 13px 16px; cursor: pointer; font-size: 12px; font-weight: 600; border-bottom: 1px solid #eee; color: #555; }
-        .settings-nav-item:last-child { border-bottom: none; }
-        .settings-nav-item:hover { background: #eeeeee; }
-        .settings-nav-item.active { background: #fff; color: #000; border-right: 3px solid #000; margin-right: -1px; font-weight: 700; }
-        .settings-nav-icon { font-size: 14px; }
-        .settings-content { background: #fff; padding: 24px; min-height: 480px; }
-        .settings-section { margin-bottom: 24px; }
-        .settings-section:last-child { margin-bottom: 0; }
-        .settings-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #999; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
-        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; gap: 16px; }
-        .setting-row:last-child { border-bottom: none; }
-        .setting-label { flex: 1; }
-        .setting-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-        .setting-desc { font-size: 11px; color: #888; }
-        .setting-control { flex-shrink: 0; }
-        .toggle { width: 40px; height: 24px; background: #ccc; border-radius: 12px; cursor: pointer; position: relative; border: none; transition: background .2s; flex-shrink: 0; }
-        .toggle.on { background: #000; }
-        .toggle::after { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left .2s; }
-        .toggle.on::after { left: 19px; }
-        .form-group { margin-bottom: 14px; }
-        .form-label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #555; margin-bottom: 5px; letter-spacing: .3px; }
-        .form-input { width: 100%; padding: 9px 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; font-family: inherit; }
-        .form-input:focus { outline: none; border-color: #000; }
-        .form-input:disabled { background: #f5f5f5; color: #999; }
-        .form-select { padding: 7px 9px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; font-family: inherit; background: #fff; }
-        .form-note { background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 3px; padding: 8px 10px; font-size: 11px; color: #555; margin-bottom: 14px; }
-        .form-warn { background: #fff; border: 1px solid #000; border-radius: 3px; padding: 8px 10px; font-size: 11px; margin-bottom: 14px; }
-        .btn-primary { padding: 9px 18px; background: #000; color: #fff; border: 1px solid #000; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: 700; }
-        .btn-primary:hover { background: #333; }
-        .btn-secondary { padding: 9px 18px; background: #fff; color: #000; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-secondary:hover { background: #f5f5f5; }
-        .btn-danger { padding: 7px 14px; background: #fff; color: #cc0000; border: 1px solid #cc0000; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-danger:hover { background: #fff5f5; }
-        .btn-ghost { background: none; border: none; cursor: pointer; font-size: 12px; font-weight: 600; color: #000; text-decoration: underline; padding: 0; }
-
-        /* API keys table */
-        .api-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
-        .api-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; }
-        .api-table td { padding: 10px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-        .api-table tr:last-child td { border-bottom: none; }
-        .api-table tr:hover td { background: #fafafa; }
-        .key-masked { font-family: 'Courier New', monospace; font-size: 10px; color: #666; }
-        .perm-badge { display: inline-block; padding: 1px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 9px; font-weight: 700; margin-right: 3px; }
-
-        /* Activity table */
-        .activity-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        .activity-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; white-space: nowrap; }
-        .activity-table td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; font-size: 11px; }
-        .activity-table tr:last-child td { border-bottom: none; }
-        .activity-table tr.failed-row td { color: #999; font-style: italic; }
-        .act-badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; border: 1px solid; }
-        .act-success { background: #f0f0f0; border-color: #666; color: #333; }
-        .act-failed { background: #fff; border-color: #999; color: #999; }
-
-        /* 2FA QR */
-        .qr-grid-sm { display: grid; grid-template-columns: repeat(20, 1fr); gap: 1px; width: 120px; height: 120px; border: 2px solid #000; padding: 6px; background: #fff; margin: 0 auto 12px; }
-        .qr-cell { background: #fff; }
-        .qr-cell.b { background: #000; }
-        .backup-codes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f5f5f5; border: 1px solid #ccc; border-radius: 3px; padding: 12px; font-family: 'Courier New', monospace; font-size: 12px; margin-bottom: 10px; }
-
-        /* Sessions table */
-        .sessions-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 12px; }
-        .sessions-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; }
-        .sessions-table td { padding: 10px 10px; border-bottom: 1px solid #f0f0f0; }
-        .sessions-table tr:last-child td { border-bottom: none; }
-        .curr-session { font-size: 10px; color: #555; font-weight: 700; margin-left: 4px; }
-
-        /* Networks table */
-        .net-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 12px; }
-        .net-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; }
-        .net-table td { padding: 10px 10px; border-bottom: 1px solid #f0f0f0; }
-        .net-table tr:last-child td { border-bottom: none; }
-
-        /* Modals */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,.4); }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-box { background: #fff; border: 1px solid #ccc; border-radius: 4px; width: 90%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,.15); }
-        .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #eee; }
-        .modal-title { font-size: 15px; font-weight: 700; }
-        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #999; }
-        .modal-body { padding: 18px; }
-        .modal-foot { padding: 14px 18px; border-top: 1px solid #eee; display: flex; gap: 8px; justify-content: flex-end; }
-
-        /* Scope note */
-        .scope-note { background: #f8f8f8; border: 1px solid #ccc; border-left: 4px solid #000; border-radius: 4px; padding: 10px 14px; margin-top: 24px; font-size: 11px; line-height: 1.5; }
-
-        /* Footer */
-        footer { background: #f0f0f0; border-top: 1px solid #ccc; padding: 14px 20px; text-align: center; font-size: 11px; color: #666; }
-        .footer-links { margin-top: 8px; display: flex; justify-content: center; gap: 16px; }
-        .footer-links a { color: #000; text-decoration: none; font-size: 11px; font-weight: 600; }
-        .footer-links a:hover { text-decoration: underline; }
-
-        /* ── NFT Gallery ─────────────────────────────────────── */
-        .nft-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; padding: 16px; }
-        .nft-card { border: 1px solid #ccc; border-radius: 4px; overflow: hidden; cursor: pointer; transition: box-shadow 0.15s; background: #fff; }
-        .nft-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
-        .nft-art { width: 100%; aspect-ratio: 1; display: grid; grid-template-columns: repeat(10, 1fr); gap: 1px; background: #eee; }
-        .nft-art-cell { background: #fff; }
-        .nft-art-cell.b { background: #000; }
-        .nft-info { padding: 8px 10px; }
-        .nft-collection { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #999; letter-spacing: 0.5px; }
-        .nft-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
-        .nft-floor { font-size: 10px; color: #555; }
-        .nft-empty { padding: 48px 16px; text-align: center; color: #999; font-size: 12px; }
-        .nft-empty-icon { font-size: 32px; margin-bottom: 8px; }
-
-        /* ── DeFi Positions ──────────────────────────────────── */
-        .defi-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .defi-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; }
-        .defi-table td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; }
-        .defi-table tr:last-child td { border-bottom: none; }
-        .health-warn { color: #c00; font-weight: 700; }
-        .collapsible-toggle { cursor: pointer; user-select: none; }
-        .collapsible-toggle:hover { background: #f5f5f5; }
-
-        /* ── Watchlist star ──────────────────────────────────── */
-        .star-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 0 4px; color: #ccc; line-height: 1; }
-        .star-btn.starred { color: #000; }
-        .star-btn:hover { color: #666; }
-
-        /* ── Address Book ────────────────────────────────────── */
-        .contacts-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .contacts-table th { background: #f5f5f5; border-bottom: 1px solid #ccc; padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #666; }
-        .contacts-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
-        .contacts-table tr:last-child td { border-bottom: none; }
-        .contacts-table tr:hover td { background: #fafafa; }
-
-        /* ── Dev console ─────────────────────────────────────── */
-        #devConsole { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 200px; background: #111; color: #0f0; font-family: 'Courier New', monospace; font-size: 11px; z-index: 9000; border-top: 2px solid #0f0; padding: 8px; overflow-y: auto; }
-        #devConsole .dev-close { position: absolute; top: 6px; right: 10px; background: none; border: none; color: #0f0; cursor: pointer; font-size: 14px; font-weight: 700; }
-        #devBanner { display: none; background: #000; color: #0f0; font-size: 11px; font-weight: 700; font-family: 'Courier New', monospace; text-align: center; padding: 4px; position: sticky; top: 52px; z-index: 199; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlimit Wallet — Sprint 3: Intelligence &amp; Security</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;color:#000;line-height:1.5;min-height:100vh}
+.app-header{background:#f0f0f0;border-bottom:2px solid #000;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;gap:12px}
+.wallet-zone{display:flex;align-items:center;position:relative}
+.wallet-btn{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:13px;font-weight:700}
+.wallet-btn:hover{background:#f5f5f5}
+.wallet-avatar{width:26px;height:26px;background:#000;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.wallet-caret{font-size:10px;color:#666}
+.wallet-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;width:260px;background:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:300}
+.wallet-dropdown.open{display:block}
+.wd-header{padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;color:#999;border-bottom:1px solid #eee}
+.wd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5}
+.wd-item:hover{background:#fafafa}.wd-item.active{background:#f5f5f5}
+.wd-info{flex:1}.wd-name{font-size:12px;font-weight:700}.wd-addr{font-size:10px;color:#999;font-family:'Courier New',monospace}
+.wd-footer a{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;font-weight:600;color:#000;text-decoration:none;border-bottom:1px solid #f5f5f5}
+.wd-footer a:hover{background:#fafafa}
+.header-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#000}
+.icon-btn:hover{background:#f5f5f5}
+.cluster-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#fff;border:1px solid #ccc;font-size:11px;font-weight:700;color:#000}
+.cluster-dot{width:6px;height:6px;border-radius:50%;background:#000}
+.main-tabs{display:flex;border-bottom:2px solid #000;background:#f5f5f5;position:sticky;top:52px;z-index:150}
+.main-tab{flex:1;padding:13px 8px;background:transparent;border:none;cursor:pointer;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#666;border-bottom:3px solid transparent;margin-bottom:-2px}
+.main-tab:hover{color:#000}.main-tab.active{color:#000;border-bottom-color:#000;background:#fff}
+.tab-view{display:none}.tab-view.active{display:block}
+.container{max-width:1000px;margin:0 auto;padding:24px 20px 48px}
+.balance-card{background:#fff;border:1px solid #ccc;border-radius:6px;padding:24px;margin-bottom:16px}
+.bal-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:4px}
+.bal-value{font-size:32px;font-weight:700;font-family:'Courier New',monospace;margin-bottom:4px}
+.bal-change{font-size:12px;margin-bottom:12px}
+.addr-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-family:'Courier New',monospace;font-size:11px;color:#666;margin-bottom:16px}
+.addr-row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.action-row{display:flex;gap:8px;flex-wrap:wrap}
+.action-btn{flex:1;min-width:80px;padding:12px 8px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;text-align:center}
+.action-btn:hover:not(:disabled){background:#f0f0f0}
+.action-btn .ab-icon{font-size:18px;display:block;margin-bottom:3px}
+.section-card{background:#fff;border:1px solid #ccc;border-radius:6px;overflow:hidden;margin-bottom:16px}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee;background:#fafafa}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.asset-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.asset-tbl th{background:#f5f5f5;border-bottom:1px solid #ccc;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:#666;white-space:nowrap}
+.asset-tbl td{padding:12px 14px;border-bottom:1px solid #f0f0f0}
+.asset-tbl tr:last-child td{border-bottom:none}.asset-tbl tr:hover td{background:#fafafa}
+.asset-name{font-weight:700}.asset-ticker{font-size:10px;color:#999;display:block}
+.btn-small{padding:6px 12px;background:#000;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700}.btn-small:hover{background:#333}
+.btn-small-outline{padding:6px 12px;background:#fff;color:#000;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600}.btn-small-outline:hover{background:#f5f5f5}
+.filter-zone{padding:14px 16px;border-bottom:1px solid #eee;background:#fafafa;display:flex;flex-direction:column;gap:8px}
+.filter-pill-row{display:flex;gap:6px;flex-wrap:wrap}
+.filter-pill{padding:5px 14px;background:#fff;border:1px solid #ccc;border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap;color:#666}
+.filter-pill.active{background:#000;color:#fff;border-color:#000}
+.filter-pill:hover:not(.active){background:#f0f0f0}
+.filter-inputs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-input{padding:6px 9px;border:1px solid #ccc;border-radius:4px;font-size:11px;font-family:inherit;background:#fff;color:#000}
+.filter-input:focus{outline:none;border-color:#000}
+.tx-table{width:100%;border-collapse:collapse;font-size:12px}
+.tx-table th{background:#f5f5f5;border-bottom:1px solid #ccc;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:#666;white-space:nowrap}
+.tx-table td{padding:12px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.tx-table tr:last-child td{border-bottom:none}.tx-table tr:hover td{background:#fafafa;cursor:pointer}
+.tx-type-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;border:1px solid;white-space:nowrap}
+.badge-sent{background:#f5f5f5;border-color:#666;color:#333}
+.badge-received{background:#fff;border-color:#000;color:#000}
+.badge-swap{background:#f0f0f0;border-color:#888;color:#444}
+.badge-pending{background:#fff;border-color:#000;color:#000;font-style:italic}
+.tx-hash-cell{font-family:'Courier New',monospace;font-size:10px;color:#999}
+.pre-sign-sim{background:#fff;border:1px solid #ccc;border-radius:6px;padding:20px;margin-bottom:16px}
+.pss-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;margin-bottom:12px;border:1px solid}
+.pss-badge-risk-medium{background:#fffbf0;border-color:#fbbf24;color:#92400e}
+.pss-plain{font-size:14px;font-weight:600;line-height:1.7;margin-bottom:14px}
+.pss-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.pss-item{padding:10px 14px;background:#fafafa;border:1px solid #eee;border-radius:4px}
+.pss-item-label{font-size:10px;color:#999;text-transform:uppercase;font-weight:700;margin-bottom:3px}
+.pss-item-value{font-size:13px;font-weight:700}
+.settings-grid{display:grid;grid-template-columns:200px 1fr;margin-bottom:16px}
+.settings-sidebar{border:1px solid #ccc;border-radius:6px;background:#fff;overflow:hidden}
+.settings-content{border:1px solid #ccc;border-radius:6px;background:#fff;padding:24px;margin-left:16px;min-height:400px}
+.settings-nav{list-style:none}
+.settings-nav li{padding:12px 18px;cursor:pointer;font-size:12px;font-weight:600;color:#666;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px}
+.settings-nav li:hover{background:#fafafa;color:#000}
+.settings-nav li.active{background:#f5f5f5;color:#000;border-left:3px solid #000;padding-left:15px}
+.settings-panel{display:none}.settings-panel.active{display:block}
+.settings-panel-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.toggle-sw{display:inline-flex;align-items:center;width:44px;height:24px;border-radius:12px;background:#ccc;cursor:pointer;position:relative;transition:background 0.2s}
+.toggle-sw.on{background:#000}
+.toggle-sw .knob{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;left:3px;transition:left 0.2s}.toggle-sw.on .knob{left:23px}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.3)}
+.modal.active{display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-content{background:#fff;border:1px solid #ccc;border-radius:6px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px 14px;border-bottom:1px solid #eee}
+.modal-title{font-weight:700;font-size:16px}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#999}.modal-close:hover{color:#000}
+.modal-body{padding:20px}
+.text-center{text-align:center}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#444;margin-bottom:6px}
+.form-input{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:4px;font-size:13px;font-family:inherit;background:#fff;color:#000}
+.form-input:focus{outline:none;border-color:#000}
+.btn-primary{width:100%;padding:12px;background:#000;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer}.btn-primary:hover{background:#333}
+.btn-secondary{width:100%;padding:12px;background:#fff;color:#000;border:1px solid #ccc;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer}.btn-secondary:hover{background:#f5f5f5}
+.btn-danger{width:100%;padding:12px;background:#fff;color:#000;border:1px solid #ccc;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer}.btn-danger:hover{background:#f5f5f5}
+.btn-row{display:flex;gap:10px}.btn-row .btn-primary,.btn-row .btn-secondary{flex:1}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.nav-link{padding:6px 12px;background:#fff;border:1px solid #ccc;border-radius:4px;font-size:11px;font-weight:600;color:#000;text-decoration:none}.nav-link:hover{background:#f5f5f5}
+.whale-token-card{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fafafa;border:1px solid #eee;border-radius:4px;margin-bottom:8px}
+.whale-token-symbol{font-weight:700}.whale-token-price{font-size:11px;margin-left:auto}
+.whale-token-badge{font-size:10px;padding:3px 8px;border-radius:4px;background:#000;color:#fff;font-weight:700}
+.whale-token-wallets{font-size:11px;color:#666}
+.whale-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.whale-tag{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1px solid #ccc;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;color:#000}
+.whale-tag:hover{background:#f5f5f5}
+.whale-tag.active{background:#f0f0f0;border-color:#000}
+.whale-tag-count{font-size:10px;color:#666;font-weight:700}
+</style>
 </head>
 <body>
 
-    <!-- ─── App Header ─────────────────────────────────────── -->
-    <div class="app-header">
-        <div class="wallet-zone">
-            <button class="wallet-btn" onclick="togglePanel('walletDropdown')">
-                <div class="wallet-avatar">MW</div>
-                My Wallet
-                <span class="wallet-caret">▾</span>
-            </button>
-            <div class="wallet-dropdown" id="walletDropdown">
-                <div class="wd-header">My Wallets</div>
-                <div class="wd-item active">
-                    <div class="wallet-avatar" style="width:28px;height:28px;font-size:9px;">MW</div>
-                    <div class="wd-info"><div class="wd-name">My Wallet</div><div class="wd-addr">0x742d...8ae7</div></div>
-                    <span>✓</span>
-                </div>
-                <div class="wd-item">
-                    <div class="wallet-avatar" style="width:28px;height:28px;font-size:9px;background:#555;">TW</div>
-                    <div class="wd-info"><div class="wd-name">Trading Wallet</div><div class="wd-addr">FMi7...9cXq</div></div>
-                </div>
-                <div class="wd-footer"><a href="sprint1.html">＋ Create New Wallet</a><a href="sprint1.html">↓ Import Wallet</a><a href="sprint1.html">👁 Watch an Address</a></div>
-            </div>
-        </div>
-        
-        <div class="header-actions">
-            <button class="icon-btn" onclick="openModal('sendModal')" title="Send">↑</button>
-            <button class="icon-btn" title="Pending">⏳</button>
-            <button class="icon-btn" onclick="switchMainTab('settings')" title="Settings">⚙</button>
-            <span class="proto-badge">Sprint 3/4</span>
-            <a href="management.html" style="font-size:11px;padding:6px 10px;border:1px solid #ccc;border-radius:4px;text-decoration:none;color:#000;background:#fff;font-weight:600;">← Dashboard</a>
-        </div>
-    </div>
+<header class="app-header">
+<div class="wallet-zone">
+<button class="wallet-btn" onclick="document.getElementById('walletDropdown').classList.toggle('open')">
+<div class="wallet-avatar">U</div><span>Unlimit Wallet</span><span class="wallet-caret">▾</span>
+</button>
+<div class="wallet-dropdown" id="walletDropdown">
+<div class="wd-header">My Wallets</div>
+<div class="wd-item active"><div class="wallet-avatar">U</div><div class="wd-info"><div class="wd-name">Unlimit Wallet</div><div class="wd-addr">DRos...xk8r</div></div><span>✓</span></div>
+<div class="wd-footer"><a href="sprint1.html">+ Add / Import Wallet</a></div>
+</div>
+</div>
+<div class="header-actions">
+<span class="cluster-pill"><span class="cluster-dot"></span> Mainnet</span>
+<button class="icon-btn" onclick="showToast('0 new alerts')">🔔</button>
+<button class="icon-btn" onclick="window.location.href='sprint4.html'" title="Social Trading">👥</button>
+</div>
+</header>
 
-    <!-- ─── Main Tab Bar ───────────────────────────────────── -->
-    <div class="main-tabs">
-        <button class="main-tab active" onclick="switchMainTab('portfolio')">◈ Portfolio</button>
-        <button class="main-tab" onclick="switchMainTab('transactions')">↕ Transactions</button>
-        <button class="main-tab" onclick="switchMainTab('nfts')">◻ NFTs</button>
-        <button class="main-tab" onclick="switchMainTab('settings')">⚙ Settings</button>
-    </div>
+<div class="main-tabs">
+<button class="main-tab active" onclick="switchMainTab('portfolio')">Portfolio</button>
+<button class="main-tab" onclick="switchMainTab('transactions')">Transactions</button>
+<button class="main-tab" onclick="switchMainTab('intelligence')">Intelligence</button>
+<button class="main-tab" onclick="switchMainTab('settings')">Settings</button>
+</div>
 
-    <div id="devBanner">🛠 DEVELOPER MODE ACTIVE — localStorage dump available in console panel below</div>
+<!-- TAB: Portfolio -->
+<div class="tab-view active" id="tab-portfolio"><div class="container">
+<div class="balance-card">
+<div class="bal-label">Total Balance</div>
+<div class="bal-value">24.42 SOL</div>
+<div class="bal-change">▲ +2.4% (24h) · ≈ $4,135.37</div>
+<div class="addr-row"><span>DRosGtEVv9XPxXBk8rPJmGgqGPY4dWUXa3YEeUUkxK8r</span><button style="background:none;border:none;cursor:pointer;color:#999" onclick="navigator.clipboard.writeText('DRosGtEVv9XPxXBk8rPJmGgqGPY4dWUXa3YEeUUkxK8r');showToast('Copied')">📋</button></div>
+<div class="action-row">
+<button class="action-btn" onclick="window.location.href='sprint2.html'"><span class="ab-icon">↑</span>Send</button>
+<button class="action-btn" onclick="window.location.href='sprint2.html'"><span class="ab-icon">↓</span>Receive</button>
+<button class="action-btn" onclick="window.location.href='sprint2.html'"><span class="ab-icon">⇄</span>Swap</button>
+<button class="action-btn" onclick="window.location.href='sprint4.html'"><span class="ab-icon">👥</span>Trade</button>
+</div>
+</div>
+<div class="section-card">
+<div class="section-header"><span class="section-title">Assets</span></div>
+<table class="asset-tbl">
+<thead><tr><th>Asset</th><th style="text-align:right">Balance</th><th style="text-align:right">Value</th><th style="text-align:right">24h</th></tr></thead>
+<tbody>
+<tr><td><span class="asset-name">Solana</span><span class="asset-ticker">SOL</span></td><td style="text-align:right;font-weight:700">24.42</td><td style="text-align:right;font-weight:700">$4,135.37</td><td style="text-align:right">+2.4%</td></tr>
+<tr><td><span class="asset-name">USD Coin</span><span class="asset-ticker">USDC</span></td><td style="text-align:right;font-weight:700">1,250.00</td><td style="text-align:right;font-weight:700">$1,250.00</td><td style="text-align:right">0.0%</td></tr>
+<tr><td><span class="asset-name">Bonk</span><span class="asset-ticker">BONK</span></td><td style="text-align:right;font-weight:700">25M</td><td style="text-align:right;font-weight:700">$412.50</td><td style="text-align:right">+8.3%</td></tr>
+<tr><td><span class="asset-name">Jito</span><span class="asset-ticker">JTO</span></td><td style="text-align:right;font-weight:700">45.00</td><td style="text-align:right;font-weight:700">$315.00</td><td style="text-align:right">-2.1%</td></tr>
+<tr><td><span class="asset-name">Pyth Network</span><span class="asset-ticker">PYTH</span></td><td style="text-align:right;font-weight:700">520.00</td><td style="text-align:right;font-weight:700">$208.00</td><td style="text-align:right">+5.7%</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section-card">
+<div class="section-header"><span class="section-title">DeFi Positions</span></div>
+<div style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f0f0" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">
+<span>🔀</span><span style="font-weight:700">SOL-USDC LP</span><span style="font-size:10px;color:#999;margin-left:auto">Raydium</span>
+</div>
+<div style="display:none;padding:12px 16px;font-size:12px;border-bottom:1px solid #f0f0f0">Pooled: 5.0 SOL + 846.00 USDC · Value: $1,690.00 · APR: 24.5%</div>
+<div style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px" onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block'">
+<span>🥩</span><span style="font-weight:700">Staked SOL</span><span style="font-size:10px;color:#999;margin-left:auto">Marinade</span>
+</div>
+<div style="display:none;padding:12px 16px;font-size:12px">Staked: 10.0 mSOL · Value: 10.42 SOL · APR: 6.8%</div>
+</div>
+</div></div>
 
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- TAB 1: PORTFOLIO (Sprint 2 cumulative)                 -->
-    <!-- ════════════════════════════════════════════════════════ -->
-    <div id="view-portfolio" class="tab-view active">
-        <div class="container">
-            <div class="balance-card">
-                <div class="bal-label">Total Portfolio Value</div>
-                <div class="bal-value">$12,547.32</div>
-                <div class="bal-change">▲ +$234.50 (+1.90%) · past 24 hours</div>
-                <div class="addr-row">
-                    <span>7xKX7PmFdRxGLXsP9aQ5dBkN3sYbFe4Wc…Bb3q</span>
-                    <button class="copy-btn" onclick="showToast('Address copied!')">⎘</button>
-                </div>
-                <div class="action-row">
-                    <button class="action-btn" onclick="openModal('sendModal')"><span class="ab-icon">↑</span>Send</button>
-                    <button class="action-btn" onclick="openModal('receiveModal')"><span class="ab-icon">↓</span>Receive</button>
-                    <button class="action-btn" onclick="openModal('swapModal')"><span class="ab-icon">⇄</span>Swap</button>
-                    <button class="action-btn" onclick="showToast('Staking — see Settings → Staking')"><span class="ab-icon">◎</span>Stake</button>
-                    <button class="action-btn" disabled><span class="ab-icon">$</span>Buy</button>
-                </div>
-            </div>
+<!-- TAB: Transactions -->
+<div class="tab-view" id="tab-transactions"><div class="container">
+<div class="section-card">
+<div class="filter-zone">
+<div class="filter-pill-row">
+<button class="filter-pill active" onclick="filterTx(this)">All</button>
+<button class="filter-pill" onclick="filterTx(this)">Sent</button>
+<button class="filter-pill" onclick="filterTx(this)">Received</button>
+<button class="filter-pill" onclick="filterTx(this)">Swaps</button>
+<button class="filter-pill" onclick="filterTx(this)">Pending</button>
+</div>
+<div class="filter-inputs">
+<input type="text" class="filter-input" placeholder="Search by signature" style="width:240px">
+<span style="font-size:11px;color:#999">Showing 7 transactions</span>
+</div>
+</div>
+<table class="tx-table">
+<thead><tr><th>Date</th><th>Type</th><th>Details</th><th style="text-align:right">Amount</th><th>Signature</th></tr></thead>
+<tbody>
+<tr onclick="openPreSignDemo('swap')"><td>May 1</td><td><span class="tx-type-badge badge-swap">Swap</span></td><td>SOL → USDC (Jupiter)</td><td style="text-align:right;font-weight:700">1 SOL → 169.44 USDC</td><td class="tx-hash-cell">5k2X...p9m</td></tr>
+<tr onclick="openPreSignDemo('received')"><td>Apr 30</td><td><span class="tx-type-badge badge-received">Received</span></td><td>From 8xGtYm... (auto-detected)</td><td style="text-align:right;font-weight:700">+500 USDC</td><td class="tx-hash-cell">3a7B...k2q</td></tr>
+<tr onclick="openPreSignDemo('sent')"><td>Apr 29</td><td><span class="tx-type-badge badge-sent">Sent</span></td><td>To 3kLpNq... (auto-ATA created)</td><td style="text-align:right;font-weight:700">-0.5 SOL</td><td class="tx-hash-cell">9fD4...r8x</td></tr>
+<tr onclick="openPreSignDemo('received')"><td>Apr 28</td><td><span class="tx-type-badge badge-received">Received</span></td><td>Auto-detected JTO airdrop</td><td style="text-align:right;font-weight:700">+45 JTO</td><td class="tx-hash-cell">2mP7...w3z</td></tr>
+<tr onclick="openPreSignDemo('swap')"><td>Apr 27</td><td><span class="tx-type-badge badge-swap">Swap</span></td><td>USDC → BONK (Jupiter)</td><td style="text-align:right;font-weight:700">100 USDC → 2.78M BONK</td><td class="tx-hash-cell">7hT1...y5n</td></tr>
+<tr onclick="openPreSignDemo('pending')"><td>Apr 26</td><td><span class="tx-type-badge badge-pending">Pending</span></td><td>Reclaim rent (Sprint 1)</td><td style="text-align:right;font-weight:700">+0.05 SOL</td><td class="tx-hash-cell">1xW9...v6c</td></tr>
+<tr onclick="openPreSignDemo('sent')"><td>Apr 25</td><td><span class="tx-type-badge badge-sent">Sent</span></td><td>To 6qRsNf... (Zero-Failure)</td><td style="text-align:right;font-weight:700">-100 USDC</td><td class="tx-hash-cell">8yP3...a7k</td></tr>
+</tbody>
+</table>
+</div>
+</div></div>
 
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">Assets</span>
-                    <button class="btn-small">＋ Add Token</button>
-                </div>
-                <table class="asset-tbl">
-                    <thead><tr><th></th><th>Asset</th><th>Balance</th><th>Value (USD)</th><th>24h Change</th></tr></thead>
-                    <tbody>
-                        <tr><td><button class="star-btn starred" onclick="toggleStar(this)" title="Watchlist">★</button></td><td><div class="asset-name">Ethereum</div><span class="asset-ticker">ETH</span></td><td>2.500 ETH</td><td>$4,250.00</td><td>▲ +2.4%</td></tr>
-                        <tr><td><button class="star-btn" onclick="toggleStar(this)" title="Watchlist">☆</button></td><td><div class="asset-name">USD Coin</div><span class="asset-ticker">USDC</span></td><td>5,000.00 USDC</td><td>$5,000.00</td><td>▲ +0.0%</td></tr>
-                        <tr><td><button class="star-btn starred" onclick="toggleStar(this)" title="Watchlist">★</button></td><td><div class="asset-name">Wrapped Bitcoin</div><span class="asset-ticker">WBTC</span></td><td>0.1500 WBTC</td><td>$6,150.00</td><td>▲ +1.8%</td></tr>
-                        <tr><td><button class="star-btn" onclick="toggleStar(this)" title="Watchlist">☆</button></td><td><div class="asset-name">Dai Stablecoin</div><span class="asset-ticker">DAI</span></td><td>2,147.32 DAI</td><td>$2,147.32</td><td>▼ -0.1%</td></tr>
-                    </tbody>
-                </table>
-            </div>
+<!-- TAB: Intelligence -->
+<div class="tab-view" id="tab-intelligence"><div class="container">
 
-            <!-- Portfolio chart placeholder -->
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">Portfolio History</span>
-                    <div style="display:flex;gap:4px;">
-                        <button class="filter-pill active" style="border-radius:3px;">24h</button>
-                        <button class="filter-pill" style="border-radius:3px;">7d</button>
-                        <button class="filter-pill" style="border-radius:3px;">30d</button>
-                        <button class="filter-pill" style="border-radius:3px;">1y</button>
-                    </div>
-                </div>
-                <div style="padding:16px;">
-                    <svg viewBox="0 0 400 80" style="width:100%;height:80px;border:1px solid #eee;" xmlns="http://www.w3.org/2000/svg">
-                        <polyline points="0,60 20,55 40,58 60,50 80,52 100,44 120,46 140,40 160,42 180,35 200,38 220,30 240,32 260,25 280,28 300,20 320,22 340,18 360,15 380,12 400,10" fill="none" stroke="#000" stroke-width="2"/>
-                        <polyline points="0,60 20,55 40,58 60,50 80,52 100,44 120,46 140,40 160,42 180,35 200,38 220,30 240,32 260,25 280,28 300,20 320,22 340,18 360,15 380,12 400,10 400,80 0,80" fill="#f5f5f5" stroke="none"/>
-                    </svg>
-                    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#666;">
-                        <span>High: <strong>$12,782.00</strong></span>
-                        <span>▲ +1.90% (24h)</span>
-                        <span>Low: <strong>$11,905.42</strong></span>
-                    </div>
-                </div>
-            </div>
+<div class="pre-sign-sim">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+<span style="font-size:24px">🔮</span>
+<div>
+<div style="font-size:16px;font-weight:700">Pre-Sign Simulation</div>
+<div style="font-size:11px;color:#666">Plain English explanation <strong>before</strong> signing any transaction</div>
+</div>
+</div>
+<div class="pss-badge pss-badge-risk-medium" style="margin-bottom:10px">⚠ Medium Risk — Site created 12 days ago</div>
+<div class="pss-plain">
+You are sending <strong>10 SOL</strong> (≈$1,690) in exchange for approximately <strong>5,000,000 $BONK</strong>. The dApp <strong>pump.fun</strong> requests this transfer. This site was created <strong>12 days ago</strong> (Medium Risk). No suspicious code detected.
+</div>
+<div class="pss-detail">
+<div class="pss-item"><div class="pss-item-label">You Give</div><div class="pss-item-value">10.0 SOL</div></div>
+<div class="pss-item"><div class="pss-item-label">You Receive</div><div class="pss-item-value">5M BONK</div></div>
+<div class="pss-item"><div class="pss-item-label">dApp</div><div class="pss-item-value">pump.fun</div></div>
+<div class="pss-item"><div class="pss-item-label">Site Age</div><div class="pss-item-value">12 days</div></div>
+<div class="pss-item"><div class="pss-item-label">Slippage</div><div class="pss-item-value">3.0%</div></div>
+</div>
+<div style="margin-top:14px;display:flex;gap:10px">
+<button class="btn-secondary" style="flex:1" onclick="showToast('Simulation refreshed')">↺ Simulate Again</button>
+<button class="btn-primary" style="flex:1" onclick="showToast('Transaction approved!')">Approve →</button>
+</div>
+</div>
 
-            <!-- DeFi Positions -->
-            <div class="section-card">
-                <div class="section-header collapsible-toggle" onclick="toggleDefi(this)">
-                    <span class="section-title">DeFi Positions <span id="defiTvl" style="font-size:11px;font-weight:400;color:#555;">· Total TVL: $4,200.00</span></span>
-                    <span id="defiChevron" style="font-size:12px;color:#999;">▼</span>
-                </div>
-                <div id="defiBody">
-                    <table class="defi-table">
-                        <thead><tr><th>Protocol</th><th>Type</th><th>Deposited (USD)</th><th>APY</th><th>Health Factor</th><th></th></tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Jupiter Perps</strong></td>
-                                <td>Liquidity</td>
-                                <td>$2,500.00</td>
-                                <td>3.24%</td>
-                                <td>—</td>
-                                <td><a href="#" style="font-size:10px;font-weight:600;color:#000;" onclick="showToast('Opening Jupiter app…');return false;">View ↗</a></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Raydium</strong></td>
-                                <td>LP</td>
-                                <td>$1,200.00</td>
-                                <td>18.7%</td>
-                                <td>—</td>
-                                <td><a href="#" style="font-size:10px;font-weight:600;color:#000;" onclick="showToast('Opening Raydium app…');return false;">View ↗</a></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Marinade</strong></td>
-                                <td>Staking</td>
-                                <td>$500.00</td>
-                                <td>6.5%</td>
-                                <td>—</td>
-                                <td><a href="#" style="font-size:10px;font-weight:600;color:#000;" onclick="showToast('Opening Marinade app…');return false;">View ↗</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="padding:10px 14px;font-size:10px;color:#999;">DeFi positions powered by Jupiter, Raydium, and Marinade. Staking rewards are distributed per epoch (~2 days).</div>
-                </div>
-            </div>
+<div class="section-card" style="margin-bottom:16px">
+<div class="section-header"><span class="section-title">🐋 Whale Activity — Smart Money Tracker</span></div>
+<div style="padding:16px">
+<div style="font-size:12px;color:#666;margin-bottom:12px">Tokens being accumulated by high-win-rate wallets</div>
+<div class="whale-tags">
+<span class="whale-tag active" onclick="showWhaleTokens('sol',this)">SOL Ecosystem<span class="whale-tag-count">12</span></span>
+<span class="whale-tag" onclick="showWhaleTokens('meme',this)">Meme<span class="whale-tag-count">8</span></span>
+<span class="whale-tag" onclick="showWhaleTokens('defi',this)">DeFi<span class="whale-tag-count">5</span></span>
+<span class="whale-tag" onclick="showWhaleTokens('ai',this)">AI Agents<span class="whale-tag-count">3</span></span>
+</div>
+<div id="whale-tokens">
+<div class="whale-token-card"><span style="font-size:18px">🪙</span><div><div class="whale-token-symbol">$BONK</div><div class="whale-token-wallets">Bought by 5 smart-money wallets</div></div><span class="whale-token-badge">Bullish</span><div class="whale-token-price">+8.3%</div></div>
+<div class="whale-token-card"><span style="font-size:18px">🧠</span><div><div class="whale-token-symbol">$WIF</div><div class="whale-token-wallets">Bought by 3 smart-money wallets</div></div><span class="whale-token-badge">Accumulating</span><div class="whale-token-price">+12.1%</div></div>
+<div class="whale-token-card"><span style="font-size:18px">🤖</span><div><div class="whale-token-symbol">$JTO</div><div class="whale-token-wallets">Sold by 2 smart-money wallets</div></div><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:#f5f5f5;font-weight:700">Bearish</span><div class="whale-token-price">-2.1%</div></div>
+</div>
+</div>
+</div>
+</div></div>
 
-            <div class="scope-note">
-                <strong>Portfolio Tab (Sprint 2 cumulative):</strong> Balance card, 24h change, address copy, quick actions, watchlist stars (★/☆ toggle), sortable asset table, DeFi positions panel, portfolio chart. Click "Transactions" tab for TX history with filters. Click "NFTs" for NFT gallery. Click "Settings" tab for full account/security/API management.
-            </div>
-        </div>
-    </div>
+<!-- TAB: Settings -->
+<div class="tab-view" id="tab-settings"><div class="container"><div class="settings-grid">
+<div class="settings-sidebar"><ul class="settings-nav">
+<li class="active" onclick="switchSettings(this,'security')">🔒 Security</li>
+<li onclick="switchSettings(this,'account')">👤 Account</li>
+<li onclick="switchSettings(this,'networks')">🌐 Networks</li>
+<li onclick="switchSettings(this,'preferences')">⚙ Preferences</li>
+</ul></div>
+<div class="settings-content">
+<div class="settings-panel active" id="panel-security">
+<div class="settings-panel-title">Security</div>
+<div class="form-group"><label class="form-label">Auto-Lock Timer</label><select class="form-input"><option>5 minutes</option><option selected>15 minutes</option><option>1 hour</option></select></div>
+<div class="form-group"><label class="form-label">Pre-Sign Simulations</label><span style="font-size:11px;margin-left:8px">ON</span><div onclick="this.classList.toggle('on');var s=this.nextElementSibling;s.textContent=this.classList.contains('on')?'ON':'OFF'" class="toggle-sw on"><div class="knob"></div></div></div>
+<div class="form-group"><label class="form-label">Whale Alerts</label><span style="font-size:11px;margin-left:8px">ON</span><div onclick="this.classList.toggle('on');var s=this.nextElementSibling;s.textContent=this.classList.contains('on')?'ON':'OFF'" class="toggle-sw on"><div class="knob"></div></div></div>
+<div class="form-group"><label class="form-label">Phishing Detection</label><span style="font-size:11px;margin-left:8px">ON</span><div onclick="this.classList.toggle('on');var s=this.nextElementSibling;s.textContent=this.classList.contains('on')?'ON':'OFF'" class="toggle-sw on"><div class="knob"></div></div></div>
+</div>
+<div class="settings-panel" id="panel-account">
+<div class="settings-panel-title">Account</div>
+<div class="form-group"><label class="form-label">Wallet Name</label><input class="form-input" value="Unlimit Wallet"></div>
+<div class="form-group"><label class="form-label">Solana Domain</label><input class="form-input" placeholder="yourname.sol"></div>
+<div style="display:flex;gap:10px"><button class="btn-secondary" style="flex:1">Export Backup</button><button class="btn-danger" style="flex:1">Remove Wallet</button></div>
+</div>
+<div class="settings-panel" id="panel-networks">
+<div class="settings-panel-title">Networks</div>
+<div style="padding:10px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;margin-bottom:10px">
+<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e0e0e0"><span style="font-weight:700">● Mainnet</span><span style="color:#666">api.mainnet-beta.solana.com</span></div>
+<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e0e0e0"><span style="font-weight:700">● Devnet</span><span style="color:#666">api.devnet.solana.com</span></div>
+<div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-weight:700">● Testnet</span><span style="color:#666">api.testnet.solana.com</span></div>
+</div>
+<button class="btn-small-outline" onclick="showToast('Custom RPC dialog')">+ Add Custom RPC</button>
+</div>
+<div class="settings-panel" id="panel-preferences">
+<div class="settings-panel-title">Preferences</div>
+<div class="form-group"><label class="form-label">Currency</label><select class="form-input"><option>USD</option><option>EUR</option><option>GBP</option></select></div>
+<div class="form-group"><label class="form-label">Language</label><select class="form-input"><option>English</option><option>Chinese</option><option>Spanish</option></select></div>
+</div>
+</div>
+</div></div></div>
 
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- TAB 2: TRANSACTIONS (Sprint 3 — WLT-201–212)          -->
-    <!-- ════════════════════════════════════════════════════════ -->
-    <div id="view-transactions" class="tab-view">
-        <div class="container">
-            <div class="section-card">
-                <!-- Filter zone -->
-                <div class="filter-zone">
-                    <div class="filter-pill-row">
-                        <button class="filter-pill active" onclick="filterTx('all',this)">All</button>
-                        <button class="filter-pill" onclick="filterTx('sent',this)">↑ Sent</button>
-                        <button class="filter-pill" onclick="filterTx('received',this)">↓ Received</button>
-                        <button class="filter-pill" onclick="filterTx('swap',this)">⇄ Swap</button>
-                        <button class="filter-pill" onclick="filterTx('pending',this)">⏳ Pending</button>
-                        <button class="filter-pill" onclick="filterTx('failed',this)">✗ Failed</button>
-                    </div>
-                    <div class="filter-inputs">
-                        <span class="filter-sep">From</span>
-                        <input type="date" class="filter-input" id="f-from">
-                        <span class="filter-sep">To</span>
-                        <input type="date" class="filter-input" id="f-to">
-                        <select class="filter-input form-select" id="f-asset" style="width:auto;">
-                            <option value="">All Assets</option>
-                            <option value="SOL">SOL</option>
-                            <option value="USDC">USDC</option>
-                            <option value="USDT">USDT</option>
-                            <option value="BONK">BONK</option>
-                            <option value="DAI">DAI</option>
-                        </select>
-                        <input type="text" class="filter-input" id="f-search" placeholder="Search hash / address…" style="min-width:180px;">
-                        <button class="filter-reset" onclick="resetFilters()">Reset</button>
-                    </div>
-                </div>
-                <div class="results-count" id="txCount">Showing 8 of 8 transactions</div>
+<div class="container"><div class="nav-links">
+<a href="management.html" class="nav-link">← Dashboard</a>
+<a href="sprint2.html" class="nav-link">← Core Wallet</a>
+<a href="sprint4.html" class="nav-link">Social Trading →</a>
+</div></div>
 
-                <!-- TX Table -->
-                <div style="overflow-x:auto;">
-                    <table class="tx-table">
-                        <thead>
-                            <tr>
-                                <th>Date / Time</th>
-                                <th>Type</th>
-                                <th>Asset &amp; Amount</th>
-                                <th>USD Value</th>
-                                <th>Status</th>
-                                <th>TX Hash</th>
-                            </tr>
-                        </thead>
-                        <tbody id="txTbody">
-                            <tr class="tx-row tx-sent" onclick="openModal('txDetailModal')">
-                                <td>Jan 15 2:32 PM</td>
-                                <td><span class="tx-type-badge badge-sent">Sent</span></td>
-                                <td>-5.000 SOL</td>
-                                <td>$847.00</td>
-                                <td><span class="status-pill pill-confirmed">✓ Confirmed</span></td>
-                                <td class="tx-hash-cell"><a href="#">4tHmQ…6wKr ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-received" onclick="openModal('txDetailModal')">
-                                <td>Jan 14 9:15 AM</td>
-                                <td><span class="tx-type-badge badge-received">Received</span></td>
-                                <td>+20.000 SOL</td>
-                                <td>$3,388.00</td>
-                                <td><span class="status-pill pill-confirmed">✓ Confirmed</span></td>
-                                <td class="tx-hash-cell"><a href="#">2xKPm…9jBv ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-sent" onclick="openModal('txDetailModal')">
-                                <td>Jan 13 4:45 PM</td>
-                                <td><span class="tx-type-badge badge-sent">Sent</span></td>
-                                <td>-100.00 USDC</td>
-                                <td>$100.00</td>
-                                <td><span class="status-pill pill-confirmed">✓ Confirmed</span></td>
-                                <td class="tx-hash-cell"><a href="#">5nRqs…3cWx ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-swap" onclick="openModal('txDetailModal')">
-                                <td>Jan 13 1:20 PM</td>
-                                <td><span class="tx-type-badge badge-swap">Swap</span></td>
-                                <td>1.0 SOL → 169.44 USDC</td>
-                                <td>$169.44</td>
-                                <td><span class="status-pill pill-confirmed">✓ Confirmed</span></td>
-                                <td class="tx-hash-cell"><a href="#">7pLqm…8dNt ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-pending" onclick="openModal('txDetailModal')">
-                                <td>Jan 12 11:20 AM</td>
-                                <td><span class="tx-type-badge badge-pending">Pending</span></td>
-                                <td>-2.500 SOL</td>
-                                <td>$422.50</td>
-                                <td><span class="status-pill pill-pending">⏳ Pending</span></td>
-                                <td class="tx-hash-cell"><a href="#">3mWvr…1bXk ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-received" onclick="openModal('txDetailModal')">
-                                <td>Jan 11 8:00 AM</td>
-                                <td><span class="tx-type-badge badge-received">Received</span></td>
-                                <td>+500.00 USDC</td>
-                                <td>$500.00</td>
-                                <td><span class="status-pill pill-confirmed">✓ Confirmed</span></td>
-                                <td class="tx-hash-cell"><a href="#">6qNbf…4cYj ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-failed" onclick="openModal('txDetailModal')">
-                                <td>Jan 10 6:30 PM</td>
-                                <td><span class="tx-type-badge badge-failed">Failed</span></td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td><span class="status-pill pill-failed">✗ Failed</span></td>
-                                <td class="tx-hash-cell"><a href="#">8kRts…2vPq ↗</a></td>
-                            </tr>
-                            <tr class="tx-row tx-sent" onclick="openModal('txDetailModal')">
-                                <td>Jan 9 3:15 PM</td>
-                                <td><span class="tx-type-badge badge-sent">Sent</span></td>
-                                <td>-2,500,000 BONK</td>
-                                <td>$75.00</td>
-                                <td><span class="status-pill pill-confirmed">✓ Confirmed</span></td>
-                                <td class="tx-hash-cell"><a href="#">1jMnp…5wHe ↗</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+<!-- Pre-Sign Modal -->
+<div class="modal" id="preSignModal"><div class="modal-content">
+<div class="modal-header"><div class="modal-title">Pre-Sign Simulation</div><button class="modal-close" onclick="closeModal('preSignModal')">✕</button></div>
+<div class="modal-body">
+<div class="pss-plain" id="pss-modal-text"></div>
+<div class="pss-detail" id="pss-modal-detail"></div>
+<div style="margin-top:14px;display:flex;gap:10px">
+<button class="btn-secondary" style="flex:1" onclick="closeModal('preSignModal')">Close</button>
+<button class="btn-primary" style="flex:1" onclick="closeModal('preSignModal');showToast('Transaction approved!')">Approve →</button>
+</div>
+</div></div></div>
 
-                <!-- Pagination -->
-                <div class="pagination">
-                    <button class="page-btn">← Prev</button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <button class="page-btn">Next →</button>
-                </div>
-            </div>
-
-            <!-- Gas analytics -->
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">Gas Analytics</span>
-                    <div style="display:flex;gap:6px;align-items:center;">
-                        <button class="btn-small-outline" onclick="showToast('wallet_txs_2025-01-15.csv downloaded')">Export CSV ↓</button>
-                    </div>
-                </div>
-                <div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-                    <div style="border:1px solid #eee;border-radius:4px;padding:14px;">
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:8px;">Transaction Fees (Solana)</div>
-                        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span>Base Fee</span><strong>5,000 lamports · always fixed</strong></div>
-                        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span>Normal</span><strong>0 µlamports/CU</strong></div>
-                        <div style="display:flex;justify-content:space-between;font-size:12px;"><span>⚡ Turbo</span><strong>50,000 µlamports/CU</strong></div>
-                    </div>
-                    <div style="border:1px solid #eee;border-radius:4px;padding:14px;">
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:8px;">My Fee Spend</div>
-                        <div style="font-size:24px;font-weight:700;font-family:'Courier New',monospace;">0.00182 SOL</div>
-                        <div style="font-size:12px;color:#666;">≈ $0.31 · last 30 days</div>
-                        <div style="display:flex;gap:6px;margin-top:8px;">
-                            <button class="filter-pill active" style="border-radius:3px;padding:3px 8px;">30d</button>
-                            <button class="filter-pill" style="border-radius:3px;padding:3px 8px;">90d</button>
-                            <button class="filter-pill" style="border-radius:3px;padding:3px 8px;">All</button>
-                        </div>
-                    </div>
-                    <div style="border:1px solid #eee;border-radius:4px;padding:14px;">
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:8px;">7-Day Avg Priority Fee (µlam/CU)</div>
-                        <svg viewBox="0 0 200 50" style="width:100%;height:50px;" xmlns="http://www.w3.org/2000/svg">
-                            <polyline points="0,40 30,35 60,30 90,38 120,25 150,20 200,15" fill="none" stroke="#000" stroke-width="1.5"/>
-                        </svg>
-                        <div style="display:flex;justify-content:space-between;font-size:10px;color:#999;margin-top:4px;"><span>Jan 9</span><span>Jan 15</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="scope-note">
-                <strong>Transactions Tab (Sprint 3 — WLT-201–WLT-212):</strong> TX history table, type filter pills, date range, asset dropdown, text search, TX detail modal, gas analytics panel, CSV export, pagination. Sprint 4 adds ENS resolution, address book, NFT gallery, and DeFi position summary.
-            </div>
-        </div>
-    </div>
-
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- TAB 3: NFTs (Sprint 3 — WLT-206)                      -->
-    <!-- ════════════════════════════════════════════════════════ -->
-    <div id="view-nfts" class="tab-view">
-        <div class="container">
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">My NFTs <span style="font-size:11px;font-weight:400;color:#555;">· 4 items · Metaplex / Token-2022</span></span>
-                    <div style="display:flex;gap:6px;">
-                        <button class="btn-small-outline" onclick="showToast('Opening Magic Eden…')">Magic Eden ↗</button>
-                        <button class="btn-small-outline" onclick="showToast('Opening Tensor…')">Tensor ↗</button>
-                    </div>
-                </div>
-                <div class="nft-grid" id="nftGrid"></div>
-            </div>
-            <div class="scope-note">
-                <strong>NFT Gallery (Sprint 3 — WLT-206):</strong> Grid of owned Solana NFTs (Metaplex / Token-2022 standard) with CSS-generated pixel art, collection name, token ID, floor price. Click any card for detail modal with full metadata + trait table + Transfer NFT action. In production: powered by Helius DAS API or Metaplex Read API.
-            </div>
-        </div>
-    </div>
-
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- TAB 4: SETTINGS (Sprint 4 — WLT-301–312)              -->
-    <!-- ════════════════════════════════════════════════════════ -->
-    <div id="view-settings" class="tab-view">
-        <div class="container">
-            <div class="settings-layout">
-                <!-- Settings sidebar nav -->
-                <div class="settings-nav">
-                    <div class="settings-nav-item active" onclick="switchSettings('account',this)">
-                        <span class="settings-nav-icon">👤</span> Account
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('security',this)">
-                        <span class="settings-nav-icon">🔒</span> Security
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('networks',this)">
-                        <span class="settings-nav-icon">🌐</span> Networks
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('prefs',this)">
-                        <span class="settings-nav-icon">✦</span> Preferences
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('staking',this)">
-                        <span class="settings-nav-icon">◎</span> Staking
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('apikeys',this)">
-                        <span class="settings-nav-icon">🔑</span> API Keys
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('addressbook',this)">
-                        <span class="settings-nav-icon">📒</span> Address Book
-                    </div>
-                    <div class="settings-nav-item" onclick="switchSettings('activity',this)">
-                        <span class="settings-nav-icon">📋</span> Activity Log
-                    </div>
-                </div>
-
-                <!-- Settings content panels -->
-                <div class="settings-content">
-
-                    <!-- ACCOUNT -->
-                    <div id="st-account" class="settings-tab active">
-                        <div class="settings-section">
-                            <div class="settings-section-title">Wallet Profile</div>
-                            <div class="form-group">
-                                <label class="form-label">Wallet Display Name</label>
-                                <div style="display:flex;gap:8px;">
-                                    <input type="text" class="form-input" value="My Wallet" style="flex:1;">
-                                    <button class="btn-primary" onclick="showToast('Name saved!')">Save</button>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">.sol Domain (SNS)</label>
-                                <input type="text" class="form-input" value="alice.sol" disabled>
-                                <div style="font-size:10px;color:#999;margin-top:3px;">Linked via Solana Name Service (Bonfida) · alice.sol → 7xKX...Bb3q</div>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Primary Wallet</div>
-                            <div class="form-group">
-                                <label class="form-label">Active Wallet for New Sessions</label>
-                                <select class="form-input">
-                                    <option>My Wallet — 7xKX...Bb3q (current)</option>
-                                    <option>Trading Wallet — FMi7...9cXq</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Account Actions</div>
-                            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                                <button class="btn-secondary" onclick="showToast('account_data.json downloaded')">⬇ Download Account Data</button>
-                                <button class="btn-danger" onclick="openModal('deleteModal')">✕ Delete Account</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SECURITY -->
-                    <div id="st-security" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div class="settings-section-title">Two-Factor Authentication (2FA)</div>
-                            <div class="setting-row">
-                                <div class="setting-label">
-                                    <div class="setting-name">TOTP Authenticator</div>
-                                    <div class="setting-desc">Use Google Authenticator or Authy</div>
-                                </div>
-                                <button class="toggle" id="tfa-toggle" onclick="toggleTFA(this)"></button>
-                            </div>
-                            <div id="tfa-setup" style="display:none;margin-top:14px;padding:14px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;">
-                                <div style="font-size:12px;font-weight:700;margin-bottom:10px;">Scan with your authenticator app:</div>
-                                <div class="qr-grid-sm" id="qrGrid2FA"></div>
-                                <div style="font-family:'Courier New',monospace;font-size:10px;text-align:center;margin-bottom:10px;word-break:break-all;">JBSWY3DPEHPK3PXP (secret key)</div>
-                                <div class="form-group">
-                                    <label class="form-label">Enter 6-digit verification code</label>
-                                    <div style="display:flex;gap:8px;">
-                                        <input type="text" class="form-input" placeholder="000000" maxlength="6" style="flex:1;letter-spacing:4px;font-family:'Courier New',monospace;">
-                                        <button class="btn-primary" onclick="verify2FA()">Verify</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="backup-codes-section" style="display:none;margin-top:14px;">
-                                <div style="font-size:12px;font-weight:700;margin-bottom:8px;">⚠ Save these backup codes securely:</div>
-                                <div class="backup-codes">
-                                    <span>A1B2-C3D4</span><span>E5F6-G7H8</span>
-                                    <span>I9J0-K1L2</span><span>M3N4-O5P6</span>
-                                    <span>Q7R8-S9T0</span><span>U1V2-W3X4</span>
-                                    <span>Y5Z6-A7B8</span><span>C9D0-E1F2</span>
-                                </div>
-                                <button class="btn-small-outline" onclick="showToast('Backup codes copied!')">⎘ Copy All Codes</button>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Password &amp; Sessions</div>
-                            <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-                                <button class="btn-secondary" onclick="openModal('pwModal')">Change Password</button>
-                                <button class="btn-danger" onclick="showToast('All other sessions revoked')">Revoke All Other Sessions</button>
-                            </div>
-                            <table class="sessions-table">
-                                <thead><tr><th>Device</th><th>IP Address</th><th>Last Active</th><th>Action</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Desktop — Chrome 120 <span class="curr-session">(This device)</span></td>
-                                        <td>192.168.1.100</td>
-                                        <td>Active now</td>
-                                        <td style="color:#999;font-size:11px;">—</td>
-                                    </tr>
-                                    <tr>
-                                        <td>iPhone — Safari 17</td>
-                                        <td>203.45.67.89</td>
-                                        <td>3 hours ago</td>
-                                        <td><button class="btn-danger" style="padding:3px 8px;font-size:10px;" onclick="showToast('Session revoked')">Revoke</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Auto-Lock</div>
-                            <div class="setting-row">
-                                <div class="setting-label">
-                                    <div class="setting-name">Lock After Inactivity</div>
-                                    <div class="setting-desc">Returns to password screen without clearing wallet state</div>
-                                </div>
-                                <select class="form-select">
-                                    <option>1 minute</option><option selected>5 minutes</option><option>15 minutes</option><option>1 hour</option><option>Never</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NETWORKS -->
-                    <div id="st-networks" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div class="settings-section-title">Configured RPC Endpoints</div>
-                            <table class="net-table">
-                                <thead><tr><th>Cluster</th><th>Endpoint</th><th>RPC URL</th><th>Type</th><th>Actions</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Solana Mainnet</strong></td><td>mainnet-beta</td><td style="font-family:'Courier New',monospace;font-size:10px;">api.mainnet-beta.solana.com</td><td><span style="font-size:10px;color:#666;">Built-in</span></td>
-                                        <td><button class="btn-ghost" disabled>Edit</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Solana Devnet</strong></td><td>devnet</td><td style="font-family:'Courier New',monospace;font-size:10px;">api.devnet.solana.com</td><td><span style="font-size:10px;color:#666;">Built-in</span></td>
-                                        <td><button class="btn-ghost" disabled>Edit</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Solana Testnet</strong></td><td>testnet</td><td style="font-family:'Courier New',monospace;font-size:10px;">api.testnet.solana.com</td><td><span style="font-size:10px;color:#666;">Built-in</span></td>
-                                        <td><button class="btn-ghost" disabled>Edit</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Helius (Custom)</strong></td><td>mainnet-beta</td><td style="font-family:'Courier New',monospace;font-size:10px;">mainnet.helius-rpc.com/…</td><td><span style="font-size:10px;font-weight:700;">Custom</span></td>
-                                        <td style="display:flex;gap:4px;"><button class="btn-ghost">Edit</button> <button class="btn-ghost" style="color:#cc0000" onclick="showToast('Endpoint removed')">Delete</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <button class="btn-small" onclick="openModal('addRpcModal')">＋ Add RPC Endpoint</button>
-                        </div>
-                    </div>
-
-                    <!-- PREFERENCES -->
-                    <div id="st-prefs" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div class="settings-section-title">Display</div>
-                            <div class="setting-row">
-                                <div class="setting-label"><div class="setting-name">Currency</div><div class="setting-desc">Display currency for balance values</div></div>
-                                <select class="form-select"><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option><option>JPY (¥)</option></select>
-                            </div>
-                            <div class="setting-row">
-                                <div class="setting-label"><div class="setting-name">Date Format</div></div>
-                                <select class="form-select"><option>MM/DD/YYYY</option><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select>
-                            </div>
-                            <div class="setting-row">
-                                <div class="setting-label"><div class="setting-name">Font Size</div></div>
-                                <select class="form-select"><option>Small (12px)</option><option selected>Medium (14px)</option><option>Large (16px)</option><option>XL (18px)</option></select>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Notifications</div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">Transaction Confirmed</div><div class="setting-desc">Notify when outgoing TX is mined</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">Incoming Transfer</div><div class="setting-desc">Notify on funds received</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">Price Alerts</div><div class="setting-desc">Notify when token hits target price</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">Low Balance Alert</div><div class="setting-desc">Notify when SOL &lt; 0.05 SOL</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">Security Alerts</div><div class="setting-desc">Always on — cannot be disabled</div></div><button class="toggle on" disabled style="opacity:.5;cursor:not-allowed;"></button></div>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Accessibility</div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">High Contrast Mode</div><div class="setting-desc">Remove grey tones, bold all borders</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-                            <div class="setting-row"><div class="setting-label"><div class="setting-name">Reduced Motion</div><div class="setting-desc">Disable animations for vestibular disorders</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
-                        </div>
-                    </div>
-
-                    <!-- STAKING (Solana-specific) -->
-                    <div id="st-staking" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div class="settings-section-title">SOL Native Staking</div>
-                            <div class="form-note">Stake SOL to earn rewards (≈6–7% APY). Your SOL remains in a stake account you control — not sent to a third party.</div>
-                            <div style="margin-bottom:14px;">
-                                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;margin-bottom:8px;">
-                                    <div><div style="font-size:12px;font-weight:700;">Staked with Solana Foundation</div><div style="font-size:11px;color:#666;">10.00 SOL · Epoch 612 · APY 6.73%</div></div>
-                                    <div style="display:flex;gap:6px;"><button class="btn-small-outline" onclick="showToast('Deactivate stake — cooldown 1 epoch (~2 days)')">Unstake</button><button class="btn-small" onclick="showToast('Added to stake account')">＋ Stake More</button></div>
-                                </div>
-                                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;">
-                                    <div><div style="font-size:12px;font-weight:700;">Marinade Liquid Staking (mSOL)</div><div style="font-size:11px;color:#666;">5.00 SOL staked · mSOL redeemable anytime · APY 6.5%</div></div>
-                                    <div><button class="btn-small-outline" onclick="showToast('Opening Marinade Finance…')">Manage ↗</button></div>
-                                </div>
-                            </div>
-                            <button class="btn-small" onclick="openModal('stakeModal')">＋ Create New Stake Account</button>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Staking Rewards</div>
-                            <table class="sessions-table">
-                                <thead><tr><th>Epoch</th><th>Validator</th><th>Reward (SOL)</th><th>APY</th></tr></thead>
-                                <tbody>
-                                    <tr><td>612</td><td>Solana Foundation</td><td>+0.00184 SOL</td><td>6.73%</td></tr>
-                                    <tr><td>611</td><td>Solana Foundation</td><td>+0.00182 SOL</td><td>6.70%</td></tr>
-                                    <tr><td>610</td><td>Solana Foundation</td><td>+0.00186 SOL</td><td>6.75%</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- API KEYS -->
-                    <div id="st-apikeys" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div class="settings-section-title">API Keys</div>
-                            <div class="form-note">Use API keys for programmatic access. Keys are bound to this wallet. Max 5 keys.</div>
-                            <table class="api-table">
-                                <thead>
-                                    <tr><th>Name</th><th>Key</th><th>Permissions</th><th>Last Used</th><th>Actions</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>My App</strong><div style="font-size:10px;color:#999;">Production</div></td>
-                                        <td class="key-masked">sk_live_a1b2c3d4…e5f6</td>
-                                        <td>
-                                            <span class="perm-badge">Read</span>
-                                            <span class="perm-badge">Webhook</span>
-                                        </td>
-                                        <td>2 hours ago</td>
-                                        <td style="display:flex;gap:4px;">
-                                            <button class="btn-ghost" onclick="showToast('Key copied to clipboard')">⎘ Copy</button>
-                                            <button class="btn-ghost" style="color:#cc0000;" onclick="openModal('revokeModal')">Revoke</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Test Key</strong><div style="font-size:10px;color:#999;">Development</div></td>
-                                        <td class="key-masked">sk_test_g7h8i9j0…k1l2</td>
-                                        <td>
-                                            <span class="perm-badge">Read</span>
-                                            <span class="perm-badge">Write</span>
-                                            <span class="perm-badge">Webhook</span>
-                                        </td>
-                                        <td>3 days ago</td>
-                                        <td style="display:flex;gap:4px;">
-                                            <button class="btn-ghost" onclick="showToast('Key copied to clipboard')">⎘ Copy</button>
-                                            <button class="btn-ghost" style="color:#cc0000;" onclick="openModal('revokeModal')">Revoke</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <button class="btn-small" onclick="openModal('createKeyModal')">＋ Create New API Key</button>
-                        </div>
-                        <div class="settings-section">
-                            <div class="settings-section-title">Webhooks</div>
-                            <div style="border:1px solid #ccc;border-radius:4px;padding:12px;margin-bottom:10px;">
-                                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-                                    <div>
-                                        <div style="font-size:12px;font-weight:700;font-family:'Courier New',monospace;">https://myapp.com/webhook/wallet</div>
-                                        <div style="font-size:10px;color:#999;margin-top:2px;">Events: TX Confirmed, Incoming Transfer · Last: ✓ 200 OK · 42ms</div>
-                                    </div>
-                                    <div style="display:flex;gap:6px;">
-                                        <button class="btn-small-outline" onclick="showToast('Test payload sent → 200 OK')">Test</button>
-                                        <button class="btn-ghost" style="color:#cc0000;">Remove</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn-small-outline" onclick="openModal('webhookModal')">＋ Add Webhook</button>
-                        </div>
-                    </div>
-
-                    <!-- ADDRESS BOOK -->
-                    <div id="st-addressbook" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                                <div class="settings-section-title" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">Saved Contacts</div>
-                                <div style="display:flex;gap:6px;">
-                                    <button class="btn-small-outline" onclick="showToast('contacts.json exported')">Export</button>
-                                    <button class="btn-small" onclick="openModal('addContactModal')">＋ Add Contact</button>
-                                </div>
-                            </div>
-                            <div style="margin-bottom:10px;">
-                                <input type="text" class="filter-input" placeholder="Search name, address, ENS…" style="width:100%;">
-                            </div>
-                            <table class="contacts-table">
-                                <thead><tr><th>Name</th><th>Address</th><th>ENS</th><th>Network</th><th>Actions</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Alice</strong></td>
-                                        <td style="font-family:'Courier New',monospace;font-size:10px;">0x742d…8ae7</td>
-                                        <td>alice.eth</td>
-                                        <td><span class="perm-badge">ETH</span></td>
-                                        <td style="display:flex;gap:4px;">
-                                            <button class="btn-ghost" onclick="showToast('Address copied!')">⎘</button>
-                                            <button class="btn-ghost" onclick="showToast('Edit contact…')">Edit</button>
-                                            <button class="btn-ghost" style="color:#cc0000;" onclick="showToast('Contact removed')">✕</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Bob — Exchange</strong></td>
-                                        <td style="font-family:'Courier New',monospace;font-size:10px;">0x1a2b…9c0d</td>
-                                        <td>—</td>
-                                        <td><span class="perm-badge">Polygon</span></td>
-                                        <td style="display:flex;gap:4px;">
-                                            <button class="btn-ghost" onclick="showToast('Address copied!')">⎘</button>
-                                            <button class="btn-ghost" onclick="showToast('Edit contact…')">Edit</button>
-                                            <button class="btn-ghost" style="color:#cc0000;" onclick="showToast('Contact removed')">✕</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Cold Storage</strong></td>
-                                        <td style="font-family:'Courier New',monospace;font-size:10px;">0x9f3c…4d1e</td>
-                                        <td>—</td>
-                                        <td><span class="perm-badge">ETH</span></td>
-                                        <td style="display:flex;gap:4px;">
-                                            <button class="btn-ghost" onclick="showToast('Address copied!')">⎘</button>
-                                            <button class="btn-ghost" onclick="showToast('Edit contact…')">Edit</button>
-                                            <button class="btn-ghost" style="color:#cc0000;" onclick="showToast('Contact removed')">✕</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div style="font-size:10px;color:#999;margin-top:8px;">3 of 50 contacts · Auto-fills in Send modal recipient field</div>
-                        </div>
-                    </div>
-
-                    <!-- ACTIVITY LOG -->
-                    <div id="st-activity" class="settings-tab" style="display:none">
-                        <div class="settings-section">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                                <div class="settings-section-title" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">Login &amp; Security Activity</div>
-                                <button class="btn-small-outline" onclick="showToast('activity_log.csv downloaded')">Export CSV ↓</button>
-                            </div>
-                            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-                                <select class="filter-input form-select">
-                                    <option>All Actions</option>
-                                    <option>Login</option>
-                                    <option>Password Change</option>
-                                    <option>API Key Created</option>
-                                    <option>Failed Login</option>
-                                </select>
-                                <input type="date" class="filter-input" placeholder="From date">
-                                <input type="date" class="filter-input" placeholder="To date">
-                            </div>
-                            <table class="activity-table">
-                                <thead>
-                                    <tr><th>Timestamp</th><th>Action</th><th>IP Address</th><th>Device</th><th>Status</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Jan 15 2:30 PM</td>
-                                        <td>Login</td>
-                                        <td>192.168.1.100</td>
-                                        <td>Desktop · Chrome</td>
-                                        <td><span class="act-badge act-success">✓ Success</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 14 10:15 AM</td>
-                                        <td>2FA Enabled</td>
-                                        <td>192.168.1.100</td>
-                                        <td>Desktop · Chrome</td>
-                                        <td><span class="act-badge act-success">✓ Success</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 13 8:20 AM</td>
-                                        <td>API Key Created</td>
-                                        <td>192.168.1.100</td>
-                                        <td>Desktop · Chrome</td>
-                                        <td><span class="act-badge act-success">✓ Success</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 13 5:45 PM</td>
-                                        <td>Password Change</td>
-                                        <td>203.45.67.89</td>
-                                        <td>iPhone · Safari</td>
-                                        <td><span class="act-badge act-success">✓ Success</span></td>
-                                    </tr>
-                                    <tr class="failed-row">
-                                        <td>Jan 12 3:20 PM</td>
-                                        <td>Login</td>
-                                        <td>45.67.89.123</td>
-                                        <td>Unknown</td>
-                                        <td><span class="act-badge act-failed">✗ Failed</span></td>
-                                    </tr>
-                                    <tr class="failed-row">
-                                        <td>Jan 12 3:19 PM</td>
-                                        <td>Login</td>
-                                        <td>45.67.89.123</td>
-                                        <td>Unknown</td>
-                                        <td><span class="act-badge act-failed">✗ Failed</span></td>
-                                    </tr>
-                                    <tr class="failed-row">
-                                        <td>Jan 12 3:18 PM</td>
-                                        <td>Login</td>
-                                        <td>45.67.89.123</td>
-                                        <td>Unknown</td>
-                                        <td><span class="act-badge act-failed">✗ Failed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 11 9:00 AM</td>
-                                        <td>Login</td>
-                                        <td>192.168.1.100</td>
-                                        <td>Desktop · Chrome</td>
-                                        <td><span class="act-badge act-success">✓ Success</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="form-warn" style="margin-top:12px;">⚠ <strong>Suspicious Activity Detected:</strong> 3 failed login attempts from IP 45.67.89.123 on Jan 12. Consider revoking all sessions if this was not you.</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="scope-note">
-                <strong>Settings Tab (Sprint 4 — WLT-301–WLT-312):</strong> Account profile + wallet name, 2FA TOTP setup with QR placeholder + backup codes, session management table with revoke, auto-lock selector, networks table + custom RPC, notification toggles, accessibility controls, API key management with permission badges, webhook configuration, address book with 50-contact capacity + ENS, activity log with suspicious activity detection, CSV export. Developer Mode: click "v4.0" in footer 5× to activate.
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- MODALS                                                  -->
-    <!-- ════════════════════════════════════════════════════════ -->
-
-    <!-- TX Detail -->
-    <div id="txDetailModal" class="modal">
-        <div class="modal-box" style="max-width:520px;">
-            <div class="modal-head">
-                <span class="modal-title">Transaction Details</span>
-                <button class="modal-close" onclick="closeModal('txDetailModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div style="background:#f5f5f5;border:1px solid #ccc;border-radius:3px;padding:12px;text-align:center;margin-bottom:14px;">
-                    <div style="font-size:28px;margin-bottom:4px;">✓</div>
-                    <div style="font-size:13px;font-weight:700;">Confirmed</div>
-                    <div style="font-size:11px;color:#666;">Block 18,423,156 · 24 confirmations</div>
-                </div>
-                <div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">Type &amp; Amount</div>
-                    <div style="font-size:18px;font-weight:700;font-family:'Courier New',monospace;">↑ Sent 0.500 ETH</div>
-                    <div style="font-size:11px;color:#888;">≈ $850.00 at time of transaction</div>
-                </div>
-                <div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">From</div>
-                    <div style="font-family:'Courier New',monospace;font-size:10px;word-break:break-all;">0x742d35Cc6634C0532925a3b844Bc7e76fE13a51b <button class="copy-btn">⎘</button></div>
-                </div>
-                <div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">To</div>
-                    <div style="font-family:'Courier New',monospace;font-size:10px;word-break:break-all;">0x8b2c4a7f2D9e3B1C5A8F7E4D3C2B1A0F9E8D7C6B <button class="copy-btn">⎘</button></div>
-                </div>
-                <div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">TX Hash</div>
-                    <div style="font-family:'Courier New',monospace;font-size:10px;word-break:break-all;">0xf3a9c2e1d8b7f4a3e2c1d0b9a8f7e6d5c4b3a2f1e0</div>
-                    <a href="#" style="font-size:10px;font-weight:600;color:#000;">View on Etherscan ↗</a>
-                </div>
-                <div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">Gas</div>
-                    <div style="font-size:11px;">21,000 / 21,000 limit · 45.23 gwei</div>
-                    <div style="font-size:11px;color:#666;">Fee paid: 0.000950 ETH (~$12.50)</div>
-                </div>
-                <div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">Decoded Call</div>
-                    <div style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:3px;padding:8px;font-family:'Courier New',monospace;font-size:10px;">transfer(<br>&nbsp; to: 0x8b2c...7c6b,<br>&nbsp; amount: 500000000000000000<br>)</div>
-                </div>
-                <div style="padding:8px 0;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:2px;">Date &amp; Time</div>
-                    <div style="font-size:12px;">Jan 15, 2025 · 2:32:07 PM UTC</div>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn-secondary" id="txSpeedUpBtn" style="display:none;" onclick="showToast('Speed Up TX: opening gas selector with Fast tier…')">⚡ Speed Up</button>
-                <button class="btn-secondary" id="txCancelBtn" style="display:none;color:#c00;border-color:#c00;" onclick="showToast('Cancel TX: broadcasting zero-value self-send with higher gas…')">✕ Cancel TX</button>
-                <button class="btn-primary" style="flex:1;" onclick="closeModal('txDetailModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Send (simplified) -->
-    <div id="sendModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Send</span><button class="modal-close" onclick="closeModal('sendModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">To</label><input type="text" class="form-input" placeholder="0x… or alice.eth"></div>
-                <div class="form-group"><label class="form-label">Asset</label><select class="form-input"><option>ETH</option><option>USDC</option><option>WBTC</option><option>DAI</option></select></div>
-                <div class="form-group"><label class="form-label">Amount</label><input type="number" class="form-input" placeholder="0.0"></div>
-                <div class="form-note">See Sprint 2 for full 3-step Send flow with EIP-1559 gas tiers.</div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('sendModal')">Cancel</button><button class="btn-primary" onclick="showToast('TX submitted!');closeModal('sendModal')">Send →</button></div>
-        </div>
-    </div>
-
-    <!-- Receive -->
-    <div id="receiveModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Receive</span><button class="modal-close" onclick="closeModal('receiveModal')">×</button></div>
-            <div class="modal-body">
-                <div class="qr-grid-sm" id="qrReceive" style="width:140px;height:140px;grid-template-columns:repeat(20,1fr);"></div>
-                <div class="addr-row" style="margin-top:12px;"><span style="font-size:9px;">0x742d35Cc6634C0532925a3b844Bc7e76fE13a51b</span><button class="copy-btn" onclick="showToast('Copied!')">⎘</button></div>
-            </div>
-            <div class="modal-foot"><button class="btn-primary" style="flex:1;" onclick="showToast('Address copied!');closeModal('receiveModal')">⎘ Copy</button></div>
-        </div>
-    </div>
-
-    <!-- Swap (simplified) -->
-    <div id="swapModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Swap</span><button class="modal-close" onclick="closeModal('swapModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">From</label><select class="form-input"><option>ETH (2.500)</option><option>USDC (5,000)</option></select></div>
-                <div class="form-group"><label class="form-label">Amount</label><input type="number" class="form-input" placeholder="0.0"></div>
-                <div class="form-group"><label class="form-label">To</label><select class="form-input"><option>USDC</option><option>ETH</option><option>DAI</option></select></div>
-                <div class="form-note">See Sprint 2 for full Swap flow with exchange rate, slippage, and 1inch routing.</div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('swapModal')">Cancel</button><button class="btn-primary" onclick="showToast('Swap submitted!');closeModal('swapModal')">Swap →</button></div>
-        </div>
-    </div>
-
-    <!-- Change Password -->
-    <div id="pwModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Change Password</span><button class="modal-close" onclick="closeModal('pwModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" placeholder="Enter current password"></div>
-                <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" placeholder="Min 8 chars, mixed case + symbol"></div>
-                <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" placeholder="Confirm new password"></div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('pwModal')">Cancel</button><button class="btn-primary" onclick="showToast('Password updated!');closeModal('pwModal')">Update</button></div>
-        </div>
-    </div>
-
-    <!-- Delete Account -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">⚠ Delete Account</span><button class="modal-close" onclick="closeModal('deleteModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-warn">This action is <strong>irreversible</strong>. All wallet data, settings, API keys, and activity logs will be permanently deleted from this device. Your on-chain assets will not be affected.</div>
-                <div class="form-group">
-                    <label class="form-label">Type DELETE to confirm</label>
-                    <input type="text" class="form-input" id="deleteConfirm" placeholder="DELETE" oninput="document.getElementById('deleteBtn').disabled=this.value!=='DELETE'">
-                </div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button><button class="btn-danger" id="deleteBtn" disabled onclick="showToast('Account deleted — redirecting to onboarding…');closeModal('deleteModal')">Delete Account</button></div>
-        </div>
-    </div>
-
-    <!-- Create API Key -->
-    <div id="createKeyModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Create API Key</span><button class="modal-close" onclick="closeModal('createKeyModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Key Name</label><input type="text" class="form-input" placeholder="e.g., My Trading Bot"></div>
-                <div class="form-group"><label class="form-label">Environment</label><select class="form-input"><option>Production</option><option>Development</option><option>Staging</option></select></div>
-                <div class="form-group">
-                    <label class="form-label">Permissions</label>
-                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
-                        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" checked> Read Balance &amp; History</label>
-                        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox"> Execute Transactions</label>
-                        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" checked> Webhook Access</label>
-                        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox"> Read Activity Log</label>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('createKeyModal')">Cancel</button><button class="btn-primary" onclick="showKeyCreated()">Create Key →</button></div>
-        </div>
-    </div>
-
-    <!-- Revoke Key -->
-    <div id="revokeModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Revoke API Key</span><button class="modal-close" onclick="closeModal('revokeModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-warn">Revoking this key will immediately invalidate all requests using it. Any applications using this key will stop working. This cannot be undone.</div>
-                <div style="font-family:'Courier New',monospace;font-size:11px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:3px;padding:10px;">sk_live_a1b2c3d4…e5f6</div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('revokeModal')">Cancel</button><button class="btn-danger" onclick="showToast('Key revoked');closeModal('revokeModal')">Revoke Key</button></div>
-        </div>
-    </div>
-
-    <!-- Add RPC -->
-    <div id="addRpcModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Add Custom Network</span><button class="modal-close" onclick="closeModal('addRpcModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Network Name</label><input type="text" class="form-input" placeholder="e.g., My L2 Network"></div>
-                <div class="form-group"><label class="form-label">Chain ID</label><input type="number" class="form-input" placeholder="e.g., 31337"></div>
-                <div class="form-group"><label class="form-label">RPC URL</label><input type="url" class="form-input" placeholder="https://…"></div>
-                <div class="form-group"><label class="form-label">Block Explorer URL (optional)</label><input type="url" class="form-input" placeholder="https://…"></div>
-                <div class="form-group"><label class="form-label">Currency Symbol</label><input type="text" class="form-input" placeholder="ETH" value="ETH"></div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn-small-outline" onclick="showToast('Connection tested → Chain ID: 31337 ✓')">Test Connection</button>
-                    <a href="https://chainlist.org" target="_blank" style="font-size:11px;font-weight:600;color:#000;display:flex;align-items:center;">Chainlist.org ↗</a>
-                </div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('addRpcModal')">Cancel</button><button class="btn-primary" onclick="showToast('Network added!');closeModal('addRpcModal')">Add Network</button></div>
-        </div>
-    </div>
-
-    <!-- Webhook Modal -->
-    <div id="webhookModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Add Webhook</span><button class="modal-close" onclick="closeModal('webhookModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Endpoint URL</label><input type="url" class="form-input" placeholder="https://…/webhook"></div>
-                <div class="form-group">
-                    <label class="form-label">Events</label>
-                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
-                        <label style="font-size:12px;display:flex;align-items:center;gap:8px;"><input type="checkbox" checked> Transaction Confirmed</label>
-                        <label style="font-size:12px;display:flex;align-items:center;gap:8px;"><input type="checkbox" checked> Incoming Transfer</label>
-                        <label style="font-size:12px;display:flex;align-items:center;gap:8px;"><input type="checkbox"> Pending TX</label>
-                        <label style="font-size:12px;display:flex;align-items:center;gap:8px;"><input type="checkbox"> Price Alert</label>
-                        <label style="font-size:12px;display:flex;align-items:center;gap:8px;"><input type="checkbox" checked> Security Alert</label>
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom:0"><label class="form-label">Secret Key (auto-generated)</label><input type="text" class="form-input" value="wh_secret_f4a9b2c1d8e7…" disabled></div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('webhookModal')">Cancel</button><button class="btn-primary" onclick="showToast('Webhook added!');closeModal('webhookModal')">Save Webhook</button></div>
-        </div>
-    </div>
-
-    <!-- Add Contact Modal -->
-    <div id="addContactModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head"><span class="modal-title">Add Contact</span><button class="modal-close" onclick="closeModal('addContactModal')">×</button></div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-input" placeholder="e.g., Alice, Cold Storage, Exchange…"></div>
-                <div class="form-group"><label class="form-label">Address (0x…)</label><input type="text" class="form-input" placeholder="0x…" style="font-family:'Courier New',monospace;"></div>
-                <div class="form-group"><label class="form-label">ENS Name (optional)</label><input type="text" class="form-input" placeholder="alice.eth"></div>
-                <div class="form-group"><label class="form-label">Network</label><select class="form-input"><option>Ethereum</option><option>Polygon</option><option>Arbitrum One</option><option>Optimism</option></select></div>
-                <div class="form-group"><label class="form-label">Note (optional)</label><input type="text" class="form-input" placeholder="e.g., Binance hot wallet"></div>
-            </div>
-            <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('addContactModal')">Cancel</button><button class="btn-primary" onclick="showToast('Contact saved!');closeModal('addContactModal')">Save Contact</button></div>
-        </div>
-    </div>
-
-    <!-- NFT Detail Modal -->
-    <div id="nftDetailModal" class="modal">
-        <div class="modal-box" style="max-width:520px;">
-            <div class="modal-head"><span class="modal-title" id="nftModalTitle">NFT Detail</span><button class="modal-close" onclick="closeModal('nftDetailModal')">×</button></div>
-            <div class="modal-body">
-                <div id="nftArtLarge" style="width:200px;height:200px;display:grid;grid-template-columns:repeat(10,1fr);gap:1px;background:#eee;margin:0 auto 16px;"></div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;padding:12px;background:#f8f8f8;border:1px solid #e8e8e8;border-radius:4px;">
-                    <div><div style="font-size:10px;color:#999;text-transform:uppercase;font-weight:700;">Collection</div><div style="font-size:12px;font-weight:700;" id="nftModalCollection"></div></div>
-                    <div><div style="font-size:10px;color:#999;text-transform:uppercase;font-weight:700;">Token ID</div><div style="font-size:12px;font-weight:700;font-family:'Courier New',monospace;" id="nftModalTokenId"></div></div>
-                    <div><div style="font-size:10px;color:#999;text-transform:uppercase;font-weight:700;">Floor Price</div><div style="font-size:12px;font-weight:700;" id="nftModalFloor"></div></div>
-                    <div><div style="font-size:10px;color:#999;text-transform:uppercase;font-weight:700;">Last Sale</div><div style="font-size:12px;font-weight:700;" id="nftModalLastSale"></div></div>
-                </div>
-                <div style="margin-bottom:12px;">
-                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:6px;">Traits</div>
-                    <table style="width:100%;font-size:11px;border-collapse:collapse;" id="nftTraitsTable"></table>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn-secondary" onclick="showToast('Opening OpenSea…')">View on OpenSea ↗</button>
-                <button class="btn-primary" onclick="showToast('Transfer NFT: opens Send modal for ERC-721 safeTransferFrom…')">Transfer NFT ↑</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dev console -->
-    <div id="devConsole">
-        <button class="dev-close" onclick="document.getElementById('devConsole').style.display='none'">✕ Close</button>
-        <div id="devLog"></div>
-    </div>
-
-    <footer>
-        <p>Sprint 3/4: Transaction Layer + Advanced Features · Low-Fidelity Prototype · WLT-201 – WLT-312</p>
-        <div class="footer-links">
-            <a href="management.html">← Dashboard</a>
-            <a href="sprint1.html">Sprint 1: Onboarding</a>
-            <a href="sprint2.html">Sprint 2: Core Wallet</a>
-            <span id="versionTag" onclick="devModeClick()" style="cursor:default;color:#aaa;font-size:11px;user-select:none;" title="v4.0">v4.0</span>
-        </div>
-    </footer>
-
-
-    <!-- ════════════════════════════════════════════════════════ -->
-    <!-- JAVASCRIPT                                             -->
-    <!-- ════════════════════════════════════════════════════════ -->
-    <script>
-    // ── Main tab switcher ──────────────────────────────────────
-    function switchMainTab(name) {
-        document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.main-tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('view-' + name).classList.add('active');
-        const labels = {portfolio:'port',transactions:'trans',nfts:'nft',settings:'sett'};
-        document.querySelectorAll('.main-tab').forEach(b => {
-            const t = b.textContent.toLowerCase();
-            if ((name==='portfolio'&&t.includes('port'))||(name==='transactions'&&t.includes('trans'))||(name==='nfts'&&t.includes('nft'))||(name==='settings'&&t.includes('sett')))
-                b.classList.add('active');
-        });
-        if (name==='nfts') renderNftGrid();
-    }
-
-    // ── Settings tab switcher ──────────────────────────────────
-    function switchSettings(name, el) {
-        document.querySelectorAll('.settings-tab').forEach(t => t.style.display = 'none');
-        document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('st-' + name).style.display = '';
-        el.classList.add('active');
-    }
-
-    // ── TX filter ──────────────────────────────────────────────
-    function filterTx(type, btn) {
-        document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        const rows = document.querySelectorAll('#txTbody .tx-row');
-        let count = 0;
-        rows.forEach(r => {
-            const show = type === 'all' || r.classList.contains('tx-' + type);
-            r.style.display = show ? '' : 'none';
-            if (show) count++;
-        });
-        document.getElementById('txCount').textContent = 'Showing ' + count + ' of 8 transactions';
-    }
-    function resetFilters() {
-        document.getElementById('f-from').value = '';
-        document.getElementById('f-to').value = '';
-        document.getElementById('f-asset').value = '';
-        document.getElementById('f-search').value = '';
-        document.querySelectorAll('#txTbody .tx-row').forEach(r => r.style.display = '');
-        document.querySelectorAll('.filter-pill').forEach((p,i) => p.classList.toggle('active', i===0));
-        document.getElementById('txCount').textContent = 'Showing 8 of 8 transactions';
-    }
-
-    // ── TX row click — show pending buttons for pending rows ──
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('#txTbody .tx-row').forEach(row => {
-            row.addEventListener('click', () => {
-                const isPending = row.classList.contains('tx-pending');
-                document.getElementById('txSpeedUpBtn').style.display = isPending ? '' : 'none';
-                document.getElementById('txCancelBtn').style.display = isPending ? '' : 'none';
-                openModal('txDetailModal');
-            });
-        });
-    });
-
-    // ── Watchlist star toggle ──────────────────────────────────
-    function toggleStar(btn) {
-        const isStarred = btn.classList.toggle('starred');
-        btn.textContent = isStarred ? '★' : '☆';
-        showToast(isStarred ? 'Added to watchlist' : 'Removed from watchlist');
-    }
-
-    // ── DeFi collapsible ──────────────────────────────────────
-    function toggleDefi(header) {
-        const body = document.getElementById('defiBody');
-        const chevron = document.getElementById('defiChevron');
-        const collapsed = body.style.display === 'none';
-        body.style.display = collapsed ? '' : 'none';
-        chevron.textContent = collapsed ? '▼' : '▲';
-    }
-
-    // ── NFT data & rendering ──────────────────────────────────
-    const nfts = [
-        {id:1, name:'Pixel Ape #0042', collection:'Pixel Apes Club', tokenId:'#0042', floor:'0.08 ETH', lastSale:'0.11 ETH',
-         traits:[['Background','Blue'],['Fur','Gold'],['Eyes','Laser'],['Hat','Crown']], seed:42},
-        {id:2, name:'Void Fragment #117', collection:'Void Fragments', tokenId:'#0117', floor:'0.25 ETH', lastSale:'0.22 ETH',
-         traits:[['Type','Rare'],['Glow','Yes'],['Fragment','Shard']], seed:117},
-        {id:3, name:'Grid Genesis #007', collection:'Grid Genesis', tokenId:'#0007', floor:'1.20 ETH', lastSale:'1.35 ETH',
-         traits:[['Rarity','Legendary'],['Color','Inverse'],['Pattern','Checker']], seed:7},
-        {id:4, name:'Onchain Relic #289', collection:'Onchain Relics', tokenId:'#0289', floor:'0.04 ETH', lastSale:'0.06 ETH',
-         traits:[['Era','Ancient'],['Material','Stone'],['Condition','Worn']], seed:289}
-    ];
-
-    function makeArtPattern(seed, cells) {
-        const pattern = [];
-        for (let i = 0; i < cells; i++) {
-            pattern.push(((seed * (i+1) * 2654435761) ^ (i * 1234567)) % 3 === 0 ? 1 : 0);
-        }
-        return pattern;
-    }
-
-    function buildNftArt(container, seed, size) {
-        container.innerHTML = '';
-        const pattern = makeArtPattern(seed, size * size);
-        pattern.forEach(v => {
-            const cell = document.createElement('div');
-            cell.className = v ? 'nft-art-cell b' : 'nft-art-cell';
-            container.appendChild(cell);
-        });
-    }
-
-    function renderNftGrid() {
-        const grid = document.getElementById('nftGrid');
-        if (!grid || grid.dataset.rendered) return;
-        grid.innerHTML = '';
-        nfts.forEach(nft => {
-            const card = document.createElement('div');
-            card.className = 'nft-card';
-            card.onclick = () => openNftDetail(nft.id);
-            const art = document.createElement('div');
-            art.className = 'nft-art';
-            buildNftArt(art, nft.seed, 10);
-            card.innerHTML = `<div class="nft-info"><div class="nft-collection">${nft.collection}</div><div class="nft-name">${nft.name}</div><div class="nft-floor">Floor: ${nft.floor}</div></div>`;
-            card.prepend(art);
-            grid.appendChild(card);
-        });
-        grid.dataset.rendered = '1';
-    }
-
-    function openNftDetail(id) {
-        const nft = nfts.find(n => n.id === id);
-        if (!nft) return;
-        document.getElementById('nftModalTitle').textContent = nft.name;
-        document.getElementById('nftModalCollection').textContent = nft.collection;
-        document.getElementById('nftModalTokenId').textContent = nft.tokenId;
-        document.getElementById('nftModalFloor').textContent = nft.floor;
-        document.getElementById('nftModalLastSale').textContent = nft.lastSale;
-        const artEl = document.getElementById('nftArtLarge');
-        artEl.style.gridTemplateColumns = 'repeat(10,1fr)';
-        buildNftArt(artEl, nft.seed, 10);
-        document.getElementById('nftTraitsTable').innerHTML = nft.traits.map(([k,v]) =>
-            `<tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:5px 8px;color:#999;font-weight:700;text-transform:uppercase;font-size:10px;">${k}</td><td style="padding:5px 8px;font-weight:600;">${v}</td></tr>`
-        ).join('');
-        openModal('nftDetailModal');
-    }
-
-    // ── 2FA toggle ─────────────────────────────────────────────
-    function toggleTFA(btn) {
-        btn.classList.toggle('on');
-        document.getElementById('tfa-setup').style.display = btn.classList.contains('on') ? '' : 'none';
-        document.getElementById('backup-codes-section').style.display = 'none';
-        if (btn.classList.contains('on')) buildQR('qrGrid2FA', 120);
-    }
-    function verify2FA() {
-        document.getElementById('tfa-setup').style.display = 'none';
-        document.getElementById('backup-codes-section').style.display = '';
-        showToast('2FA enabled! Save your backup codes.');
-    }
-
-    // ── QR builder ─────────────────────────────────────────────
-    const qrSeed = [1,0,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,0,1,0,1,0,1,1,0,1,1,0,0,1,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,1,0,1,0,1,1,0,1,1,0,0,1,0,1,1,0,1,0,0,1];
-    function buildQR(id) {
-        const grid = document.getElementById(id);
-        if (!grid) return;
-        grid.innerHTML = '';
-        qrSeed.forEach(v => {
-            const cell = document.createElement('div');
-            cell.className = 'qr-cell' + (v ? ' b' : '');
-            grid.appendChild(cell);
-        });
-    }
-    buildQR('qrGrid2FA');
-
-    // ── Panel toggle ───────────────────────────────────────────
-    function togglePanel(id) { document.getElementById(id).classList.toggle('open'); }
-    document.addEventListener('click', e => {
-        if (!e.target.closest('.wallet-zone')) {
-            const d = document.getElementById('walletDropdown');
-            if (d) d.classList.remove('open');
-        }
-    });
-
-    // ── Modal helpers ──────────────────────────────────────────
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    window.addEventListener('click', e => {
-        if (e.target.classList.contains('modal')) e.target.classList.remove('active');
-    });
-
-    // ── Create key reveal ──────────────────────────────────────
-    function showKeyCreated() {
-        closeModal('createKeyModal');
-        showToast('API key created! Copy it now — it won\'t be shown again.');
-    }
-
-    // ── Developer mode easter egg ──────────────────────────────
-    let devClicks = 0, devTimer, devModeActive = false;
-    function devModeClick() {
-        devClicks++;
-        clearTimeout(devTimer);
-        devTimer = setTimeout(() => { devClicks = 0; }, 2000);
-        if (devClicks >= 5) {
-            devClicks = 0;
-            devModeActive = !devModeActive;
-            document.getElementById('devBanner').style.display = devModeActive ? 'block' : 'none';
-            document.getElementById('devConsole').style.display = devModeActive ? 'block' : 'none';
-            if (devModeActive) {
-                devLog('Developer Mode activated');
-                devLog('localStorage keys: ' + Object.keys(localStorage).join(', ') || '(empty)');
-                devLog('onboarding_complete: ' + localStorage.getItem('onboarding_complete'));
-                devLog('wallet_name: ' + localStorage.getItem('wallet_name'));
-                devLog('wallet_network: ' + localStorage.getItem('wallet_network'));
-            }
-            showToast(devModeActive ? '🛠 Developer Mode enabled — click v4.0 again to disable' : 'Developer Mode disabled');
-        }
-    }
-    function devLog(msg) {
-        const log = document.getElementById('devLog');
-        const line = document.createElement('div');
-        line.textContent = new Date().toISOString().slice(11,23) + ' › ' + msg;
-        log.appendChild(line);
-        log.scrollTop = log.scrollHeight;
-    }
-
-    // ── Toast ──────────────────────────────────────────────────
-    function showToast(msg) {
-        let t = document.getElementById('toast');
-        if (!t) {
-            t = document.createElement('div');
-            t.id = 'toast';
-            Object.assign(t.style, { position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)', background:'#000', color:'#fff', padding:'8px 16px', borderRadius:'4px', fontSize:'12px', fontWeight:'700', zIndex:'9999', transition:'opacity 0.3s', pointerEvents:'none' });
-            document.body.appendChild(t);
-        }
-        t.textContent = msg;
-        t.style.opacity = '1';
-        clearTimeout(t._t);
-        t._t = setTimeout(() => { t.style.opacity = '0'; }, 2500);
-    }
-    </script>
+<script>
+function switchMainTab(name){document.querySelectorAll('.main-tab').forEach(function(t){t.classList.remove('active')});event.target.classList.add('active');document.querySelectorAll('.tab-view').forEach(function(v){v.classList.remove('active')});document.getElementById('tab-'+name).classList.add('active')}
+function switchSettings(el,name){el.parentElement.querySelectorAll('li').forEach(function(li){li.classList.remove('active')});el.classList.add('active');document.querySelectorAll('.settings-panel').forEach(function(p){p.classList.remove('active')});document.getElementById('panel-'+name).classList.add('active')}
+function filterTx(el){el.parentElement.querySelectorAll('.filter-pill').forEach(function(p){p.classList.remove('active')});el.classList.add('active')}
+function openPreSignDemo(type){
+var texts={swap:'You swapped <strong>1 SOL</strong> (≈$169) for approximately <strong>169.44 USDC</strong> via Jupiter aggregator. No additional risks detected.',sent:'You sent <strong>0.5 SOL</strong> (≈$84.67) to <strong>3kLpNq...</strong>. The recipient''s ATA was auto-created by Unlimit. Transaction confirmed.',received:'You received funds. Your ATA was auto-detected by Unlimit''s Account Indexer. No action needed.',pending:'This rent reclaim transaction is pending. You are recovering <strong>0.05 SOL</strong> from empty token accounts.'};
+document.getElementById('pss-modal-text').innerHTML=texts[type]||texts.swap;
+document.getElementById('pss-modal-detail').innerHTML='<div class="pss-item"><div class="pss-item-label">Status</div><div class="pss-item-value">Confirmed</div></div><div class="pss-item"><div class="pss-item-label">Risk</div><div class="pss-item-value">Low</div></div>';
+openModal('preSignModal')
+}
+function openModal(id){document.getElementById(id).classList.add('active')}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+window.addEventListener('click',function(e){if(e.target.classList.contains('modal'))e.target.classList.remove('active');if(!e.target.closest('.wallet-zone')){var d=document.getElementById('walletDropdown');if(d)d.classList.remove('open')}});
+function showToast(msg){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';Object.assign(t.style,{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',background:'#000',color:'#fff',padding:'8px 16px',borderRadius:'4px',fontSize:'12px',fontWeight:'700',zIndex:'9999',transition:'opacity 0.3s',pointerEvents:'none'});document.body.appendChild(t)}t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(function(){t.style.opacity='0'},2500)}
+function showWhaleTokens(cat,btn){document.querySelectorAll('.whale-tag').forEach(function(t){t.classList.remove('active')});btn.classList.add('active');showToast('Showing '+cat+' whale activity')}
+</script>
 </body>
 </html>

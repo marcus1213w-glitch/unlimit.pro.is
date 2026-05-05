@@ -43,7 +43,7 @@ h2 { font-size: 11px; font-weight: 700; margin: 32px 0 14px; text-transform: upp
 .sc-btn-outline:hover { background: #f5f5f5; }
 .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
 .filter-label { font-size: 11px; font-weight: 700; color: #555; margin-right: 4px; }
-.filter-btn { padding: 5px 13px; background: #fff; border: 1px solid #ccc; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600; }
+.filter-btn { padding: 5px 13px; background: #fff; border: 1px solid #ccc; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600; color: #000; }
 .filter-btn.active { background: #000; color: #fff; border-color: #000; }
 .filter-btn:hover:not(.active) { background: #f0f0f0; }
 .task-table-wrap { overflow-x: auto; border: 1px solid #ccc; border-radius: 6px; }
@@ -64,14 +64,6 @@ h2 { font-size: 11px; font-weight: 700; margin: 32px 0 14px; text-transform: upp
 .s2-marker td:first-child { border-left: 3px solid #555; }
 .s3-marker td:first-child { border-left: 3px solid #aaa; }
 .s4-marker td:first-child { border-left: 3px solid #ddd; }
-.task-title-cell { max-width: 280px; }
-.task-title-cell strong { display: block; font-size: 12px; margin-bottom: 1px; }
-.task-title-cell span { font-size: 10px; color: #888; }
-.cat-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid; white-space: nowrap; }
-.cat-frontend { background: #e3f2fd; color: #1976d2; border-color: #1976d2; }
-.cat-backend { background: #f3e5f5; color: #7b1fa2; border-color: #7b1fa2; }
-.cat-qa { background: #e8f5e9; color: #388e3c; border-color: #388e3c; }
-.cat-design { background: #fce4ec; color: #c2185b; border-color: #c2185b; }
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
 .summary-card { border: 1px solid #ccc; border-radius: 6px; padding: 18px 20px; background: #fff; }
 .summary-card.active-card { border-color: #000; border-width: 2px; }
@@ -105,67 +97,68 @@ footer { background: #f0f0f0; border-top: 1px solid #ccc; padding: 16px 24px; te
 </head>
 <body>
 <header>
-<div class="logo">◈ Wallet<span>Project Management Board · Solana</span></div>
+<div class="logo">🔮 Unlimit<span>Project Management Board · Solana</span></div>
 <div class="nav-links">
-<a href="sprint1.html" class="nav-link">S1: Onboarding</a>
-<a href="sprint2.html" class="nav-link">S2: Core Wallet</a>
-<a href="sprint3.html" class="nav-link">S3/4: Advanced</a>
+<a href="sprint1.html" class="nav-link">S1: Wealth Recovery</a>
+<a href="sprint2.html" class="nav-link">S2: Invisible Tokens</a>
+<a href="sprint3.html" class="nav-link">S3: Intelligence</a>
+<a href="sprint4.html" class="nav-link">S4: Social Trading</a>
 </div>
 </header>
 
 <div class="container">
-<h1>Project Dashboard</h1>
-<p class="subtitle">Solana Wallet · 4 Sprints · 55 Tasks · Solflare / Phantom–inspired Low-Fidelity HTML Prototypes</p>
+<h1>Unlimit Wallet — Project Dashboard</h1>
+<p class="subtitle">Solana Wallet · 4 Sprints · Zero-to-One Roadmap · Solflare / Phantom–inspired Prototypes</p>
 <div class="status-banner">
-<span style="font-size:16px;">🟢</span>
-<div><strong>Sprint 1 — In Progress</strong> &nbsp;·&nbsp; Week 1 of 2 &nbsp;·&nbsp; 12 tasks active &nbsp;·&nbsp; Target: full Solana onboarding flow from splash to working dashboard</div>
+<span style="font-size:16px;">🚀</span>
+<div><strong>Sprint 1 — Wealth Recovery</strong> &nbsp;·&nbsp; Active &nbsp;·&nbsp; Scans old wallets for locked SOL rent &nbsp;·&nbsp; Free value for every import</div>
 </div>
 
 <h2>Sprint Overview</h2>
 <div class="sprint-nav">
 <div class="sprint-card active-sprint">
-<div class="sc-header"><span class="sc-badge sc-active">In Progress</span><span class="sc-num">Sprint 1</span></div>
-<div class="sc-title">Onboarding &amp; Account Setup</div>
-<div class="sc-desc">Splash → Create/Import/SecretKey path → Terms gate → Wallet name + cluster → Password strength → BIP-39 seed (Ed25519 / m/44'/501') → Blur/reveal → Word-picker confirmation → Import grid + base58 secret key → Success screen (base58 address) → Dashboard entry</div>
+<div class="sc-header"><span class="sc-badge sc-active">Active</span><span class="sc-num">Sprint 1</span></div>
+<div class="sc-title">Wealth Recovery — The "Free SOL" Hook</div>
+<div class="sc-desc">Landing page showcases "We found X SOL locked in your old accounts." Import wallet → Account Indexer scans every ATA → Reclaim rent SOL from empty token boxes. BIP-39 seed generation + encrypted local storage. Establish trust with immediate value.</div>
 <div class="sc-progress">
-<div style="font-size:10px;color:#999;margin-bottom:2px;">0 / 12 tasks done</div>
-<div class="sc-progress-bar"><div class="sc-progress-fill" style="width:0%"></div></div>
+<div style="font-size:10px;color:#999;margin-bottom:2px;">In Progress</div>
+<div class="sc-progress-bar"><div class="sc-progress-fill" style="width:10%"></div></div>
 </div>
-<div class="sc-meta"><span>12 tasks</span><span>Weeks 1–2 · Apr 2026</span></div>
+<div class="sc-meta"><span>Foundation</span><span>Weeks 1–2</span></div>
 <a href="sprint1.html" class="sc-btn">Open Prototype →</a>
 </div>
 <div class="sprint-card">
 <div class="sc-header"><span class="sc-badge sc-backlog">Backlog</span><span class="sc-num">Sprint 2</span></div>
-<div class="sc-title">Core Wallet &amp; Transactions</div>
-<div class="sc-desc">App header + wallet selector → SOL balance card → SPL token list → 3-step Send (base58 → Solana priority fee tiers → broadcast) → Receive QR (base58) → Jupiter Swap → RPC setup (Helius/QuickNode) → REST API → Auth (JWT + ed25519 sig) → Balance integration → Broadcast service → Multi-wallet → Lock screen → Watch-only → Spam filtering</div>
+<div class="sc-title">Invisible Token Manager</div>
+<div class="sc-desc">No "Add Token" button. Auto-provisioning: detect incoming tokens, create ATA in background. Zero-Failure Transfers: bundle "Create Box" with every send so transactions never fail. Send/Receive SOL & SPL tokens. Jupiter swap integration.</div>
 <div class="sc-progress">
-<div style="font-size:10px;color:#999;margin-bottom:2px;">0 / 15 tasks done</div>
+<div style="font-size:10px;color:#999;margin-bottom:2px;">Backlog</div>
 <div class="sc-progress-bar"><div class="sc-progress-fill" style="width:0%"></div></div>
 </div>
-<div class="sc-meta"><span>15 tasks</span><span>Weeks 3–4</span></div>
+<div class="sc-meta"><span>Make ATA invisible</span><span>Weeks 3–4</span></div>
 <a href="sprint2.html" class="sc-btn sc-btn-outline">Preview Prototype →</a>
 </div>
 <div class="sprint-card">
 <div class="sc-header"><span class="sc-badge sc-backlog">Backlog</span><span class="sc-num">Sprint 3</span></div>
-<div class="sc-title">TX History &amp; Analytics</div>
-<div class="sc-desc">TX history (getSignaturesForAddress) → Instruction-type filter + date range → TX detail modal (instructions + pre/post balances) → Fee analytics → CSV export → NFT gallery (Metaplex / Token-2022) → DeFi positions (Jupiter/Raydium/Marinade) → Jupiter Price API → Portfolio chart → Watchlist → Address book → SNS (.sol) resolution → Wallet Standard dApp connection → Sign/Simulate UI</div>
+<div class="sc-title">Intelligence & Security Layer</div>
+<div class="sc-desc">Pre-Sign Simulation: plain English explanation of every transaction before approval. Risk scoring (site age, suspicious code). Whale Tags: "Being bought by 5 Smart-Money Wallets" badges. Jupiter swap with pre-sign review. Settings: 2FA, RPC, auto-lock.</div>
 <div class="sc-progress">
-<div style="font-size:10px;color:#999;margin-bottom:2px;">0 / 14 tasks done</div>
+<div style="font-size:10px;color:#999;margin-bottom:2px;">Backlog</div>
 <div class="sc-progress-bar"><div class="sc-progress-fill" style="width:0%"></div></div>
 </div>
-<div class="sc-meta"><span>14 tasks</span><span>Weeks 5–6</span></div>
+<div class="sc-meta"><span>Beat MetaMask & Phantom</span><span>Weeks 5–6</span></div>
 <a href="sprint3.html" class="sc-btn sc-btn-outline">Preview Prototype →</a>
 </div>
 <div class="sprint-card">
 <div class="sc-header"><span class="sc-badge sc-backlog">Backlog</span><span class="sc-num">Sprint 4</span></div>
-<div class="sc-title">Settings &amp; Advanced Features</div>
-<div class="sc-desc">Settings panel (7 tabs) → Account + .sol profile → 2FA/TOTP → Session management → SOL native staking (validator selection, stake/unstake, epoch rewards) → Staking analytics → Activity log → Custom RPC endpoints → Data export → Notification prefs → Dev mode → Accessibility/i18n → SPL Token Delegate Manager → Phishing detection (Solana)</div>
+<div class="sc-title">Social Trading & Turbo Game</div>
+<div class="sc-desc">Copy-Trading: one-click mirror any trade in the social feed. TURBO Toggle: gamified priority-fee button to land first on meme launches. Blinks: shareable X/Discord links that let anyone buy tokens directly. Viral "Lead Trader" referral loop.</div>
 <div class="sc-progress">
-<div style="font-size:10px;color:#999;margin-bottom:2px;">0 / 14 tasks done</div>
+<div style="font-size:10px;color:#999;margin-bottom:2px;">Backlog</div>
 <div class="sc-progress-bar"><div class="sc-progress-fill" style="width:0%"></div></div>
 </div>
-<div class="sc-meta"><span>14 tasks</span><span>Weeks 7–8</span></div>
-<a href="sprint3.html" class="sc-btn sc-btn-outline">Preview Prototype →</a>
+<div class="sc-meta"><span>Viral growth</span><span>Weeks 7–8</span></div>
+<a href="sprint4.html" class="sc-btn sc-btn-outline">Preview Prototype →</a>
 </div>
 </div>
 
@@ -189,12 +182,12 @@ footer { background: #f0f0f0; border-top: 1px solid #ccc; padding: 16px 24px; te
 
 <h2>Project Summary</h2>
 <div class="summary-grid">
-<div class="summary-card"><div class="sum-value">55</div><div class="sum-label">Total Tasks</div><div class="sum-sub">across 4 sprints</div></div>
-<div class="summary-card active-card"><div class="sum-value">1</div><div class="sum-label">Active Sprint</div><div class="sum-sub">Sprint 1 — Onboarding</div></div>
-<div class="summary-card"><div class="sum-value">0</div><div class="sum-label">Done</div><div class="sum-sub">0 of 55 completed</div></div>
-<div class="summary-card active-card"><div class="sum-value">12</div><div class="sum-label">In Progress</div><div class="sum-sub">Sprint 1 tasks active</div></div>
-<div class="summary-card"><div class="sum-value">43</div><div class="sum-label">Backlog</div><div class="sum-sub">Sprints 2–4 queued</div></div>
-<div class="summary-card"><div class="sum-value">v4.0</div><div class="sum-label">Version</div><div class="sum-sub">Apr 2026</div></div>
+<div class="summary-card"><div class="sum-value">4</div><div class="sum-label">Sprints</div><div class="sum-sub">Zero-to-One Roadmap</div></div>
+<div class="summary-card active-card"><div class="sum-value">🔮</div><div class="sum-label">The Edge</div><div class="sum-sub">Wealth Recovery · Auto-ATA · Pre-Sign · Copy-Trade</div></div>
+<div class="summary-card"><div class="sum-value">4</div><div class="sum-label">Prototypes</div><div class="sum-sub">Sprint 1–4 HTML wireframes</div></div>
+<div class="summary-card active-card"><div class="sum-value">∞</div><div class="sum-label">Unlimit</div><div class="sum-sub">No limits. No boundaries.</div></div>
+<div class="summary-card"><div class="sum-value">Solana</div><div class="sum-label">Chain</div><div class="sum-sub">Ed25519 · SPL · ATA</div></div>
+<div class="summary-card"><div class="sum-value">v1.0</div><div class="sum-label">Version</div><div class="sum-sub">May 2025</div></div>
 </div>
 </div>
 
@@ -212,11 +205,12 @@ footer { background: #f0f0f0; border-top: 1px solid #ccc; padding: 16px 24px; te
 </div>
 
 <footer>
-<p>Solana Wallet Project Management Board · Sprint 1 In Progress · April 2026</p>
+<p>🔮 Unlimit Wallet · Project Management Board · Sprint 1 Active · May 2025</p>
 <div class="footer-links">
-<a href="sprint1.html">Sprint 1: Onboarding</a>
-<a href="sprint2.html">Sprint 2: Core Wallet</a>
-<a href="sprint3.html">Sprint 3/4: Advanced</a>
+<a href="sprint1.html">S1: Wealth Recovery</a>
+<a href="sprint2.html">S2: Invisible Tokens</a>
+<a href="sprint3.html">S3: Intelligence</a>
+<a href="sprint4.html">S4: Social Trading</a>
 </div>
 </footer>
 
