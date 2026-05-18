@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint Requirements: IS-380 → IS-449 (Sprints 8–28) — Intelligent System</title>
+    <title>Sprint Requirements: IS-380 → IS-513 (Sprints 8–35) — Intelligent System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #000000; line-height: 1.6; min-height: 100vh; }
@@ -180,20 +180,20 @@
     <div class="container">
 
         <div class="sprint-header">
-            <h1>Intelligent System — New Features (Sprints 8–28)</h1>
-            <div class="sub">Watchlist · Token Screener · DEX Pools · Alert Rules · Social Sentiment · Network Dashboard · Auto-DCA Strategies · Whale Consensus · Portfolio P&amp;L · Wallet Profiler · Backtesting · Search · Onboarding · Mobile · Notification Bell · AI Summaries · Feed Enhancements · Token Comparison · Smart Money Insights · Copy Trading v2 · Price Chart · Launch Tracker · API Playground · Multi-Wallet · KOL Feed · Alert History · Portfolio Export · Copy Trading Marketplace · AI Strategy Advisor · Trending Leaderboard · DCA History · Notification Inbox · Sentiment Heatmap · Portfolio Rebalancer · Share &amp; Referral · Strategy Comparison · Trade Journal · Smart Alerts History · Market Maker Tracker · Token Research Hub · Copy Trading Report · AI News Curator · Price Alerts Manager <span style="background:#fff3cd;border-radius:3px;padding:1px 5px;font-size:11px;">⚠ Community Leaderboard DESCOPED</span> <span style="background:#fff3cd;border-radius:3px;padding:1px 5px;font-size:11px;">⚠ Portfolio Tax Summary DESCOPED</span> · Sidebar Search &amp; Nav Polish · Inbox &amp; Notification Centre · UI/UX Consistency Audit</div>
+            <h1>Intelligent System — New Features (Sprints 8–35)</h1>
+            <div class="sub">Watchlist · Token Screener · DEX Pools · Alert Rules · Social Sentiment · Network Dashboard · Auto-DCA Strategies · Whale Consensus · Portfolio P&amp;L · Wallet Profiler · Backtesting · Search · Onboarding · Mobile · Notification Bell · AI Summaries · Feed Enhancements · Token Comparison · Smart Money Insights · Copy Trading v2 · Price Chart · Launch Tracker · API Playground · Multi-Wallet · KOL Feed · Alert History · Portfolio Export · Copy Trading Marketplace · AI Strategy Advisor · Trending Leaderboard · DCA History · Notification Inbox · Sentiment Heatmap · Portfolio Rebalancer · Share &amp; Referral · Strategy Comparison · Trade Journal · Smart Alerts History · Market Maker Tracker · Token Research Hub · Copy Trading Report · AI News Curator · Price Alerts Manager <span style="background:#fff3cd;border-radius:3px;padding:1px 5px;font-size:11px;">⚠ Community Leaderboard DESCOPED</span> <span style="background:#fff3cd;border-radius:3px;padding:1px 5px;font-size:11px;">⚠ Portfolio Tax Summary DESCOPED</span> · Sidebar Search &amp; Nav Polish · Inbox &amp; Notification Centre · UI/UX Consistency Audit · Nav Reduction · DCA History Enrichment · API Playground Enrichment · Live Signals Pipeline · Price Alert Push · Flow &amp; Clickability Audit · OpenAPI Spec · Tax &amp; KOL UI Pass · Full Prototype Validation · Strategy Scheduler · Real-time Price Feed · Portfolio Analytics API · Copy Trade Execution · DEX Pool Aggregator · Onboarding Personalisation</div>
             <div class="sprint-meta">
-                <span>65 tasks</span>
-                <span>IS-380 → IS-449</span>
-                <span>Target: v8 prototype</span>
+                <span>134 tasks</span>
+                <span>IS-380 → IS-513</span>
+                <span>Target: v7 prototype</span>
                 <span>Platform: Solana</span>
             </div>
         </div>
 
         <div class="progress-section">
             <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Sprint Progress</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div>
-            <div class="progress-meta"><span>47 of 65 tasks implemented in prototype</span><span>Prototype: index_v7.html → index_v8.html</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+            <div class="progress-meta"><span>67 of 134 tasks implemented in prototype</span><span>Prototype: index_v7.html</span></div>
         </div>
 
         <!-- Sprint 8 overview table -->
@@ -5851,10 +5851,933 @@
             IS-479 Clickability Audit — FE (6 SP) · IS-480 Empty State Audit — FE (5 SP) · IS-481 Flow Audit Design — Design (4 SP) · IS-482 pushNotification Pipeline — BE (5 SP) · IS-483 Routing Logic Audit — FE (4 SP) · IS-484 Final UI Audit — Design (4 SP) · IS-485 OpenAPI Spec — BE (5 SP) · IS-486 Tax/KOL UI Pass — FE (3 SP) · IS-487 Full Prototype Validation — QA (5 SP). Sprint 32 total: <strong>41 SP</strong>. Cumulative grand total across all sprints (8–32): <strong>561 SP</strong>. Prototype: <a href="index_v7.html" style="color:#000;font-weight:700;">index_v7.html</a>.
         </div>
 
+        <!-- ═══════════════════════════════════════════════ SPRINT 33 ══ -->
+        <div class="sprint-divider">
+            <span class="sprint-divider-label">Sprint 33 — Strategy Scheduler, Real-Time Price Feed &amp; DCA Execution Engine</span>
+            <span class="sprint-divider-line"></span>
+            <span style="font-size:11px;font-weight:700;color:#999;">IS-488 → IS-496 · 43 SP</span>
+        </div>
+
+        <!-- IS-488 FE: Strategies Page — Next-Run Countdown & Live Status -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-488</span>
+                    <span class="task-title">Strategies Page — Next-Run Countdown Timer &amp; Live Execution Status Banner</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderStrategies()</code> with: (1) a live countdown timer on each active strategy card showing "Next run in Xh Ym" using <code>nextRun</code> from strategy data; (2) a "Live" status banner at the top of the page when at least one strategy is active — showing count of active strategies and total capital deployed; (3) an inline "Running…" state on the strategy card when execution is in progress; (4) the DCA Execution History section gains a "Refresh" button that calls <code>renderStrategies()</code> to re-fetch latest rows. Countdown updates every 60s via <code>startLiveSim()</code> tick.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Active strategy cards show "Next run in Xh Ym" — updates every 60s</li>
+                        <li>Live banner appears when 1+ strategies are active</li>
+                        <li>Execution History "Refresh" button calls <code>renderStrategies()</code></li>
+                        <li>No JS errors when strategies array is empty</li>
+                        <li>Countdown shows "Overdue — pending" when nextRun date is in the past</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">appState.strategies[].nextRun as ISO date string</span>
+                        <span class="tech-tag">Countdown: Math.floor((Date.parse(nextRun)-Date.now())/1000/3600) + 'h'</span>
+                        <span class="tech-tag">startLiveSim() tick every 60s calls partial re-render of countdown labels</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-464 (DCA History) · renderStrategies() · startLiveSim()</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-489 BE: Strategy Scheduler Service -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-489</span>
+                    <span class="task-title">DCA Strategy Scheduler — Cron-Based Execution Engine &amp; Jupiter Swap Integration</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">13 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the production DCA execution scheduler. A cron job runs every minute and checks for strategies whose <code>next_run</code> timestamp is past. For each due strategy: (1) fetch the current best route from Jupiter Aggregator v6 API; (2) submit the swap transaction signed by the user's delegated keypair; (3) confirm the transaction on-chain; (4) write an execution record to <code>dca_executions</code> table (status: filled/failed); (5) update <code>strategies.last_run</code> and <code>next_run</code>; (6) push in-app notification. Handle: slippage tolerance, transaction timeout (30s), retry once on failure, insufficient balance error.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Strategy executes within 2 minutes of <code>next_run</code> time (P95)</li>
+                        <li>Successful execution writes a <code>filled</code> record to <code>dca_executions</code></li>
+                        <li>Failed execution (network/balance) writes a <code>failed</code> record and retries once</li>
+                        <li>Jupiter swap uses best route with 0.5% slippage tolerance</li>
+                        <li>In-app notification pushed on both success and failure</li>
+                        <li>Unit tests: mock Jupiter API, mock Solana RPC, test retry logic</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Jupiter Aggregator v6: GET /quote + POST /swap</span>
+                        <span class="tech-tag">Cron: node-cron or BullMQ with Redis</span>
+                        <span class="tech-tag">Solana RPC: @solana/web3.js sendTransaction + confirmTransaction</span>
+                        <span class="tech-tag">Delegated keypair: user's pre-approved transaction authority</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-465 (dca_executions table) · Jupiter API key · Solana RPC endpoint · IS-482 (notification pipeline)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-490 BE: Real-Time Price Feed Service -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-490</span>
+                    <span class="task-title">Real-Time Price Feed — Token Price Polling, Cache &amp; WebSocket Broadcast</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">8 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the real-time price feed backend. A polling service fetches prices for the top 100 Solana tokens from Jupiter Price API every 5 seconds. Prices are cached in Redis (TTL: 10s). The <code>GET /v1/tokens/price?sym=SOL</code> endpoint reads from cache (sub-5ms response). A WebSocket channel <code>wss://api.unlimit.io/v1/ws/prices</code> broadcasts price updates to subscribed clients every 5s. Clients subscribe by sending <code>{"subscribe": ["SOL","JUP","BONK"]}</code>. Price schema: <code>{sym, price, change_24h, change_24h_abs, volume_24h, updated_at}</code>.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Price API responds in &lt;5ms for cached tokens (P99)</li>
+                        <li>WebSocket price updates broadcast every 5s per subscribed token</li>
+                        <li>Stale data older than 30s is flagged with <code>stale: true</code> in response</li>
+                        <li>Redis cache key: <code>price:SOL</code> with 10s TTL</li>
+                        <li>Load test: 1,000 concurrent WebSocket subscribers without lag</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Jupiter Price API v2: GET /price?ids=SOL,JUP</span>
+                        <span class="tech-tag">Redis: ioredis with hash HMSET for bulk updates</span>
+                        <span class="tech-tag">WebSocket fan-out: Redis pub/sub → ws broadcast per channel</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-473 (WebSocket infra) · Redis cluster · Jupiter Price API</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-491 FE: Live Price Tickers on Token Cards -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-491</span>
+                    <span class="task-title">Live Price Tickers — Real-Time Price Flash on Token Cards &amp; Top 100 Table</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Connect the front-end live simulation (<code>startLiveSim()</code>) to flash price updates on the Top 100 table and the Watchlist. When a simulated price tick fires: (1) update the relevant row in <code>top100Tokens[]</code> by ±0.5%; (2) flash the price cell green (up) or red (down) for 800ms using <code>.price-flash-up</code> / <code>.price-flash-down</code> CSS classes; (3) update the hero stats bar on the Watchlist page; (4) update the DCA history "P&amp;L" column live if the Strategies page is active. Add CSS: <code>@keyframes priceFlash</code> with background colour transition.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Top 100 table: price cells flash green/red on each simulated tick</li>
+                        <li>Flash duration: 800ms, no lingering class after flash</li>
+                        <li>Watchlist hero stats update on tick when page is active</li>
+                        <li>No flash if price is unchanged</li>
+                        <li>Performance: no layout reflow on flash — use <code>background-color</code> animation only</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">@keyframes priceFlash { 0%{background:#d1fae5} 100%{background:transparent} }</span>
+                        <span class="tech-tag">setTimeout to remove class after 800ms</span>
+                        <span class="tech-tag">appState.currentPage check before DOM update to avoid ghost updates</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">startLiveSim() · top100Tokens[] · renderTop100() · IS-490 (price feed)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-492 Design: Strategies Page — Full Spec -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-492</span>
+                    <span class="task-title">Strategies Page — Complete Design Specification &amp; Execution State Flows</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge design">Design</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Create the full design specification for the Strategies page. Cover: (1) strategy card anatomy — status badge, type badge, next-run countdown, total deployed, unrealised P&amp;L, toggle/delete actions; (2) execution history section — stats bar, frequency chart, filter pills, table columns; (3) strategy builder form — field layout, validation states, frequency selector; (4) live banner treatment; (5) all empty states (no strategies, execution history filtered to zero); (6) responsive layout for mobile (stacked cards). Ensure consistent use of monospace font for all numeric values.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Figma frames: strategy card (active/paused/running), builder form, empty state</li>
+                        <li>Execution history section fully annotated with component labels</li>
+                        <li>Mobile layout defined for strategy cards (single column)</li>
+                        <li>All countdown timer states documented: Xh Ym / Overdue / Running</li>
+                        <li>Consistent token badge, P&amp;L colour, and status badge design across all states</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-488 (FE enrichment) · IS-464 (DCA history)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-493 BE: Portfolio Analytics API -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-493</span>
+                    <span class="task-title">Portfolio Analytics API — Holdings, P&amp;L &amp; Historical Performance Endpoints</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">8 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the production portfolio analytics backend. Expose: <code>GET /v1/portfolio/holdings?wallet=:address</code> (current holdings with live prices from cache), <code>GET /v1/portfolio/summary</code> (total value, unrealised P&amp;L, 24h change), <code>GET /v1/portfolio/history?wallet=:address&amp;period=30d</code> (daily portfolio value over time). For holdings: fetch token balances from Solana RPC, enrich with prices from IS-490 cache, compute cost basis from transaction history (FIFO). Results cached per wallet for 30s.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li><code>GET /v1/portfolio/holdings</code> returns all SPL token balances with price and P&amp;L</li>
+                        <li><code>GET /v1/portfolio/summary</code> returns total value, P&amp;L, 24h change</li>
+                        <li><code>GET /v1/portfolio/history?period=30d</code> returns 30 daily data points</li>
+                        <li>Response includes <code>last_updated</code> timestamp</li>
+                        <li>Wallet balance fetch: Helius RPC or Solana getTokenAccountsByOwner</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Solana RPC: getTokenAccountsByOwner (parsed)</span>
+                        <span class="tech-tag">FIFO cost basis: transaction history from Helius webhooks</span>
+                        <span class="tech-tag">30s per-wallet Redis cache to prevent RPC hammering</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-490 (price cache) · Solana RPC · Helius transaction history API</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-494 FE: Portfolio Page — Historical Chart & Holdings Table Enrichment -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-494</span>
+                    <span class="task-title">Portfolio Page — 30-Day Value Chart, Holdings Sort &amp; Cost Basis Column</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderPortfolio()</code> with: (1) a 30-day portfolio value sparkline chart using the existing price chart bar pattern; (2) a sortable holdings table — clicking column headers (Value, P&amp;L %, 24h Change) toggles sort direction with a <code>▲/▼</code> indicator; (3) a new "Cost Basis" column showing avg cost per token in JetBrains Mono; (4) a "% of portfolio" allocation bar behind each row using a subtle bar fill on the row background; (5) an "Export PDF Report" button in the hero area that calls <code>exportPortfolioReport()</code>. All mock data.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>30-day sparkline renders using <code>portfolioHistory[]</code> mock data</li>
+                        <li>Column sort: clicking header toggles asc/desc, updates sort state</li>
+                        <li>Cost Basis column shows avg cost in monospace format</li>
+                        <li>Allocation bar fill correct relative to total portfolio value</li>
+                        <li>Export PDF button calls <code>exportPortfolioReport()</code></li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">portfolioHoldings[] · renderPriceChartForToken() pattern · exportPortfolioReport()</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-495 Design: Portfolio Page Full Spec -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-495</span>
+                    <span class="task-title">Portfolio Page — Design Specification &amp; Data Visualisation Patterns</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge design">Design</span>
+                    <span class="story-points">3 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Create the design spec for the enriched Portfolio page. Define: (1) hero stats bar layout (4 metrics: Total Value, Unrealised P&amp;L, 24h Change, # Assets); (2) 30-day sparkline chart style guide — bar width, gap, colour scale, empty/loading states; (3) holdings table column order and widths; (4) sortable column header treatment — icon states (neutral/asc/desc); (5) row allocation bar — opacity, colour, z-index layering; (6) responsive behaviour on mobile (hidden cost basis column). All consistent with low-fidelity system tokens.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Figma frames for Portfolio: populated, empty (no holdings), loading</li>
+                        <li>Chart style guide: bar colour, hover tooltip, period pill treatment</li>
+                        <li>Sort icon states documented with all three states per column</li>
+                        <li>Mobile layout: cost basis column hidden, value column visible</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-494 (FE enrichment) · Design system tokens</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-496 QA: Sprint 33 Full Regression -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-496</span>
+                    <span class="task-title">Sprint 33 Regression — Strategy Scheduler, Price Feed, Portfolio Enrichment</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge qa">QA</span>
+                    <span class="story-points">3 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Regression test for Sprint 33: (1) Strategies page: countdown timer renders and updates on active strategies; live banner appears; (2) Price flash: Top 100 table cells flash green/red on live sim tick; (3) Portfolio: sparkline renders, column sort works for all 3 sortable columns, cost basis column visible; (4) Export PDF: opens in new tab without JS error; (5) BE integration (staging): DCA scheduler executes a mock strategy, writes to dca_executions, notification fires; (6) Zero console errors across all tested pages.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Strategy countdown shows in "Xh Ym" format on all active cards</li>
+                        <li>Price flash: green flash on price-up, red on price-down, no lingering class</li>
+                        <li>Portfolio table sorts correctly by Value (asc/desc), P&amp;L %, 24h Change</li>
+                        <li>DCA scheduler (staging): execution record appears in dca_executions within 2 min</li>
+                        <li>Zero JS errors across Strategies, Portfolio, Top 100, Watchlist pages</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-488 · IS-489 · IS-490 · IS-491 · IS-494</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scope-note">
+            <strong>Sprint 33 Scope Summary:</strong>
+            IS-488 Strategy Countdown FE — FE (4 SP) · IS-489 DCA Scheduler BE — BE (13 SP) · IS-490 Price Feed BE — BE (8 SP) · IS-491 Price Flash FE — FE (4 SP) · IS-492 Strategies Design Spec — Design (4 SP) · IS-493 Portfolio Analytics API — BE (8 SP) · IS-494 Portfolio Enrichment FE — FE (4 SP) · IS-495 Portfolio Design Spec — Design (3 SP) · IS-496 Sprint 33 Regression — QA (3 SP). Sprint 33 total: <strong>51 SP</strong>. Cumulative grand total across all sprints (8–33): <strong>612 SP</strong>. Prototype: <a href="index_v7.html" style="color:#000;font-weight:700;">index_v7.html</a>.
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ SPRINT 34 ══ -->
+        <div class="sprint-divider">
+            <span class="sprint-divider-label">Sprint 34 — Copy Trade Execution, DEX Pool Aggregator &amp; Whale Alerts</span>
+            <span class="sprint-divider-line"></span>
+            <span style="font-size:11px;font-weight:700;color:#999;">IS-497 → IS-505 · 46 SP</span>
+        </div>
+
+        <!-- IS-497 FE: Copy Trading Page — Execution Controls & Trade Feed -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-497</span>
+                    <span class="task-title">Copy Trading — Trade Feed, Mirror Toggle &amp; Max Allocation Input</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">5 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderCopyTrading()</code> with: (1) a "Mirrored Trades Feed" section showing the last 5 executed mirror trades — each card shows: wallet alias, token, side (BUY/SELL), amount, execution price, result (filled/failed), timestamp; (2) a "Max Allocation" input per followed wallet (default: 2% of portfolio) with a live USD equivalent label; (3) a "Stop Loss" input per followed wallet; (4) a global "Mirror Mode" toggle (Auto / Manual) — Manual shows an approval button per incoming signal; (5) an "Unfollow" confirmation modal before removing a wallet. All simulated.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Mirrored Trades Feed shows 5 most recent mock trades with all fields</li>
+                        <li>Max Allocation input shows USD equivalent below field (e.g., "≈ $249.60")</li>
+                        <li>Mirror Mode toggle updates <code>appState.copyMirrorMode</code></li>
+                        <li>Unfollow shows confirmation modal before removing wallet</li>
+                        <li>No JS errors when mirrored trades array is empty</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">mirroredTrades[] mock array with 5 items</span>
+                        <span class="tech-tag">appState.copyMirrorMode: 'auto' | 'manual'</span>
+                        <span class="tech-tag">Unfollow: openModal('confirmDeleteModal') with custom text</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">renderCopyTrading() · eliteWallets[] · confirmDeleteModal</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-498 BE: Copy Trade Execution Pipeline -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-498</span>
+                    <span class="task-title">Copy Trade Execution — Mirror Swap Pipeline &amp; Allocation Guard</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">13 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the copy trade execution backend. When the signals WebSocket emits a BUY/SELL from a followed elite wallet: (1) compute the scaled trade size from the user's max allocation setting; (2) apply stop-loss guard — skip if token is already at or below user's stop level; (3) route through Jupiter Aggregator for best execution; (4) write result to <code>copy_trades</code> table (wallet_id, token, side, amount_usd, price, status, executed_at); (5) push a "Copy trade executed" notification. In manual mode: write a <code>pending</code> record and push a notification with an approve/reject button.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Mirror trade executes within 3s of incoming signal (P95)</li>
+                        <li>Allocation capped at user's configured max (default 2%)</li>
+                        <li>Stop-loss guard prevents execution when condition is met</li>
+                        <li>Manual mode: pending record created, notification with approve/reject</li>
+                        <li>copy_trades table populated with all required fields</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Pipeline: signal event → allocation calc → Jupiter quote → swap → persist</span>
+                        <span class="tech-tag">Max allocation: (portfolio_value * pct) / token_price = qty</span>
+                        <span class="tech-tag">copy_trades schema: id, user_id, wallet_id, token, side, amount_usd, price, qty, status, executed_at</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-473 (WebSocket signals) · IS-489 (Jupiter swap) · IS-493 (portfolio value) · IS-482 (notifications)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-499 FE: DEX Pools — 24h Volume Chart & Pool Health Score -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-499</span>
+                    <span class="task-title">DEX Pools — 24h Volume Sparkline, Pool Health Score &amp; Fee APR Column</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderDex()</code> with: (1) a 7-bar volume sparkline per pool row using inline SVG or div-bar chart (showing last 7 days of simulated volume data); (2) a "Pool Health" score column (0–100, computed from: volume stability + liquidity depth + fee consistency); (3) a "Fee APR" column showing annualised return from fees (fee rate × daily volume / TVL × 365); (4) a filter pill row — All / Stable / Volatile / High TVL (&gt;$10M); (5) a "Track Pool" button per row that adds pool to <code>appState.trackedPools[]</code>. Mock data only.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Volume sparkline visible per row (7 bars, 2px gap, 24px max height)</li>
+                        <li>Pool Health score 0–100 with colour: &gt;70=green, 40–70=amber, &lt;40=red</li>
+                        <li>Fee APR calculated correctly from mock data</li>
+                        <li>Filter pills filter the table correctly for all 4 states</li>
+                        <li>Track Pool adds to <code>trackedPools[]</code> and shows toast confirmation</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">renderDex() · dexPools[] mock data · appState.trackedPools</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-500 BE: DEX Pool Aggregator -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-500</span>
+                    <span class="task-title">DEX Pool Aggregator — Raydium + Orca + Meteora Pool Data Pipeline</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">10 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Build the DEX pool data aggregator. Pull pool data from: Raydium API (top 50 pools), Orca Whirlpools API (top 30 pools), Meteora DLMM API (top 20 pools). For each pool: normalise schema (pool_id, dex, pair, tvl_usd, volume_24h, fee_rate, apr, created_at). Compute pool health score: 40% liquidity depth + 30% volume stability (7-day std dev) + 30% fee consistency. Store in <code>dex_pools</code> table, refresh every 5 minutes. Expose <code>GET /v1/dex/pools?sort=tvl&amp;limit=50&amp;filter=stable</code>.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>100 pools ingested per refresh cycle from 3 DEX sources</li>
+                        <li>Pool health score computed and stored per pool</li>
+                        <li><code>GET /v1/dex/pools</code> supports sort (tvl/volume/health), limit, filter params</li>
+                        <li>Refresh cycle completes in &lt;60s</li>
+                        <li>dex_pools schema: id, dex, pair, tvl_usd, volume_24h, fee_rate, health_score, apr, updated_at</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Raydium: https://api.raydium.io/v2/ammV3/ammPools</span>
+                        <span class="tech-tag">Orca: https://api.mainnet.orca.so/v1/whirlpool/list</span>
+                        <span class="tech-tag">Meteora: https://dlmm-api.meteora.ag/pair/all_with_pagination</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-490 (price feed) · Raydium/Orca/Meteora API keys</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-501 FE: Smart Money — Whale Alert Banner & Portfolio Overlap -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-501</span>
+                    <span class="task-title">Smart Money — Whale Alert Banner, Portfolio Overlap &amp; Conviction Score</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderSmartMoney()</code> with: (1) a dismissible "Whale Alert" banner at the top showing the most recent large buy (&gt;$50K) from the elite wallet list with wallet alias, token, and amount; (2) a "Portfolio Overlap" column in the wallet leaderboard showing the count of tokens shared between the wallet and the user's own portfolio (e.g., "3 shared tokens"); (3) a "Conviction Score" column — how many elite wallets hold the same top position (e.g., "7/10 whales in SOL"); (4) "Copy" button on each leaderboard row opens Copy Trading page to that wallet. All simulated.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Whale alert banner shows top large buy from eliteWallets[] signals</li>
+                        <li>Banner dismisses on click (appState.whaleBannerDismissed = true)</li>
+                        <li>Portfolio overlap count correct vs portfolioHoldings[]</li>
+                        <li>Copy button: navigateTo('copyTrading') and scrolls to selected wallet</li>
+                        <li>No JS errors when eliteWallets array is empty</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">renderSmartMoney() · eliteWallets[] · portfolioHoldings[] · navigateTo('copyTrading')</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-502 Design: Copy Trading & DEX Pools Full Spec -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-502</span>
+                    <span class="task-title">Copy Trading &amp; DEX Pools — Full Design Specification</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge design">Design</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Create design specs for Copy Trading and DEX Pools pages. Copy Trading: mirrored trade card anatomy (wallet badge, token pill, side badge, amount, price, status), max allocation input + USD label, mirror mode toggle states, unfollow modal. DEX Pools: pool row anatomy (pool name, DEX badge, TVL, volume, health bar, fee APR, sparkline), pool health colour scale (green/amber/red), filter pill treatment, track button states. Both: consistent hero stats bar, empty states, mobile responsive behaviour.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Figma frames: Copy Trading (populated, empty, manual mode), DEX Pools (all filter states)</li>
+                        <li>Pool health colour scale annotated: green &gt;70, amber 40–70, red &lt;40</li>
+                        <li>Mirror mode toggle documented with Auto/Manual states</li>
+                        <li>Unfollow modal designed with confirmation CTA</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-497 · IS-499</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-503 BE: Whale Alert Webhooks & Consensus Score -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-503</span>
+                    <span class="task-title">Whale Alerts — Large Buy/Sell Webhook Detection &amp; Consensus Score Computation</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">8 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Extend the signals indexer with whale alert detection. When a tracked elite wallet executes a swap &gt;$50K USD: classify as "large buy" or "large sell", compute the token's current consensus score (count of elite wallets holding the token / total elite wallets × 100), persist to <code>whale_alerts</code> table, push to WebSocket channel <code>wss://.../v1/ws/whale-alerts</code>. Consensus score endpoint: <code>GET /v1/consensus/:token</code>. Alert schema: <code>{wallet_alias, token, side, amount_usd, consensus_score, triggered_at}</code>.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Whale alerts fire within 5s of large swap detection (P95)</li>
+                        <li>Threshold: &gt;$50K USD (configurable via env var)</li>
+                        <li>Consensus score recomputed on each alert event</li>
+                        <li><code>GET /v1/consensus/:token</code> returns score and list of holding wallets</li>
+                        <li>whale_alerts table schema validated and indexed on triggered_at</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-473 (WebSocket) · IS-490 (price feed for USD value) · Signals indexer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-504 FE: Alert Rules — Condition Builder & Test Fire -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-504</span>
+                    <span class="task-title">Alert Rules — Multi-Condition Builder, Test Fire &amp; Alert History Table</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderAlertRules()</code> with: (1) a multi-condition alert builder — users can add up to 3 conditions (token, operator, value) with AND/OR logic; (2) a "Test Fire" button that simulates the alert triggering immediately and pushes a test notification; (3) an "Alert History" table below the rules list showing the last 10 triggered events (date, rule name, triggered value, channel); (4) snooze controls per active alert (Snooze 1h / 4h / 24h); (5) a badge on each rule showing trigger count. All simulated with mock data.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Multi-condition builder renders up to 3 conditions with +Add / Remove controls</li>
+                        <li>Test Fire calls <code>showToast()</code> and <code>pushNotification()</code> immediately</li>
+                        <li>Alert History table renders last 10 mock events</li>
+                        <li>Snooze sets <code>rule.snoozedUntil</code> and shows "Snoozed until Xh" badge on rule</li>
+                        <li>Trigger count badge visible on each rule card</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">renderAlertRules() · appState.alertRules[] · pushNotification() · IS-482</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-505 QA: Sprint 34 Full Regression -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-505</span>
+                    <span class="task-title">Sprint 34 Regression — Copy Trading, DEX Pools, Smart Money, Alert Rules</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge qa">QA</span>
+                    <span class="story-points">3 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Regression test for Sprint 34: (1) Copy Trading: mirrored trades feed renders, max allocation shows USD equiv, mirror mode toggle updates state, unfollow modal appears; (2) DEX Pools: sparklines render, health score colours correct, filter pills work for all 4 states, track button adds pool; (3) Smart Money: whale alert banner shows, conviction score column visible, copy button navigates correctly; (4) Alert Rules: multi-condition builder adds/removes conditions, test fire pushes notification, alert history table renders; (5) BE staging: copy trade pipeline executes and writes record. Zero JS errors.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Copy Trading: all 4 enrichments verified on desktop and mobile</li>
+                        <li>DEX Pools: health colour scale correct; green/amber/red matching score thresholds</li>
+                        <li>Alert Rules: Test Fire → notification badge increments + toast appears</li>
+                        <li>Copy trade pipeline (staging): execution record in copy_trades within 3s</li>
+                        <li>Zero JS errors across Copy Trading, DEX Pools, Smart Money, Alert Rules pages</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-497 · IS-498 · IS-499 · IS-501 · IS-504</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scope-note">
+            <strong>Sprint 34 Scope Summary:</strong>
+            IS-497 Copy Trading Enrichment FE — FE (5 SP) · IS-498 Copy Trade Execution BE — BE (13 SP) · IS-499 DEX Pools Enrichment FE — FE (4 SP) · IS-500 DEX Pool Aggregator BE — BE (10 SP) · IS-501 Smart Money Enrichment FE — FE (4 SP) · IS-502 Copy Trading &amp; DEX Design Spec — Design (4 SP) · IS-503 Whale Alerts BE — BE (8 SP) · IS-504 Alert Rules Enrichment FE — FE (4 SP) · IS-505 Sprint 34 Regression QA — QA (3 SP). Sprint 34 total: <strong>55 SP</strong>. Cumulative grand total across all sprints (8–34): <strong>667 SP</strong>. Prototype: <a href="index_v7.html" style="color:#000;font-weight:700;">index_v7.html</a>.
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ SPRINT 35 ══ -->
+        <div class="sprint-divider">
+            <span class="sprint-divider-label">Sprint 35 — Onboarding Personalisation, Insights Feed Enrichment &amp; Token Research Hub</span>
+            <span class="sprint-divider-line"></span>
+            <span style="font-size:11px;font-weight:700;color:#999;">IS-506 → IS-513 · 38 SP</span>
+        </div>
+
+        <!-- IS-506 FE: Personalised Onboarding Flow -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-506</span>
+                    <span class="task-title">Onboarding — Personalisation Step (Goals, Experience &amp; Token Interests)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">5 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Extend the onboarding flow with 2 new personalisation steps: (1) "What are your goals?" — multi-select checklist: Track whale wallets / Automate DCA buys / Monitor DEX liquidity / Research new tokens / Copy elite traders; (2) "Which tokens are you interested in?" — grid of 12 common tokens (SOL, JUP, BONK, WIF, etc.) with toggle chips. Save selections to <code>appState.onboardingProfile = { goals, tokens }</code>. On completion, render the Home page with a "Personalised for you" banner and pre-populate the Watchlist with selected tokens. Skip button dismisses personalisation but saves a default profile.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Two new steps inserted after existing step 2 (total: 7 steps)</li>
+                        <li>Goal checkboxes: min 1 required to proceed</li>
+                        <li>Token grid: min 1 token required to proceed</li>
+                        <li>On completion: Watchlist pre-populated with selected tokens</li>
+                        <li>Home page shows "Personalised for you" banner if onboardingProfile.tokens.length &gt; 0</li>
+                        <li>Skip button saves empty profile and proceeds</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">appState.onboardingProfile = { goals: [], tokens: [] }</span>
+                        <span class="tech-tag">Token chips: toggle class 'selected' on click, read before skipOnboarding()</span>
+                        <span class="tech-tag">Watchlist pre-populate: appState.watchlist.tokens.push(...selected)</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">showOnboarding() · onboardingSteps[] · appState.watchlist · renderOverview()</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-507 BE: Onboarding Profile Persistence -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-507</span>
+                    <span class="task-title">Onboarding Profile — Backend Persistence &amp; Personalisation API</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">5 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the onboarding profile persistence backend. On onboarding completion: <code>POST /v1/user/onboarding</code> saves goals and token interests to <code>user_profiles</code> table. The profile is used to personalise the home page feed (<code>GET /v1/feed?personalised=true</code> — boost items matching user's token interests). Add a <code>GET /v1/user/profile</code> endpoint to retrieve the stored profile. On app load, if profile exists, skip the onboarding modal. Schema: <code>{user_id, goals[], token_interests[], completed_at}</code>.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li><code>POST /v1/user/onboarding</code> persists goals and token_interests</li>
+                        <li><code>GET /v1/user/profile</code> returns stored profile (or 404 if not completed)</li>
+                        <li>Personalised feed boosts items matching token_interests</li>
+                        <li>Completed users skip onboarding modal on next app load</li>
+                        <li>Unauthenticated request returns 401</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">Auth JWT service · user_profiles table · IS-506 (FE onboarding)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-508 FE: Insights Feed — Category Tabs, Bookmarks & Related Tokens -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-508</span>
+                    <span class="task-title">Insights Feed — Category Tabs, Bookmark Items &amp; Related Token Panel</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderFeed()</code> with: (1) category tabs above the feed — All / On-Chain / News / Whale Moves / DeFi / Regulatory — each tab filters <code>feedItems[]</code> by type; (2) a bookmark icon on each feed card — clicking adds the item to <code>appState.bookmarkedFeed[]</code> and shows toast; (3) a "Bookmarks" tab (appears when bookmarks &gt; 0); (4) an expandable "Related Tokens" panel on each feed card showing 2–3 token pills related to the item's content; (5) a hero stat bar showing: Total stories, High Impact count, Avg impact score, Bullish %. All simulated.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>6 category tabs filter feed correctly by type field</li>
+                        <li>Bookmarks tab appears after first bookmark is added</li>
+                        <li>Related tokens panel expands/collapses on click</li>
+                        <li>Hero stat bar renders with correct counts from feedItems[]</li>
+                        <li>Empty state for filtered category with 0 matching items</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">renderFeed() · feedItems[] · appState.bookmarkedFeed · openTokenPage()</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-509 BE: Insights Feed Enrichment — AI Summary & Token Tag Extraction -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-509</span>
+                    <span class="task-title">Insights Feed — AI Summary Generation &amp; Token Tag Extraction Pipeline</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">8 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Build the AI enrichment pipeline for the Insights Feed. For each ingested news item: (1) run an LLM summarisation prompt (max 2 sentences, factual) to generate <code>ai_summary</code>; (2) extract mentioned token symbols using regex + token dictionary; (3) score sentiment (BULLISH / BEARISH / NEUTRAL) using a fine-tuned classifier; (4) compute impact score (1–10) from: source credibility + social amplification + market cap of mentioned tokens. Pipeline runs async after ingestion. Expose <code>GET /v1/feed?category=news&amp;impact_min=7</code>. Schema addition: <code>ai_summary, token_tags[], category</code>.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>AI summary generated for 95% of ingested items within 30s of ingestion</li>
+                        <li>Token extraction: regex matches SOL, JUP, BONK etc. in article text</li>
+                        <li>Sentiment classifier: 80%+ accuracy on labelled test set</li>
+                        <li>Impact score correlates with social amplification (r &gt; 0.6)</li>
+                        <li>Feed API returns ai_summary and token_tags fields</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">LLM: OpenAI GPT-4o-mini via streaming API</span>
+                        <span class="tech-tag">Token dictionary: curated list of ~200 Solana token symbols</span>
+                        <span class="tech-tag">Sentiment: zero-shot classification via LLM prompt</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">News ingestion service · OpenAI API key · IS-508 (FE category tabs)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-510 FE: Token Research Hub — Audit Tab & Holder Distribution -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-510</span>
+                    <span class="task-title">Token Research Hub — Audit Tab, Holder Distribution Chart &amp; Social Links</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Enrich <code>renderResearch()</code> with 2 additional sub-tabs: (1) "Audit" tab — shows audit status badge (Audited / Partially Audited / Unaudited), audit firm name, audit date, key findings summary (max 3 bullet points), and a risk score bar (0–100, low=green/high=red); (2) "Holders" tab — horizontal stacked bar chart (SVG) showing top 10 holder concentration as percentage of supply; whale count (wallets &gt;1% of supply); a "Insider %" metric. "Social Links" section on Overview tab: Twitter/X, Discord, Website, Explorer links as icon+label buttons. All mock data.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Audit tab renders: status badge, firm, date, 3 findings, risk score bar</li>
+                        <li>Holders tab renders: stacked bar chart for top 10 holders, whale count, insider %</li>
+                        <li>Risk score bar: green ≤30, amber 31–60, red &gt;60</li>
+                        <li>Social links: 4 buttons with SVG icons, all call <code>showToast()</code> on click</li>
+                        <li>All 4 sub-tabs (Overview, Audit, Holders, Trading) navigate without error</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">renderResearch() · researchTokenData{} mock data · tokenResearchTab appState</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-511 Design: Onboarding, Feed & Research Hub Spec -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-511</span>
+                    <span class="task-title">Onboarding, Insights Feed &amp; Token Research Hub — Design Specification</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge design">Design</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Create design specifications for three areas: (1) Onboarding personalisation steps — goal checkbox layout, token chip grid (3-column, 4 rows), progress dots treatment, CTA button states; (2) Insights Feed — category tab bar, feed card with bookmark icon, related tokens panel (collapsed/expanded), hero stat bar layout; (3) Token Research Hub — sub-tab navigation, audit status badge variants, risk score bar, holder distribution stacked bar, social link buttons. All consistent with the low-fidelity design system tokens. Annotate all interactive states.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Figma frames: Onboarding steps 3 &amp; 4 (goal select, token select)</li>
+                        <li>Insights Feed: all 7 category tabs + bookmark states + related tokens panel</li>
+                        <li>Research Hub: Audit tab and Holders tab fully annotated</li>
+                        <li>Risk score bar colour scale documented in design system</li>
+                        <li>All interactive states (hover, selected, empty) shown for each component</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-506 · IS-508 · IS-510</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-512 BE: Token Research Hub — On-Chain Data Enrichment -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-512</span>
+                    <span class="task-title">Token Research Hub — On-Chain Holder Data, Audit Registry &amp; Social Metadata API</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">6 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the data backend for the Token Research Hub. (1) Holder distribution: <code>GET /v1/tokens/:sym/holders?top=10</code> — fetches top holder accounts from Helius RPC <code>getTokenLargestAccounts</code>, enriches with wallet labels (whale/insider/unknown), computes concentration metrics; (2) Audit registry: maintained as a JSON file in the repo (<code>data/audits.json</code>) — <code>GET /v1/tokens/:sym/audit</code> returns audit status, firm, date, and findings; (3) Social metadata: <code>GET /v1/tokens/:sym/social</code> — returns links from CoinGecko API enriched with on-chain mint metadata.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li><code>GET /v1/tokens/:sym/holders</code> returns top 10 holders with pct_supply and label</li>
+                        <li>Insider %: sum of pct_supply for accounts labelled "insider"</li>
+                        <li>Whale count: count of accounts with pct_supply &gt; 1%</li>
+                        <li><code>GET /v1/tokens/:sym/audit</code> returns audit object or <code>{status:"unaudited"}</code></li>
+                        <li><code>GET /v1/tokens/:sym/social</code> returns website, twitter, discord links</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">Helius RPC · CoinGecko API · IS-510 (FE holders tab)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-513 QA: Sprint 35 Full Regression -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-513</span>
+                    <span class="task-title">Sprint 35 Regression — Onboarding, Insights Feed, Token Research Hub</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge qa">QA</span>
+                    <span class="story-points">2 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Regression test for Sprint 35: (1) Onboarding: goal selection requires min 1 goal; token grid min 1 selection; completed → Watchlist pre-populated; home page shows personalisation banner; skip path saves empty profile; (2) Insights Feed: all 6 category tabs filter correctly; bookmark adds to appState.bookmarkedFeed; bookmarks tab appears; related tokens panel expands; hero stat bar correct; (3) Token Research Hub: Audit tab renders all fields; Holders tab shows stacked bar and whale count; social links show toast on click; risk score colour scale correct. Zero JS errors across all pages.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Onboarding: 7-step flow completes without JS error; Watchlist populated with selected tokens</li>
+                        <li>Insights Feed: bookmark badge increments; all category filters return correct subset</li>
+                        <li>Research Hub: Audit tab + Holders tab both render; all 4 sub-tabs navigate</li>
+                        <li>Zero JS errors across all 3 enriched pages</li>
+                        <li>Mobile: onboarding token grid responsive on 375px viewport</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-506 · IS-508 · IS-510</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scope-note">
+            <strong>Sprint 35 Scope Summary:</strong>
+            IS-506 Personalised Onboarding FE — FE (5 SP) · IS-507 Onboarding Profile BE — BE (5 SP) · IS-508 Insights Feed Enrichment FE — FE (4 SP) · IS-509 Feed AI Pipeline BE — BE (8 SP) · IS-510 Token Research Hub FE — FE (4 SP) · IS-511 Onboarding + Feed + Research Design Spec — Design (4 SP) · IS-512 Research Hub Data API BE — BE (6 SP) · IS-513 Sprint 35 Regression QA — QA (2 SP). Sprint 35 total: <strong>38 SP</strong>. Cumulative grand total across all sprints (8–35): <strong>705 SP</strong>. Prototype: <a href="index_v7.html" style="color:#000;font-weight:707;">index_v7.html</a>.
+        </div>
+
     </div>
 
     <footer>
-        Intelligent System Sprint Requirements · IS-380 → IS-449 (Sprints 8–28) · Low-Fidelity Specification
+        Intelligent System Sprint Requirements · IS-380 → IS-513 (Sprints 8–35) · Low-Fidelity Specification
         <div class="footer-links">
             <a href="../index.html">← Project Board</a>
             <a href="sprint_requirements.html">Previous Sprint Requirements</a>
