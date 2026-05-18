@@ -2566,15 +2566,16 @@
   /* ==================== SIDEBAR SEARCH ==================== */
   /* Topbar search hint (lightweight shortcut reminder) */
   .topbar-search-hint{
-    display:inline-flex; align-items:center; gap:5px;
-    padding: 5px 10px;
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 6px 14px;
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
     background: var(--surface-2);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
     font-weight: 500;
+    min-width: 160px;
     transition: border-color .15s, background .15s;
     user-select: none;
   }
@@ -2674,10 +2675,6 @@
           <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
           <span class="nav-label">Heatmap</span>
         </div>
-        <div class="nav-item" id="nav-trending" onclick="navigateTo('trending')" data-tip="Trending">
-          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
-          <span class="nav-label">Trending</span>
-        </div>
         <div class="nav-item" id="nav-sentimentMap" onclick="navigateTo('sentimentMap')" data-tip="Sentiment Map">
           <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
           <span class="nav-label">Sentiment Map</span>
@@ -2726,18 +2723,6 @@
         <div class="nav-item" id="nav-compare" onclick="navigateTo('compare')" data-tip="Compare">
           <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
           <span class="nav-label">Compare</span>
-        </div>
-        <div class="nav-item" id="nav-network" onclick="navigateTo('network')" data-tip="Network">
-          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/><circle cx="12" cy="12" r="13" stroke-width="1.2"/></svg></span>
-          <span class="nav-label">Network</span>
-        </div>
-        <div class="nav-item" id="nav-research" onclick="navigateTo('research')" data-tip="Token Research">
-          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M8 11h6M11 8v6"/></svg></span>
-          <span class="nav-label">Research</span>
-        </div>
-        <div class="nav-item" id="nav-tradeJournal" onclick="navigateTo('tradeJournal')" data-tip="Trade Journal">
-          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg></span>
-          <span class="nav-label">Journal</span>
         </div>
         <div class="nav-item" id="nav-priceAlerts" onclick="navigateTo('priceAlerts')" data-tip="Price Alerts">
           <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="12" y1="5" x2="12" y2="3"/></svg></span>
@@ -3415,11 +3400,11 @@ feedState.backtestRunning = false;
 appState.onboardingDone = false;
 appState.onboardingStep = 0;
 const onboardingSteps = [
-  {icon:'🔭',title:'Welcome to Intelligent System',body:'Your all-in-one Solana analytics platform. Track elite wallets, discover new tokens, monitor DEX pools, and automate your trading strategies.'},
-  {icon:'🐋',title:'Follow Smart Money',body:'The Whales leaderboard shows the top-performing wallets on Solana. Click any wallet to see their trade history and copy their positions with one tap.'},
-  {icon:'📊',title:'Screen & Discover',body:'Use the Token Screener to filter the Top 100 by direction, % change, and Whale Score. New Token Discovery alerts you to emerging SPL mints in real time.'},
-  {icon:'⚡',title:'Automate Your Strategy',body:'Set up DCA, Ladder, or Whale-Trigger strategies and let them run automatically via Jupiter Aggregator. Build custom Alert Rules for any on-chain event.'},
-  {icon:'🚀',title:"You're all set!",body:'Upgrade to Pro to unlock Whale Consensus Scanner, Social Sentiment Analytics, DEX Pool Analytics, Wallet Profiler, and Strategy Backtesting.'}
+  {icon:'01',title:'Welcome to Intelligent System',body:'Your all-in-one Solana analytics platform. Track elite wallets, discover new tokens, monitor DEX pools, and automate your trading strategies.'},
+  {icon:'02',title:'Follow Smart Money',body:'The Whales leaderboard shows the top-performing wallets on Solana. Click any wallet to see their trade history and copy their positions with one tap.'},
+  {icon:'03',title:'Screen & Discover',body:'Use the Token Screener to filter the Top 100 by direction, % change, and Whale Score. New Token Discovery alerts you to emerging SPL mints in real time.'},
+  {icon:'04',title:'Automate Your Strategy',body:'Set up DCA, Ladder, or Whale-Trigger strategies and let them run automatically via Jupiter Aggregator. Build custom Alert Rules for any on-chain event.'},
+  {icon:'05',title:"You're all set!",body:'Upgrade to Pro to unlock Whale Consensus Scanner, Social Sentiment Analytics, DEX Pool Analytics, Wallet Profiler, and Strategy Backtesting.'}
 ];
 
 // Global search index
@@ -3447,11 +3432,11 @@ feedState.searchQuery = '';
 
 // Notifications (IS-402)
 const notifications = [
-  {id:'n1',icon:'🐋',title:'Whale Alert: SOL',body:'Quantum Apex bought $60K SOL at $140.20',time:'2m ago',unread:true,page:'smartMoney'},
-  {id:'n2',icon:'⚡',title:'Consensus Signal: JUP BUY',body:'3 elite wallets agree — STRONG BUY JUP',time:'12m ago',unread:true,page:'consensus'},
-  {id:'n3',icon:'📊',title:'Price Alert: BONK',body:'BONK up +12.4% — your alert rule triggered',time:'28m ago',unread:true,page:'alertrules'},
-  {id:'n4',icon:'🔍',title:'New Token Discovered',body:'GOAT/USDC — Verified · $2.8M initial liquidity',time:'1h ago',unread:false,page:'discovery'},
-  {id:'n5',icon:'💼',title:'Portfolio Update',body:'Your portfolio is up +2.1% today',time:'3h ago',unread:false,page:'portfolio'}
+  {id:'n1',icon:'WH',title:'Whale Alert: SOL',body:'Quantum Apex bought $60K SOL at $140.20',time:'2m ago',unread:true,page:'smartMoney'},
+  {id:'n2',icon:'SG',title:'Consensus Signal: JUP BUY',body:'3 elite wallets agree — STRONG BUY JUP',time:'12m ago',unread:true,page:'consensus'},
+  {id:'n3',icon:'AL',title:'Price Alert: BONK',body:'BONK up +12.4% — your alert rule triggered',time:'28m ago',unread:true,page:'alertrules'},
+  {id:'n4',icon:'DI',title:'New Token Discovered',body:'GOAT/USDC — Verified · $2.8M initial liquidity',time:'1h ago',unread:false,page:'discovery'},
+  {id:'n5',icon:'PF',title:'Portfolio Update',body:'Your portfolio is up +2.1% today',time:'3h ago',unread:false,page:'portfolio'}
 ];
 appState.notifDropdownOpen = false;
 
@@ -3553,12 +3538,12 @@ const multiWalletData = {
 
 // IS-415: KOL Social Feed
 const kolFeedItems = [
-  {id:'k1',avatar:'🐂',name:'Ansem',handle:'@blknoiz06',text:'SOL looking very clean on the weekly. $180 retest then new ATH incoming. Big whale accumulation confirmed by multiple sources. Not financial advice.',time:'12m ago',tokens:['SOL'],likes:4200,rt:890},
-  {id:'k2',avatar:'🦍',name:'Murad',handle:'@MuradMahmudov',text:'The meme coin supercycle is just getting started. BONK, WIF, POPCAT — all still early. Culture wins over utility in this cycle.',time:'28m ago',tokens:['BONK','WIF'],likes:8100,rt:1240},
-  {id:'k3',avatar:'🔭',name:'0xSunrize',handle:'@0xSunrize',text:'JUP at these levels is criminally undervalued vs. its swap volume. One of the few tokens with real product-market fit. Accumulating.',time:'45m ago',tokens:['JUP'],likes:2300,rt:410},
-  {id:'k4',avatar:'🧠',name:'Cobie',handle:'@cobie',text:'Nobody wants to buy when prices are low. Then when prices are high, everyone wants to buy. Classic cycle repeating. Do with this information what you will.',time:'1h ago',tokens:[],likes:12400,rt:3800},
-  {id:'k5',avatar:'🌊',name:'Hsaka',handle:'@HsakaTrades',text:'DRIFT setup looking very interesting. Watching for a breakout above $1.00. Stop at $0.78. Could be a 3x from here if the volume holds.',time:'2h ago',tokens:['DRIFT'],likes:1800,rt:320},
-  {id:'k6',avatar:'🎯',name:'DegenSpartan',handle:'@DegenSpartan',text:'Elite wallets are rotating out of ETH and into Solana ecosystem tokens. Follow the smart money. They know something we don\'t.',time:'3h ago',tokens:['SOL'],likes:5600,rt:1100}
+  {id:'k1',avatar:'AN',name:'Ansem',handle:'@blknoiz06',text:'SOL looking very clean on the weekly. $180 retest then new ATH incoming. Big whale accumulation confirmed by multiple sources. Not financial advice.',time:'12m ago',tokens:['SOL'],likes:4200,rt:890},
+  {id:'k2',avatar:'MU',name:'Murad',handle:'@MuradMahmudov',text:'The meme coin supercycle is just getting started. BONK, WIF, POPCAT — all still early. Culture wins over utility in this cycle.',time:'28m ago',tokens:['BONK','WIF'],likes:8100,rt:1240},
+  {id:'k3',avatar:'SX',name:'0xSunrize',handle:'@0xSunrize',text:'JUP at these levels is criminally undervalued vs. its swap volume. One of the few tokens with real product-market fit. Accumulating.',time:'45m ago',tokens:['JUP'],likes:2300,rt:410},
+  {id:'k4',avatar:'CB',name:'Cobie',handle:'@cobie',text:'Nobody wants to buy when prices are low. Then when prices are high, everyone wants to buy. Classic cycle repeating. Do with this information what you will.',time:'1h ago',tokens:[],likes:12400,rt:3800},
+  {id:'k5',avatar:'HS',name:'Hsaka',handle:'@HsakaTrades',text:'DRIFT setup looking very interesting. Watching for a breakout above $1.00. Stop at $0.78. Could be a 3x from here if the volume holds.',time:'2h ago',tokens:['DRIFT'],likes:1800,rt:320},
+  {id:'k6',avatar:'DS',name:'DegenSpartan',handle:'@DegenSpartan',text:'Elite wallets are rotating out of ETH and into Solana ecosystem tokens. Follow the smart money. They know something we don\'t.',time:'3h ago',tokens:['SOL'],likes:5600,rt:1100}
 ];
 feedState.kolFilter = 'all';
 
@@ -3669,7 +3654,7 @@ appState.activeWidgetPage = 0;
 function toggleDarkMode(){
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
-  document.getElementById('darkToggleBtn').textContent = isDark ? '☀️' : '🌙';
+  const dtb = document.getElementById('darkToggleBtn'); if (dtb) dtb.textContent = isDark ? 'Light' : 'Dark';
   try { localStorage.setItem('unlimit_dark_mode', isDark ? '1' : '0'); } catch(e){}
 }
 
@@ -3703,7 +3688,7 @@ function renderSearchPaletteResults(q){
   }
   el.innerHTML = results.map((r,i)=>`
     <div class="sp-result-item" onclick="onSearchPaletteSelect('${r.page||r.sym||''}','${r.type}')">
-      <div class="sp-result-icon">${r.type==='token'?r.label.substring(0,3):(r.type==='page'?'📄':'🔑')}</div>
+      <div class="sp-result-icon">${r.type==='token'?r.label.substring(0,3):(r.type==='page'?'Pg':'Wlt')}</div>
       <div>
         <div class="sp-result-label">${r.label}</div>
         <div class="sp-result-sub">${r.sub}</div>
@@ -3754,21 +3739,43 @@ function renderOnboardingStep(){
 let _liveSimInterval = null;
 function startLiveSim(){
   if (_liveSimInterval) return;
+  let _simNotifTick = 0;
   _liveSimInterval = setInterval(()=>{
     // drift TPS ±50
     networkStats.tps = Math.max(1000, Math.min(4500, networkStats.tps + (Math.random()-0.5)*120));
     // drift token prices slightly
     top100Tokens.forEach(t=>{ t.price *= (1 + (Math.random()-0.502)*0.002); });
-    // update live dot pulse via class toggle
+    // update live dot pulse
     document.querySelectorAll('.live-dot').forEach(d=>{d.style.transform='scale(1.4)'; setTimeout(()=>d.style.transform='',300);});
-    // if on network page, refresh TPS display
-    if (appState.currentPage === 'network'){
-      const tpsEl = document.querySelector('[data-live-tps]');
-      if (tpsEl) tpsEl.textContent = Math.round(networkStats.tps).toLocaleString();
-    }
     // if on portfolio page update value
     if (appState.currentPage === 'portfolio') renderPortfolio();
+    // push a notification every 15 ticks (45s)
+    _simNotifTick++;
+    if (_simNotifTick % 15 === 0){
+      const t = top100Tokens[Math.floor(Math.random()*10)];
+      pushNotification({type:'ALERT',title:'Price Alert: '+t.sym,body:t.sym+' moved '+((Math.random()>0.5?'+':'-')+(Math.random()*5).toFixed(1))+'% in the last 5 minutes.',token:t.sym,page:'priceAlerts'});
+    }
   }, 3000);
+}
+
+// ==================== NOTIFICATION PIPELINE (IS-443) ====================
+function pushNotification(item){
+  const newItem = {
+    id: 'auto_'+Date.now(),
+    type: item.type || 'ALERT',
+    title: item.title || 'Notification',
+    body: item.body || '',
+    token: item.token || null,
+    page: item.page || null,
+    time: 'Just now',
+    read: false,
+    deleted: false,
+    ...item
+  };
+  notifInboxItems.unshift(newItem);
+  if (notifInboxItems.length > 50) notifInboxItems.pop();
+  syncInboxBadge();
+  showToast(newItem.title);
 }
 
 // ==================== INIT ====================
@@ -3780,7 +3787,6 @@ function init(){
     }
     if (localStorage.getItem('unlimit_dark_mode') === '1'){
       document.body.classList.add('dark-mode');
-      const dtb = document.getElementById('darkToggleBtn'); if(dtb) dtb.textContent = '☀️';
     }
     const wp = localStorage.getItem('unlimit_widget_pages');
     if (wp) { try { const parsed = JSON.parse(wp); if (parsed.length) appState.widgetPages = parsed; } catch(e){} }
@@ -3903,7 +3909,7 @@ function _authWall(featureLabel, type = 'login'){
     if (!isAuth){
       // Not logged in at all
       return `<div class="card" style="padding:52px 40px;text-align:center;max-width:480px;margin:40px auto;">
-        <div style="font-size:32px;margin-bottom:16px;">🔒</div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;">LOCKED</div>
         <div style="font-size:17px;font-weight:700;margin-bottom:8px;">${featureLabel}</div>
         <div style="color:var(--muted);font-size:13px;margin-bottom:22px;line-height:1.6;">Sign in and connect a wallet to view your personalised ${featureLabel.toLowerCase()}.</div>
         <div style="display:flex;gap:10px;justify-content:center;">
@@ -3914,7 +3920,7 @@ function _authWall(featureLabel, type = 'login'){
     }
     // Logged in but no wallet
     return `<div class="card" style="padding:40px;text-align:center;max-width:480px;margin:40px auto;">
-      <div style="font-size:32px;margin-bottom:16px;">🔗</div>
+      <div style="font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;">WALLET</div>
       <div style="font-size:17px;font-weight:700;margin-bottom:8px;">Connect a Wallet</div>
       <div style="color:var(--muted);font-size:13px;margin-bottom:22px;line-height:1.6;">Connect your Solana wallet to view ${featureLabel.toLowerCase()} data linked to your holdings.</div>
       <button class="btn btn-accent" onclick="connectWallet(event)">Connect Wallet</button>
@@ -3922,7 +3928,7 @@ function _authWall(featureLabel, type = 'login'){
   }
   if (type === 'login' && !isAuth){
     return `<div class="card" style="padding:52px 40px;text-align:center;max-width:480px;margin:40px auto;">
-      <div style="font-size:32px;margin-bottom:16px;">🔐</div>
+      <div style="font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;">SIGN IN</div>
       <div style="font-size:17px;font-weight:700;margin-bottom:8px;">${featureLabel}</div>
       <div style="color:var(--muted);font-size:13px;margin-bottom:22px;line-height:1.6;">Sign in to access your personal ${featureLabel.toLowerCase()}.</div>
       <div style="display:flex;gap:10px;justify-content:center;">
@@ -4114,8 +4120,8 @@ function navigateTo(page){
   else if (page==='widgets'){     setCrumbs(['Widgets']); renderWidgetBuilder(); }
   else if (page==='dashboard'){   setCrumbs(['My Dashboard']); renderMyDashboard(); }
   else if (page==='watchlist'){   setCrumbs(['Watchlist']); renderWatchlist(); }
-  else if (page==='screener'){    setCrumbs(['Screener']); renderScreener(); }
-  else if (page==='network'){     setCrumbs(['Network']); renderNetwork(); }
+  else if (page==='screener'){    feedState.top100Tab='screener'; setCrumbs(['Tokens','Screener']); renderTop100(); return; }
+  else if (page==='network'){     navigateTo('overview'); return; }
   else if (page==='alertrules'){  setCrumbs(['Alert Rules']); renderAlertRules(); }
   else if (page==='consensus'){   setCrumbs(['Consensus']); renderConsensus(); }
   else if (page==='sentiment'){   setCrumbs(['Sentiment']); renderSentiment(); }
@@ -4130,16 +4136,17 @@ function navigateTo(page){
   else if (page==='multiWallet'){ setCrumbs(['Multi-Wallet Dashboard']); renderMultiWallet(); }
   else if (page==='apiPlayground'){ setCrumbs(['API Playground']); renderApiPlayground(); }
   else if (page==='aiAdvisor'){   setCrumbs(['AI Strategy Advisor']); renderAiAdvisor(); }
-  else if (page==='trending'){    setCrumbs(['Trending Tokens']); renderTrending(); }
+  else if (page==='trending'){    feedState.top100Tab='trending'; setCrumbs(['Tokens','Trending']); renderTop100(); }
+  else if (page==='screener'){    feedState.top100Tab='screener'; setCrumbs(['Tokens','Screener']); renderTop100(); }
   else if (page==='sentimentMap'){setCrumbs(['Sentiment Heatmap']); renderSentimentMap(); }
   else if (page==='notifInbox'){  setCrumbs(['Notification Inbox']); renderNotifInbox(); }
   else if (page==='shareHub'){    setCrumbs(['Share & Referral']); renderShareHub(); }
   else if (page==='rebalancer'){  setCrumbs(['Portfolio Rebalancer']); renderRebalancer(); }
   else if (page==='stratCompare'){setCrumbs(['Strategy Comparison']); renderStrategyCompare(); }
-  else if (page==='tradeJournal'){ setCrumbs(['Trade Journal']); renderTradeJournal(); }
-  else if (page==='alertsHistory'){ setCrumbs(['Smart Alerts History']); renderAlertsHistory(); }
+  else if (page==='tradeJournal'){ navigateTo('portfolio'); return; }
+  else if (page==='network'){     navigateTo('overview'); return; }
+  else if (page==='research'){    setCrumbs(['Token Research']); renderTokenResearch(); }
   else if (page==='mmTracker'){   setCrumbs(['Market Maker Tracker']); renderMmTracker(); }
-  else if (page==='research'){    setCrumbs(['Token Research Hub']); renderTokenResearch(); }
   else if (page==='ctReport'){    setCrumbs(['Copy Trading Report']); renderCtReport(); }
   else if (page==='aiCurator'){   setCrumbs(['AI News Curator']); renderAiCurator(); }
   else if (page==='priceAlerts'){ setCrumbs(['Price Alerts']); renderPriceAlerts(); }
@@ -4385,7 +4392,7 @@ function renderOverview(){
         <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
           ${discoveredTokens.slice(0,3).map(t => `
             <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer;" onclick="navigateTo('discovery')">
-              <div class="discovery-risk ${t.risk}" style="min-width:70px;">${t.risk === 'verified' ? '✓ Verified' : t.risk === 'unverified' ? '⚠ Unverified' : '✗ Suspicious'}</div>
+              <div class="discovery-risk ${t.risk}" style="min-width:70px;">${t.risk === 'verified' ? 'Verified' : t.risk === 'unverified' ? 'Unverified' : 'Suspicious'}</div>
               <div style="flex:1;font-weight:600;">${t.sym}</div>
               <div style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;">${t.liquidity}</div>
               <div class="discovery-age">${t.age}</div>
@@ -4410,8 +4417,8 @@ function renderOverview(){
             }).join('')}
           </div>
           <div style="display:flex;gap:16px;font-size:10px;color:var(--muted);">
-            <span>🟢 Inbound: +$32.4M</span>
-            <span>🔴 Outbound: -$18.2M</span>
+            <span style="color:var(--pos);">+ Inbound: +$32.4M</span>
+            <span style="color:var(--neg);">- Outbound: -$18.2M</span>
             <span style="color:var(--pos);">Net: +$14.2M</span>
           </div>
         </div>
@@ -4423,7 +4430,21 @@ function renderOverview(){
 // ==================== TOP 100 ====================
 function renderTop100(){
   appState.currentPage = 'top100';
-  const q = feedState.top100Search.trim().toLowerCase();
+  if (!feedState.top100Tab) feedState.top100Tab = 'assets';
+  const tab = feedState.top100Tab;
+
+  const tabBar = `
+    <div class="settings-tabs" style="margin-bottom:16px;">
+      <button class="stab ${tab==='assets'?'active':''}" onclick="feedState.top100Tab='assets';renderTop100()">All Assets</button>
+      <button class="stab ${tab==='screener'?'active':''}" onclick="feedState.top100Tab='screener';renderTop100()">Screener</button>
+      <button class="stab ${tab==='trending'?'active':''}" onclick="feedState.top100Tab='trending';renderTop100()">Trending</button>
+    </div>`;
+
+  if (tab === 'screener'){ _renderScreenerTab(tabBar); return; }
+  if (tab === 'trending'){ _renderTrendingTab(tabBar); return; }
+
+  // ── All Assets tab ──
+  const q = (feedState.top100Search||'').trim().toLowerCase();
   const sortDir = feedState.top100Dir, sortKey = feedState.top100Sort;
 
   let rows = [...top100Tokens].filter(t => !q || t.sym.toLowerCase().includes(q) || t.name.toLowerCase().includes(q))
@@ -4446,18 +4467,21 @@ function renderTop100(){
       <td class="price-cell">${fmtP(t.price)}</td>
       <td class="${t.pos?'change-pos':'change-neg'}">${t.pos?'↑':'↓'} ${Math.abs(t.change).toFixed(2)}%</td>
       <td style="color:var(--muted);">${t.mcap}</td>
-    </tr>`).join('') || `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-title">No assets match</div><p>Try a different search term.</p></div></td></tr>`;
+      <td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();addToWatchlistToken('${t.sym}')">Watch</button></td>
+    </tr>`).join('') || `<tr><td colspan="6"><div class="empty-state"><div class="empty-state-title">No assets match</div><p>Try a different search term.</p></div></td></tr>`;
 
   document.getElementById('content').innerHTML = `
     <div class="hero">
       <div class="hero-row">
         <div>
-          <h1>Top 100 Assets</h1>
-          <p class="sub">Solana ecosystem tokens ranked by market cap, with live price data.</p>
+          <h1>Top 100 <span class="serif">Assets</span></h1>
+          <p class="sub">Solana ecosystem tokens ranked by market cap with live price data, trend screening and momentum tracking.</p>
         </div>
-        <input class="search-input" placeholder="Search symbol or address…" value="${feedState.top100Search}" oninput="onTop100Search(this.value)" />
+        <input class="search-input" placeholder="Search symbol or name…" value="${feedState.top100Search||''}" oninput="onTop100Search(this.value)" />
       </div>
     </div>
+
+    ${tabBar}
 
     <div class="card">
       <div class="card-header">
@@ -4467,15 +4491,16 @@ function renderTop100(){
         </div>
         <span class="badge"><span class="live-dot"></span> Real-time</span>
       </div>
-      <div class="card-body tight">
+      <div class="card-body tight" style="overflow-x:auto;">
         <table>
           <thead>
             <tr>
               <th class="sortable ${sortKey==='rank'?'sorted':''}" onclick="sortTop100('rank')">Rank <span class="sort-ind">${si('rank')}</span></th>
               <th>Asset</th>
               <th class="sortable ${sortKey==='price'?'sorted':''}" onclick="sortTop100('price')">Price <span class="sort-ind">${si('price')}</span></th>
-              <th class="sortable ${sortKey==='change'?'sorted':''}" onclick="sortTop100('change')">24h change <span class="sort-ind">${si('change')}</span></th>
-              <th>Market cap</th>
+              <th class="sortable ${sortKey==='change'?'sorted':''}" onclick="sortTop100('change')">24h <span class="sort-ind">${si('change')}</span></th>
+              <th>Market Cap</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>${tableRows}</tbody>
@@ -4489,6 +4514,176 @@ function sortTop100(key){
   renderTop100();
 }
 function onTop100Search(v){ feedState.top100Search = v; renderTop100(); }
+
+// ── Screener tab renderer ──
+function _renderScreenerTab(tabBar){
+  const isPro = _isPro();
+  const s = feedState.screener;
+  const fmtP = p => p<0.001 ? '$'+p.toFixed(6) : p<1 ? '$'+p.toFixed(4) : '$'+p.toFixed(2);
+
+  let results = top100Tokens.map(t => ({
+    ...t, whaleScore: Math.round(20 + (_tokSeed(t.sym) % 78))
+  }));
+  if (s.direction === 'bullish') results = results.filter(t => t.pos);
+  if (s.direction === 'bearish') results = results.filter(t => !t.pos);
+  if (s.minChange !== '') results = results.filter(t => Math.abs(t.change) >= parseFloat(s.minChange));
+  if (s.maxChange !== '') results = results.filter(t => Math.abs(t.change) <= parseFloat(s.maxChange));
+  if (isPro && s.whaleActivity && s.whaleActivity !== 'any'){
+    const minScore = s.whaleActivity === 'high' ? 60 : 40;
+    results = results.filter(t => t.whaleScore >= minScore);
+  }
+  results.sort((a,b) => {
+    if (s.sortKey === 'rank') return s.sortDir === 'asc' ? a.rank-b.rank : b.rank-a.rank;
+    if (s.sortKey === 'change') return s.sortDir === 'asc' ? a.change-b.change : b.change-a.change;
+    if (s.sortKey === 'whaleScore') return s.sortDir === 'asc' ? a.whaleScore-b.whaleScore : b.whaleScore-a.whaleScore;
+    return a.rank - b.rank;
+  });
+  const si = k => s.sortKey===k ? (s.sortDir==='asc'?'▲':'▼') : '↕';
+
+  const tableRows = results.map(t => `
+    <tr class="row-click" onclick="openTokenPage('${t.sym}')" onmouseenter="showTokPreview('${t.sym}',event)" onmousemove="positionTokPreview(event)" onmouseleave="hideTokPreview()">
+      <td class="rank">${String(t.rank).padStart(2,'0')}</td>
+      <td><div class="asset-cell">
+        <div class="asset-icon">${t.sym.substring(0,3)}</div>
+        <div><div class="asset-sym">${t.sym}</div><div class="asset-name">${t.name}</div></div>
+      </div></td>
+      <td class="price-cell">${fmtP(t.price)}</td>
+      <td class="${t.pos?'change-pos':'change-neg'}">${t.pos?'↑':'↓'} ${Math.abs(t.change).toFixed(2)}%</td>
+      <td style="color:var(--muted);">${t.mcap}</td>
+      <td>${isPro
+          ? `<div class="whale-score-bar"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;">${t.whaleScore}</span><div class="bar"><span style="width:${t.whaleScore}%;"></span></div></div>`
+          : `<span style="font-size:11px;color:var(--muted-2);cursor:pointer;" onclick="navigateTo('settings');setTimeout(()=>switchTab('billing'),50)">PRO</span>`}
+      </td>
+      <td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();addToWatchlistToken('${t.sym}');if(appState.currentPage==='watchlist')renderWatchlist();">Watch</button></td>
+    </tr>`).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="hero">
+      <div class="hero-row">
+        <div>
+          <h1>Top 100 <span class="serif">Assets</span></h1>
+          <p class="sub">Filter and rank Solana tokens by price momentum, market cap, and whale activity score.</p>
+        </div>
+        ${isPro ? `<button class="btn btn-sm" onclick="showToast('CSV export coming soon')">Export CSV</button>` : ''}
+      </div>
+    </div>
+
+    ${tabBar}
+
+    <div class="screener-filters" style="margin-bottom:16px;">
+      <div class="screener-field">
+        <label>Direction</label>
+        <select class="form-select" onchange="feedState.screener.direction=this.value;renderTop100()">
+          <option value="all" ${s.direction==='all'?'selected':''}>All</option>
+          <option value="bullish" ${s.direction==='bullish'?'selected':''}>Bullish (↑)</option>
+          <option value="bearish" ${s.direction==='bearish'?'selected':''}>Bearish (↓)</option>
+        </select>
+      </div>
+      <div class="screener-field">
+        <label>Min 24h change (%)</label>
+        <input class="form-input" type="number" placeholder="e.g. 3" value="${s.minChange}" oninput="feedState.screener.minChange=this.value;renderTop100()" />
+      </div>
+      <div class="screener-field">
+        <label>Max 24h change (%)</label>
+        <input class="form-input" type="number" placeholder="e.g. 20" value="${s.maxChange}" oninput="feedState.screener.maxChange=this.value;renderTop100()" />
+      </div>
+      <div class="screener-field">
+        <label>Whale Activity</label>
+        ${isPro
+          ? `<select class="form-select" onchange="feedState.screener.whaleActivity=this.value;renderTop100()">
+              <option value="any" ${s.whaleActivity==='any'?'selected':''}>Any</option>
+              <option value="high" ${s.whaleActivity==='high'?'selected':''}>High (≥60)</option>
+              <option value="medium" ${s.whaleActivity==='medium'?'selected':''}>Medium (≥40)</option>
+            </select>`
+          : `<div class="screener-locked-overlay" onclick="navigateTo('settings');setTimeout(()=>switchTab('billing'),50)"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> PRO only</div>`}
+      </div>
+      <div class="screener-field">
+        <label>Sort by</label>
+        <select class="form-select" onchange="const[k,d]=this.value.split(':');feedState.screener.sortKey=k;feedState.screener.sortDir=d;renderTop100()">
+          <option value="rank:asc" ${s.sortKey==='rank'&&s.sortDir==='asc'?'selected':''}>Rank ↑</option>
+          <option value="change:desc" ${s.sortKey==='change'&&s.sortDir==='desc'?'selected':''}>24h Change ↓</option>
+          <option value="change:asc" ${s.sortKey==='change'&&s.sortDir==='asc'?'selected':''}>24h Change ↑</option>
+          <option value="whaleScore:desc" ${s.sortKey==='whaleScore'&&s.sortDir==='desc'?'selected':''}>Whale Score ↓</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span>
+          ${results.length} tokens matching criteria
+        </div>
+        <span class="badge"><span class="live-dot"></span> Real-time</span>
+      </div>
+      <div class="card-body tight" style="overflow-x:auto;">
+        <table>
+          <thead><tr>
+            <th class="sortable ${s.sortKey==='rank'?'sorted':''}" onclick="feedState.screener.sortKey='rank';feedState.screener.sortDir=s.sortDir==='asc'?'desc':'asc';renderTop100()">Rank <span class="sort-ind">${si('rank')}</span></th>
+            <th>Asset</th>
+            <th>Price</th>
+            <th class="sortable ${s.sortKey==='change'?'sorted':''}" onclick="feedState.screener.sortKey='change';feedState.screener.sortDir=s.sortDir==='asc'?'desc':'asc';renderTop100()">24h <span class="sort-ind">${si('change')}</span></th>
+            <th>Market Cap</th>
+            <th class="${isPro?'sortable':''}">Whale Score</th>
+            <th></th>
+          </tr></thead>
+          <tbody>${tableRows || `<tr><td colspan="7"><div class="empty-state"><div class="empty-state-title">No tokens match</div><p>Try relaxing your filter criteria.</p></div></td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ── Trending tab renderer ──
+function _renderTrendingTab(tabBar){
+  const rows = trendingTokens.map(t=>{
+    const rankDiff = t.prev - t.rank;
+    const rankTag = rankDiff>0
+      ? `<span class="rank-change rank-up">+${rankDiff}</span>`
+      : rankDiff<0
+        ? `<span class="rank-change rank-down">${rankDiff}</span>`
+        : `<span class="rank-change rank-same">—</span>`;
+    const priceStr = t.price >= 1 ? '$'+t.price.toFixed(2) : '$'+t.price.toFixed(t.price<0.001?6:4);
+    const chgPos = t.change24h >= 0;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="trending-rank ${t.rank<=3?'top3':''}">${t.rank}</div>${rankTag}</div></td>
+      <td><div class="asset-cell" style="cursor:pointer;" onclick="openTokenPage('${t.sym}')"><div class="asset-icon">${t.sym.substring(0,3)}</div><div><div class="asset-sym">${t.sym}</div><div class="asset-name">${t.name}</div></div></div></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${priceStr}</td>
+      <td class="${chgPos?'change-pos':'change-neg'}" style="font-family:'JetBrains Mono',monospace;font-size:12px;">${chgPos?'+':''}${t.change24h}%</td>
+      <td style="font-size:12px;color:var(--muted);">${t.vol24h}</td>
+      <td style="font-size:12px;color:var(--muted);">${t.mcap}</td>
+      <td><button class="btn btn-sm" onclick="addToWatchlistFromTrending('${t.sym}')">Watch</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="hero">
+      <div class="hero-row">
+        <div>
+          <h1>Top 100 <span class="serif">Assets</span></h1>
+          <p class="sub">Top tokens by momentum and trading volume on Solana over the last 24h. Updated every 60 seconds.</p>
+        </div>
+      </div>
+    </div>
+
+    ${tabBar}
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+          Trending Leaderboard — 24h Volume
+        </div>
+        <span class="badge" style="font-size:10px;">Updated 60s · Simulated</span>
+      </div>
+      <div class="card-body tight" style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Rank</th><th>Token</th><th>Price</th><th>24h Change</th><th>Volume</th><th>Market Cap</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="banner" style="margin-top:12px;"><span class="banner-dot"></span><div>Rank movement shows change from previous 24h period. Positive = moved up, negative = moved down.</div></div>`;
+}
 
 // ==================== SMART MONEY ====================
 function renderSmartMoney(){
@@ -4597,13 +4792,13 @@ function renderFeed(){
         <span style="font-size:10px;padding:2px 6px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;">${src}</span>
         <span style="font-family:'JetBrains Mono',monospace;">${n.time}</span>
         <span class="impact-badge ${n.impact>=7?'high':''}">${n.impact}/10</span>
-        <button class="ai-expand-btn" onclick="event.stopPropagation();toggleFeedBookmark(${n.id})" title="${isBookmarked?'Remove bookmark':'Bookmark'}" style="margin-left:auto;opacity:0.7;">${isBookmarked?'🔖':'🏷️'}</button>
+        <button class="ai-expand-btn" onclick="event.stopPropagation();toggleFeedBookmark(${n.id})" title="${isBookmarked?'Remove bookmark':'Bookmark'}" style="margin-left:auto;opacity:0.7;">${isBookmarked?'Saved':'Save'}</button>
       </div>
       <div class="news-title">${n.title}</div>
       <div class="news-desc">${n.desc}</div>
       ${isHighImpact && aiSum ? `<div class="ai-summary-expand" id="aisum-${n.id}">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);">⚡ AI Summary</span>
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);">AI Summary</span>
         </div>
         <div style="font-size:12px;color:var(--ink);line-height:1.5;">${aiSum}</div>
       </div>` : ''}
@@ -4627,7 +4822,7 @@ function renderFeed(){
         <h1>Intelligence <span class="serif">feed</span></h1>
         <p class="sub">AI-enriched news with on-chain correlation and sentiment scoring.</p>
       </div>
-      ${bookmarkCount>0 ? `<button class="btn" onclick="setFeedSourceFilter('bookmarks')">🔖 ${bookmarkCount} Saved</button>` : ''}
+      ${bookmarkCount>0 ? `<button class="btn" onclick="setFeedSourceFilter('bookmarks')">${bookmarkCount} Saved</button>` : ''}
     </div>
 
     <div class="card">
@@ -4810,8 +5005,8 @@ function renderCopyTrading(){
     </div>
 
     <div class="tab-bar" style="margin-bottom:16px;">
-      <button class="tab-btn ${appState.ctTab!=='discover'?'active':''}" onclick="appState.ctTab='wallets';renderCopyTrading()">⚙️ My Wallets</button>
-      <button class="tab-btn ${appState.ctTab==='discover'?'active':''}" onclick="appState.ctTab='discover';renderCopyTrading()">🌐 Discover Wallets</button>
+      <button class="tab-btn ${appState.ctTab!=='discover'?'active':''}" onclick="appState.ctTab='wallets';renderCopyTrading()">My Wallets</button>
+      <button class="tab-btn ${appState.ctTab==='discover'?'active':''}" onclick="appState.ctTab='discover';renderCopyTrading()">Discover Wallets</button>
     </div>
 
     ${(appState.ctTab==='discover') ? renderCTDiscover() : `
@@ -4883,12 +5078,12 @@ function toggleCopyPause(id){
 }
 
 const discoverWallets = [
-  {id:'dw1',avatar:'🐋',alias:'Whale Master',pnl30d:'+$142K',winRate:71,followers:1840,strategy:'Swing'},
-  {id:'dw2',avatar:'⚡',alias:'Flash Alpha',pnl30d:'+$89K',winRate:68,followers:920,strategy:'Aggressive'},
-  {id:'dw3',avatar:'🎯',alias:'Precision DCA',pnl30d:'+$38K',winRate:83,followers:3210,strategy:'DCA'},
-  {id:'dw4',avatar:'🧠',alias:'Smart Money',pnl30d:'+$211K',winRate:74,followers:5600,strategy:'Swing'},
-  {id:'dw5',avatar:'🌊',alias:'Solana Surfer',pnl30d:'+$61K',winRate:59,followers:770,strategy:'Aggressive'},
-  {id:'dw6',avatar:'🏦',alias:'Steady Returns',pnl30d:'+$22K',winRate:88,followers:4200,strategy:'DCA'},
+  {id:'dw1',avatar:'WM',alias:'Whale Master',pnl30d:'+$142K',winRate:71,followers:1840,strategy:'Swing'},
+  {id:'dw2',avatar:'FA',alias:'Flash Alpha',pnl30d:'+$89K',winRate:68,followers:920,strategy:'Aggressive'},
+  {id:'dw3',avatar:'PD',alias:'Precision DCA',pnl30d:'+$38K',winRate:83,followers:3210,strategy:'DCA'},
+  {id:'dw4',avatar:'SM',alias:'Smart Money',pnl30d:'+$211K',winRate:74,followers:5600,strategy:'Swing'},
+  {id:'dw5',avatar:'SS',alias:'Solana Surfer',pnl30d:'+$61K',winRate:59,followers:770,strategy:'Aggressive'},
+  {id:'dw6',avatar:'SR',alias:'Steady Returns',pnl30d:'+$22K',winRate:88,followers:4200,strategy:'DCA'},
 ];
 
 function renderCTDiscover(){
@@ -4952,7 +5147,7 @@ function renderDiscovery(){
 
   const rows = tokens.map(t => `
     <tr class="row-click" onclick="openDiscoveryToken('${t.id}')">
-      <td><div class="discovery-risk ${t.risk}">${t.risk === 'verified' ? '✓ Verified' : t.risk === 'unverified' ? '⚠ Unverified' : '✗ Suspicious'}</div></td>
+      <td><div class="discovery-risk ${t.risk}">${t.risk === 'verified' ? '✓ Verified' : t.risk === 'unverified' ? 'Unverified' : '✗ Suspicious'}</div></td>
       <td><div class="asset-cell"><div class="asset-icon">${t.sym.substring(0,3)}</div><div><div class="discovery-token">${t.sym}</div><div class="discovery-name">${t.name}</div></div></div></td>
       <td class="discovery-age">${t.age}</td>
       <td class="discovery-liquidity">${t.liquidity}</td>
@@ -4966,7 +5161,7 @@ function renderDiscovery(){
 
   const monitorEntries = discoveredTokens.slice(0,6).map(t => `
     <div class="live-monitor-entry">
-      <div class="discovery-risk ${t.risk}" style="padding:1px 4px;font-size:8px;">${t.risk === 'verified' ? '✓' : t.risk === 'unverified' ? '⚠' : '✗'}</div>
+      <div class="discovery-risk ${t.risk}" style="padding:1px 4px;font-size:8px;">${t.risk === 'verified' ? '✓' : t.risk === 'unverified' ? 'Note:' : '✗'}</div>
       <div style="flex:1;font-weight:600;">${t.sym}</div>
       <div style="color:var(--muted);">${t.liquidity}</div>
       <div class="discovery-age">${t.age}</div>
@@ -5016,7 +5211,7 @@ function renderDiscovery(){
             <div class="pills">
               <button class="pill ${f==='all'?'active':''}" onclick="feedState.discoveryFilter='all';renderDiscovery()">All</button>
               <button class="pill ${f==='verified'?'active':''}" onclick="feedState.discoveryFilter='verified';renderDiscovery()">✓ Verified</button>
-              <button class="pill ${f==='unverified'?'active':''}" onclick="feedState.discoveryFilter='unverified';renderDiscovery()">⚠ Unverified</button>
+              <button class="pill ${f==='unverified'?'active':''}" onclick="feedState.discoveryFilter='unverified';renderDiscovery()">Unverified</button>
               <button class="pill ${f==='suspicious'?'active':''}" onclick="feedState.discoveryFilter='suspicious';renderDiscovery()">✗ Suspicious</button>
             </div>
           </div>
@@ -5187,7 +5382,7 @@ function renderWidgetBuilder(){
       ${pages.map((p,i)=>`<div class="page-tab ${i===activeIdx?'active':''}" onclick="appState.activeWidgetPage=${i};renderWidgetBuilder()">${p.name}</div>`).join('')}
       <div class="page-tab-add" onclick="addWidgetPage()">+ New page</div>
       ${pages.length>1?`<button class="btn btn-sm" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="deleteWidgetPage()">Delete page</button>`:''}
-      <button class="btn btn-sm" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="previewWidgetPage()">👁 Preview as Dashboard</button>
+      <button class="btn btn-sm" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="previewWidgetPage()"> Preview as Dashboard</button>
     </div>
 
     <div class="section-h">
@@ -5265,9 +5460,9 @@ function renderMyDashboard(){
     if(wid==='wt-heatmap') return '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;">'+fundFlowData.slice(0,10).map(t=>{const nf=parseFloat(t.netFlow);return'<div style="padding:6px 4px;border-radius:var(--r-sm);text-align:center;font-size:10px;font-weight:600;'+(nf>3?'background:var(--pos-soft);color:var(--pos);':nf<-1?'background:var(--neg-soft);color:var(--neg);':'background:var(--surface-3);color:var(--muted);')+'">'+t.sym+'<br/><span style="font-size:9px;font-family:\'JetBrains Mono\',monospace;">'+(nf>0?'+':'')+'$'+nf+'M</span></div>';}).join('')+'</div>';
     if(wid==='wt-signals') return '<div style="display:flex;flex-direction:column;gap:6px;">'+allSignals.slice(0,4).map(s=>'<div style="display:flex;gap:8px;align-items:center;font-size:11px;"><span class="signal-tag '+(s.type==='SELL'?'sell':'')+'" style="font-size:8px;padding:2px 6px;">'+s.type+'</span><span style="font-family:\'JetBrains Mono\',monospace;">'+s.wallet+'</span><span style="color:var(--muted);margin-left:auto;">'+s.usd+' '+s.token+'</span></div>').join('')+'</div>';
     if(wid==='wt-feed') return '<div style="display:flex;flex-direction:column;gap:8px;">'+newsItems.slice(0,4).map(n=>'<div style="font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer;" onclick="openNewsDrawer('+n.id+')"><span class="impact-badge '+(n.impact>=7?'high':'')+'" style="font-size:9px;">'+n.impact+'/10</span> <strong>'+n.title.substring(0,50)+'…</strong> <span style="color:var(--muted);font-size:10px;">'+n.time+'</span></div>').join('')+'</div>';
-    if(wid==='wt-chatbot') return '<div style="padding:20px;text-align:center;color:var(--muted);">💬 Ask me about any token, whale activity, or market news…</div>';
+    if(wid==='wt-chatbot') return '<div style="padding:20px;text-align:center;color:var(--muted);"> Ask me about any token, whale activity, or market news…</div>';
     if(wid==='wt-portfolio') return '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">'+['Total PnL','Win Rate','Active Trades'].map(l=>'<div style="padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);text-align:center;"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700;">'+l+'</div><div style="font-size:16px;font-weight:700;margin-top:4px;font-family:\'JetBrains Mono\',monospace;">—</div></div>').join('')+'</div>';
-    if(wid==='wt-discovery') return '<div style="display:flex;flex-direction:column;gap:6px;">'+discoveredTokens.slice(0,4).map(t=>'<div style="display:flex;gap:8px;align-items:center;font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);"><span class="discovery-risk '+t.risk+'" style="min-width:70px;font-size:9px;">'+(t.risk==='verified'?'✓ Verified':t.risk==='unverified'?'⚠ Unverified':'✗ Suspicious')+'</span><strong>'+t.sym+'</strong><span style="color:var(--muted);margin-left:auto;">'+t.age+'</span></div>').join('')+'</div>';
+    if(wid==='wt-discovery') return '<div style="display:flex;flex-direction:column;gap:6px;">'+discoveredTokens.slice(0,4).map(t=>'<div style="display:flex;gap:8px;align-items:center;font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);"><span class="discovery-risk '+t.risk+'" style="min-width:70px;font-size:9px;">'+(t.risk==='verified'?'✓ Verified':t.risk==='unverified'?'Unverified':'✗ Suspicious')+'</span><strong>'+t.sym+'</strong><span style="color:var(--muted);margin-left:auto;">'+t.age+'</span></div>').join('')+'</div>';
     return '<div style="font-size:11px;color:var(--muted);">Widget preview</div>';
   }
 
@@ -5351,9 +5546,9 @@ function previewWidgetPage(){
     else if(wid==='wt-heatmap')body='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;">'+fundFlowData.slice(0,10).map(t=>{const nf=parseFloat(t.netFlow);return`<div style="padding:6px 4px;border-radius:var(--r-sm);text-align:center;font-size:10px;font-weight:600;${nf>3?'background:var(--pos-soft);color:var(--pos);':nf<-1?'background:var(--neg-soft);color:var(--neg);':'background:var(--surface-3);color:var(--muted);'}">${t.sym}<br/><span style="font-size:9px;font-family:\'JetBrains Mono\',monospace;">${nf>0?'+':''}\$${nf}M</span></div>`}).join('')+'</div>';
     else if(wid==='wt-signals')body='<div style="display:flex;flex-direction:column;gap:6px;">'+allSignals.slice(0,4).map(s=>`<div style="display:flex;gap:8px;align-items:center;font-size:11px;"><span class="signal-tag ${s.type==='SELL'?'sell':''}" style="font-size:8px;padding:2px 6px;">${s.type}</span><span style="font-family:\'JetBrains Mono\',monospace;">${s.wallet}</span><span style="color:var(--muted);margin-left:auto;">${s.usd} ${s.token}</span></div>`).join('')+'</div>';
     else if(wid==='wt-feed')body='<div style="display:flex;flex-direction:column;gap:8px;">'+newsItems.slice(0,4).map(n=>`<div style="font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer;"><span class="impact-badge ${n.impact>=7?'high':''}" style="font-size:9px;">${n.impact}/10</span> <strong>${n.title.substring(0,50)}…</strong> <span style="color:var(--muted);font-size:10px;">${n.time}</span></div>`).join('')+'</div>';
-    else if(wid==='wt-chatbot')body='<div style="padding:20px;text-align:center;color:var(--muted);">💬 Ask me about any token, whale activity, or market news…</div>';
+    else if(wid==='wt-chatbot')body='<div style="padding:20px;text-align:center;color:var(--muted);"> Ask me about any token, whale activity, or market news…</div>';
     else if(wid==='wt-portfolio')body='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">'+['Total PnL','Win Rate','Active Trades'].map(l=>`<div style="padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);text-align:center;"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700;">${l}</div><div style="font-size:16px;font-weight:700;margin-top:4px;font-family:\'JetBrains Mono\',monospace;">—</div></div>`).join('')+'</div>';
-    else if(wid==='wt-discovery')body='<div style="display:flex;flex-direction:column;gap:6px;">'+discoveredTokens.slice(0,4).map(t=>`<div style="display:flex;gap:8px;align-items:center;font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);"><span class="discovery-risk ${t.risk}" style="min-width:70px;font-size:9px;">${t.risk==='verified'?'✓ Verified':t.risk==='unverified'?'⚠ Unverified':'✗ Suspicious'}</span><strong>${t.sym}</strong><span style="color:var(--muted);margin-left:auto;">${t.age}</span></div>`).join('')+'</div>';
+    else if(wid==='wt-discovery')body='<div style="display:flex;flex-direction:column;gap:6px;">'+discoveredTokens.slice(0,4).map(t=>`<div style="display:flex;gap:8px;align-items:center;font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);"><span class="discovery-risk ${t.risk}" style="min-width:70px;font-size:9px;">${t.risk==='verified'?'✓ Verified':t.risk==='unverified'?'Unverified':'✗ Suspicious'}</span><strong>${t.sym}</strong><span style="color:var(--muted);margin-left:auto;">${t.age}</span></div>`).join('')+'</div>';
     return`<div class="card" style="margin-bottom:10px;"><div class="card-header"><div class="card-title" style="font-size:14px;">${wt.name}</div></div><div class="card-body">${body}</div></div>`;
   }).join('');
   document.getElementById('content').innerHTML=`
@@ -5817,12 +6012,12 @@ function renderTokenPage(){
           </div>
           ${_isPro() ? `
           <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:6px;">⚡ AI Analysis</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:6px;">AI Analysis</div>
             <div style="font-size:12px;color:var(--ink);line-height:1.55;">${aiTokenSummaries[sym] || aiTokenSummaries['DEFAULT'] || ''}</div>
             <button class="btn" style="margin-top:8px;font-size:10px;" onclick="showToast('AI analysis copied to clipboard')">Copy analysis</button>
           </div>` : `
           <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;position:relative;overflow:hidden;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:6px;">⚡ AI Analysis</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:6px;">AI Analysis</div>
             <div style="font-size:12px;line-height:1.55;filter:blur(4px);user-select:none;color:var(--ink);">SOL continues to show strong accumulation by elite wallets with 72% of top-50 addresses holding unchanged...</div>
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(var(--bg-rgb,255,255,255),0.7);">
               <button class="btn btn-accent" onclick="navigateTo('settings');setTimeout(()=>switchTab('billing'),50)">Upgrade to Pro →</button>
@@ -6002,7 +6197,7 @@ function renderProfileTab(){
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Email address</label>
           <input type="email" class="form-input" value="${appState.user.email}" disabled />
-          <div style="font-size:12px;color:var(--muted);margin-top:6px;">🔒 Linked to your Google SSO account — cannot be changed.</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;">Linked to your Google SSO account — cannot be changed.</div>
         </div>
       </div>
     </div>
@@ -6411,7 +6606,7 @@ function renderNotificationsTab(){
             </div>`).join('')
         }
         <div style="margin-top:12px;text-align:center;">
-          <button class="btn" onclick="toggleNotifDropdown()">View all notifications 🔔</button>
+          <button class="btn" onclick="toggleNotifDropdown()">View all notifications </button>
         </div>
       </div>
     </div>`;
@@ -6590,7 +6785,7 @@ function renderScreener(){
       <td>
         ${isPro
           ? `<div class="whale-score-bar"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;">${t.whaleScore}</span><div class="bar"><span style="width:${t.whaleScore}%;"></span></div></div>`
-          : `<span style="font-size:11px;color:var(--muted-2);cursor:pointer;" onclick="navigateTo('settings');setTimeout(()=>switchTab('billing'),50)">🔒 PRO</span>`}
+          : `<span style="font-size:11px;color:var(--muted-2);cursor:pointer;" onclick="navigateTo('settings');setTimeout(()=>switchTab('billing'),50)">PRO</span>`}
       </td>
       <td>
         <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();addToWatchlistToken('${t.sym}');if(appState.currentPage==='watchlist')renderWatchlist();">☆ Watch</button>
@@ -6977,12 +7172,12 @@ function renderSentiment(){
       <td class="mention-badge">${t.totalMentions.toLocaleString()}</td>
       <td>
         <div style="display:flex;gap:4px;font-size:10px;color:var(--muted);">
-          <span title="Twitter/X">𝕏 ${(t.twitterMentions/1000).toFixed(1)}K</span>
-          <span title="Telegram">✈ ${(t.telegramMentions/1000).toFixed(1)}K</span>
-          <span title="Reddit">🔺 ${(t.redditMentions/1000).toFixed(1)}K</span>
+          <span title="Twitter/X">X ${(t.twitterMentions/1000).toFixed(1)}K</span>
+          <span title="Telegram">TG ${(t.telegramMentions/1000).toFixed(1)}K</span>
+          <span title="Reddit">RD ${(t.redditMentions/1000).toFixed(1)}K</span>
         </div>
       </td>
-      <td>${t.trending ? '<span class="trending-tag">🔥 Trending</span>' : '<span style="color:var(--muted-2);font-size:10px;">—</span>'}</td>
+      <td>${t.trending ? '<span class="trending-tag">Trending</span>' : '<span style="color:var(--muted-2);font-size:10px;">—</span>'}</td>
       <td>
         <div style="font-size:11px;font-family:\'JetBrains Mono\',monospace;">
           <span class="${t.pos?'change-pos':'change-neg'}">${t.pos?'↑':'↓'}${Math.abs(t.change).toFixed(2)}%</span>
@@ -7378,7 +7573,7 @@ function renderConsensus(){
       <div style="margin-top:12px;display:flex;gap:6px;">
         <button class="btn btn-sm btn-primary" onclick="openTokenPage('${cs.token}')">View ${cs.token} →</button>
         <button class="btn btn-sm btn-ghost" onclick="addToWatchlistToken('${cs.token}');if(appState.currentPage==='watchlist')renderWatchlist()">☆ Watchlist</button>
-        ${_isPro() ? `<button class="btn btn-sm btn-accent" onclick="followConsensusTrade('${cs.token}','${cs.type}')">⚡ Mirror trade</button>` : ''}
+        ${_isPro() ? `<button class="btn btn-sm btn-accent" onclick="followConsensusTrade('${cs.token}','${cs.type}')">Mirror trade</button>` : ''}
       </div>
     </div>`).join('');
 
@@ -7426,7 +7621,7 @@ function renderConsensus(){
       <div class="card-header">
         <div class="pills">
           <button class="pill ${f==='all'?'active':''}" onclick="feedState.consensusFilter='all';renderConsensus()">All strength</button>
-          <button class="pill ${f==='strong'?'active':''}" onclick="feedState.consensusFilter='strong';renderConsensus()">💪 Strong</button>
+          <button class="pill ${f==='strong'?'active':''}" onclick="feedState.consensusFilter='strong';renderConsensus()"> Strong</button>
           <button class="pill ${f==='moderate'?'active':''}" onclick="feedState.consensusFilter='moderate';renderConsensus()">Moderate</button>
           <button class="pill ${f==='weak'?'active':''}" onclick="feedState.consensusFilter='weak';renderConsensus()">Weak</button>
         </div>
@@ -7529,7 +7724,7 @@ function renderPortfolio(){
   }).join('');
 
   document.getElementById('content').innerHTML = `
-    <div class="hero"><div><h1>Portfolio <span class="badge badge-accent">Tracker</span></h1><p class="sub">Your Solana holdings and P&amp;L overview.</p></div><button class="btn btn-accent" onclick="exportPortfolioReport()" style="align-self:center;">📤 Export Report</button></div>
+    <div class="hero"><div><h1>Portfolio <span class="badge badge-accent">Tracker</span></h1><p class="sub">Your Solana holdings and P&amp;L overview.</p></div><button class="btn btn-accent" onclick="exportPortfolioReport()" style="align-self:center;">Export Report</button></div>
     <div class="portfolio-summary-grid">
       <div class="pf-stat">
         <div class="pf-stat-label">Total Value</div>
@@ -7574,14 +7769,14 @@ function renderPortfolio(){
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
       <!-- Best Performer -->
       <div class="card" style="border-left:3px solid var(--pos);">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;">🏆 Best Performer</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;">Best Performer</div>
         <div style="font-size:18px;font-weight:800;">${best.sym}</div>
         <div style="font-size:12px;color:var(--muted);">${best.name}</div>
         <div style="font-size:16px;font-weight:700;color:var(--pos);margin-top:6px;">${best.pnlPct}</div>
       </div>
       <!-- Worst Performer -->
       <div class="card" style="border-left:3px solid var(--neg);">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;">📉 Worst Performer</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;">Worst Performer</div>
         <div style="font-size:18px;font-weight:800;">${worst.sym}</div>
         <div style="font-size:12px;color:var(--muted);">${worst.name}</div>
         <div style="font-size:16px;font-weight:700;color:var(--neg);margin-top:6px;">${worst.pnlPct}</div>
@@ -7768,7 +7963,7 @@ function renderBacktest(){
     </div></div>
 
     <div style="background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r-lg);padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--ink);">
-      ⚠ Backtesting uses historical data and does not guarantee future performance. Slippage and fees are approximated.
+      Note: Backtesting uses historical data and does not guarantee future performance. Slippage and fees are approximated.
     </div>
 
     <div class="card" style="margin-bottom:16px;">
@@ -7897,50 +8092,86 @@ function markAllNotifsRead(){
 function renderTokenComparison(){
   const fmtP = p => p<0.001?'$'+p.toFixed(6):p<1?'$'+p.toFixed(4):'$'+p.toFixed(2);
   const slots = tokenCompareSlots;
+  const filledSlots = slots.filter(s=>s);
 
   const slotCards = slots.map((sym,i)=>{
     const t = sym ? top100Tokens.find(t=>t.sym===sym) : null;
     if (!t) return `
-      <div class="compare-slot empty" onclick="addCompareSlot(${i})">
-        <span>+ Add Token ${i+1}</span>
+      <div class="compare-slot empty" onclick="addCompareSlot(${i})" style="cursor:pointer;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--muted-2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span style="font-size:12px;color:var(--muted);margin-top:8px;">Add Token ${i+1}</span>
       </div>`;
+    const ws = Math.round(20 + (_tokSeed(t.sym) % 78));
     return `
-      <div class="compare-slot">
-        <button class="compare-remove" onclick="removeCompareSlot(${i})" title="Remove">✕</button>
-        <div class="asset-cell" style="margin-bottom:10px;">
-          <div class="asset-icon">${t.sym.substring(0,3)}</div>
-          <div><div class="asset-sym">${t.sym}</div><div class="asset-name">${t.name}</div></div>
+      <div class="compare-slot" style="position:relative;">
+        <button class="compare-remove" onclick="removeCompareSlot(${i})" title="Remove" style="position:absolute;top:10px;right:10px;background:transparent;border:1px solid var(--line);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--muted);">Remove</button>
+        <div class="asset-cell" style="margin-bottom:12px;">
+          <div class="asset-icon" style="width:36px;height:36px;font-size:12px;">${t.sym.substring(0,3)}</div>
+          <div><div class="asset-sym" style="font-size:15px;">${t.sym}</div><div class="asset-name">${t.name}</div></div>
         </div>
-        <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;">${fmtP(t.price)}</div>
-        <div class="${t.pos?'change-pos':'change-neg'}" style="font-size:13px;margin-top:2px;">${t.pos?'↑':'↓'} ${Math.abs(t.change).toFixed(2)}%</div>
+        <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-0.02em;">${fmtP(t.price)}</div>
+        <div class="${t.pos?'change-pos':'change-neg'}" style="font-size:12px;margin-top:2px;">${t.pos?'↑':'↓'} ${Math.abs(t.change).toFixed(2)}% 24h</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);">Market Cap: <strong style="color:var(--ink);">${t.mcap}</strong></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Rank: <strong style="color:var(--ink);">#${t.rank}</strong></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Whale Score: <strong style="color:var(--ink);">${ws}/100</strong></div>
+        <div style="margin-top:10px;display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="openTokenPage('${t.sym}')">View Detail</button>
+          <button class="btn btn-sm btn-ghost" onclick="addToWatchlistToken('${t.sym}')">Watch</button>
+        </div>
       </div>`;
   }).join('');
 
   // build metrics comparison table
-  const filledSlots = slots.filter(s=>s);
   let metricsHtml = '';
   if (filledSlots.length >= 2){
     const tokens = slots.map(sym => sym ? top100Tokens.find(t=>t.sym===sym) : null);
+    const getWinner = (vals, higherIsBetter) => {
+      let best = null, bestVal = null;
+      vals.forEach((v,i)=>{
+        const n = parseFloat(v);
+        if (isNaN(n)) return;
+        if (bestVal === null || (higherIsBetter ? n > bestVal : n < bestVal)){ best=i; bestVal=n; }
+      });
+      return best;
+    };
+
     const metricRows = [
-      {label:'Price', vals: tokens.map(t=>t?fmtP(t.price):'—'), better: null},
-      {label:'24h Change %', vals: tokens.map(t=>t?(t.pos?'+':'')+t.change.toFixed(2)+'%':'—'), better: tokens.reduce((best,t,i)=>{ if(!t) return best; return (best===null || t.change > (tokens[best]?.change||0)) ? i : best; }, null)},
-      {label:'Market Cap', vals: tokens.map(t=>t?t.mcap:'—'), better: null},
-      {label:'Whale Score', vals: tokens.map(t=>t ? (Math.round(40 + (t.rank < 10 ? 50 : t.rank < 30 ? 35 : 20) + Math.random()*10))+'/100' : '—'), better: null},
-      {label:'Rank', vals: tokens.map(t=>t?'#'+t.rank:'—'), better: tokens.reduce((best,t,i)=>{ if(!t) return best; return (best===null || t.rank < (tokens[best]?.rank||999)) ? i : best; }, null)}
+      {label:'Price (USD)',   vals: tokens.map(t=>t?fmtP(t.price):'—'),           better: null},
+      {label:'24h Change',    vals: tokens.map(t=>t?(t.pos?'+':'')+t.change.toFixed(2)+'%':'—'), betterRaw: tokens.map(t=>t?t.change:null), higherIsBetter:true},
+      {label:'Market Cap',    vals: tokens.map(t=>t?t.mcap:'—'),                   better: null},
+      {label:'Rank (#)',      vals: tokens.map(t=>t?t.rank:'—'),                   betterRaw: tokens.map(t=>t?t.rank:null), higherIsBetter:false},
+      {label:'Whale Score',   vals: tokens.map(t=>t?(Math.round(20+(_tokSeed(t.sym)%78)))+'/100':'—'), betterRaw: tokens.map(t=>t?Math.round(20+(_tokSeed(t.sym)%78)):null), higherIsBetter:true},
+      {label:'Solana Network',vals: tokens.map(t=>t?'Yes':'—'),                    better: null},
     ];
+
+    const rowHtml = metricRows.map(row=>{
+      const winner = row.betterRaw ? getWinner(row.betterRaw, row.higherIsBetter) : row.better;
+      return `<tr>
+        <td style="font-size:11px;font-weight:600;color:var(--muted);padding:10px 12px;white-space:nowrap;">${row.label}</td>
+        ${row.vals.map((v,i)=>`<td style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px 12px;font-weight:${winner===i?700:400};color:${winner===i?'var(--pos)':'var(--ink)'};">
+          ${winner===i && typeof v === 'string' && v !== '—' ? `<span style="display:inline-flex;align-items:center;gap:4px;">${v} <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="var(--pos)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>` : v}
+        </td>`).join('')}
+      </tr>`;
+    }).join('');
 
     metricsHtml = `
       <div class="card" style="margin-top:16px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Metric Comparison</div>
-        <div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);margin-bottom:4px;">
-          <div class="compare-metric-label">Metric</div>
-          ${slots.map(sym=>sym ? `<div class="compare-cell" style="font-weight:700;">${sym}</div>` : `<div class="compare-cell" style="color:var(--muted);">—</div>`).join('')}
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+            Metric Comparison
+          </div>
+          <span style="font-size:11px;color:var(--pos);display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Winner highlighted</span>
         </div>
-        ${metricRows.map(row=>`
-          <div class="compare-metric-row">
-            <div class="compare-metric-label">${row.label}</div>
-            ${row.vals.map((v,i)=>`<div class="compare-cell ${row.better===i?'compare-winner':''}">${v}</div>`).join('')}
-          </div>`).join('')}
+        <div class="card-body tight">
+          <table>
+            <thead><tr>
+              <th style="width:140px;">Metric</th>
+              ${slots.map(sym=>sym?`<th style="text-align:center;">${sym}</th>`:`<th style="text-align:center;color:var(--muted-2);">—</th>`).join('')}
+            </tr></thead>
+            <tbody>${rowHtml}</tbody>
+          </table>
+        </div>
       </div>`;
   }
 
@@ -7951,12 +8182,20 @@ function renderTokenComparison(){
     </div></div>
 
     <div class="compare-grid">${slotCards}</div>
-    ${metricsHtml || (filledSlots.length < 2 ? '<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px;">Add at least 2 tokens to see comparison metrics.</div>' : '')}
+    ${metricsHtml || (filledSlots.length < 2 ? '<div class="card" style="text-align:center;padding:32px;"><div style="color:var(--muted);font-size:13px;">Add at least 2 tokens above to see comparison metrics.</div></div>' : '')}
 
-    <div style="margin-top:16px;">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Quick Add from Top 10</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${top100Tokens.slice(0,10).map(t=>`<button class="pill" onclick="quickAddCompare('${t.sym}')">${t.sym}</button>`).join('')}
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></span>
+          Quick Add — Top 10 Tokens
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${top100Tokens.slice(0,10).map(t=>`<button class="pill ${slots.includes(t.sym)?'active':''}" onclick="quickAddCompare('${t.sym}')">${t.sym}</button>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;">Click a token to add it to a comparison slot. Active = already added.</div>
       </div>
     </div>`;
 }
@@ -8023,7 +8262,7 @@ function renderLaunches(){
         <h1>Token <span class="serif">Launches</span></h1>
         <p class="sub">Newly launched Solana tokens with AI-enriched risk scoring and whale interest metrics.</p>
       </div>
-      <div style="font-size:12px;padding:8px 12px;background:oklch(97% 0.04 85);border:1px solid oklch(85% 0.08 85);border-radius:6px;color:var(--warn);">⚠️ New tokens carry high risk. Always verify contracts before investing.</div>
+      <div style="font-size:12px;padding:8px 12px;background:oklch(97% 0.04 85);border:1px solid oklch(85% 0.08 85);border-radius:6px;color:var(--warn);">Unverified New tokens carry high risk. Always verify contracts before investing.</div>
     </div>
 
     <div class="card" style="margin-bottom:12px;">
@@ -8053,7 +8292,7 @@ function addLaunchToWatchlist(sym){
   if (!appState.watchlist) appState.watchlist = { tokens:[], wallets:[], tokenNotes:{}, walletNotes:{} };
   if (appState.watchlist.tokens.includes(sym)){ showToast(`${sym} is already in your Watchlist`); return; }
   appState.watchlist.tokens.push(sym);
-  showToast(`${sym} added to Watchlist ☆`);
+  showToast(`${sym} added to Watchlist`);
 }
 
 // ==================== KOL SOCIAL FEED (IS-415) ====================
@@ -8076,7 +8315,7 @@ function renderKolFeed(){
       <div class="kol-text">${k.text}</div>
       <div class="kol-meta">
         ${k.tokens.map(t=>`<span class="kol-token-pill" onclick="feedState.kolFilter='${t}';renderKolFeed()">${t}</span>`).join('')}
-        <span class="kol-engage">❤️ ${k.likes.toLocaleString()} · 🔁 ${k.rt.toLocaleString()}</span>
+        <span class="kol-engage">${k.likes.toLocaleString()} likes · ${k.rt.toLocaleString()} shares</span>
       </div>
     </div>`).join('') || `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-title">No posts match filter</div></div>`;
 
@@ -8316,7 +8555,7 @@ function renderAiAdvisor(){
     </div>
 
     <div class="ai-advisor-disclaimer">
-      ⚠️ <strong>Not financial advice.</strong> These are AI-generated suggestions based on on-chain data patterns. Always do your own research before making any trades.
+      <strong>Note:</strong> Not financial advice. These are AI-generated suggestions based on on-chain data patterns. Always do your own research before making any trades.
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start;">
@@ -8324,9 +8563,9 @@ function renderAiAdvisor(){
         <div class="card" style="margin-bottom:12px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Risk Profile</div>
           <div class="ai-risk-selector">
-            <button class="ai-risk-btn ${risk==='conservative'?'active':''}" onclick="appState.aiAdvisorRisk='conservative';renderAiAdvisor()">🛡️ Conservative</button>
-            <button class="ai-risk-btn ${risk==='moderate'?'active':''}" onclick="appState.aiAdvisorRisk='moderate';renderAiAdvisor()">⚖️ Moderate</button>
-            <button class="ai-risk-btn ${risk==='aggressive'?'active':''}" onclick="appState.aiAdvisorRisk='aggressive';renderAiAdvisor()">🔥 Aggressive</button>
+            <button class="ai-risk-btn ${risk==='conservative'?'active':''}" onclick="appState.aiAdvisorRisk='conservative';renderAiAdvisor()">Conservative</button>
+            <button class="ai-risk-btn ${risk==='moderate'?'active':''}" onclick="appState.aiAdvisorRisk='moderate';renderAiAdvisor()">Moderate</button>
+            <button class="ai-risk-btn ${risk==='aggressive'?'active':''}" onclick="appState.aiAdvisorRisk='aggressive';renderAiAdvisor()">Aggressive</button>
           </div>
         </div>
 
@@ -8392,7 +8631,7 @@ function exportPortfolioReport(){
     .disclaimer{margin-top:32px;padding:14px 16px;background:#fefce8;border:1px solid #fde047;border-radius:6px;font-size:12px;color:#713f12;}
     @media print{body{margin:20px;} .disclaimer{background:none;border-color:#ccc;}}
   </style></head><body>
-  <h1>📊 Portfolio Report — Unlimit</h1>
+  <h1>Portfolio Report — Unlimit</h1>
   <div class="meta">Generated: ${ts} · ${portfolioHoldings.length} assets · Solana network</div>
   <div class="summary">
     <div class="stat"><div class="stat-label">Total Value</div><div class="stat-val">$${(totalValue/1000).toFixed(2)}K</div></div>
@@ -8404,7 +8643,7 @@ function exportPortfolioReport(){
     <thead><tr><th>Symbol</th><th>Name</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Avg Cost</th><th style="text-align:right;">Price</th><th style="text-align:right;">Value</th><th style="text-align:right;">P&amp;L %</th><th style="text-align:right;">P&amp;L $</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div class="disclaimer">⚠️ <strong>Disclaimer:</strong> This report is for informational purposes only. Not financial advice. Prices are from a prototype simulation and do not reflect real market values.</div>
+  <div class="disclaimer">Unverified <strong>Disclaimer:</strong> This report is for informational purposes only. Not financial advice. Prices are from a prototype simulation and do not reflect real market values.</div>
   </body></html>`;
   const w = window.open('','_blank');
   w.document.write(html);
@@ -8505,7 +8744,7 @@ function renderDcaHistory(){
     <td><span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(22,163,74,0.12);color:var(--pos);font-weight:700;">${h.status}</span></td>
   </tr>`).join('');
   return `<div class="card" style="margin-top:16px;">
-    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">📋 DCA Execution History</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">DCA Execution History</div>
     <div style="overflow-x:auto;"><table>
       <thead><tr><th>Time</th><th>Strategy</th><th>Side</th><th>Token</th><th>Amount</th><th>Price</th><th>Qty</th><th>Status</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -8591,34 +8830,46 @@ function renderRebalancer(){
     <div class="banner" style="margin-top:12px;"><span class="banner-dot"></span><div>This is a simulation tool only. No actual trades are executed.</div></div>`;
 }
 
-// IS-427: Notification Inbox
+// IS-427 / IS-442: Notification Inbox (Full Notification Centre)
 function renderNotifInbox(){
   const wall = _authWall('Notification Inbox', 'login');
   if (wall){ document.getElementById('content').innerHTML = `<div class="hero"><div><h1>Notification <span class="serif">Inbox</span></h1><p class="sub">Your alerts and messages.</p></div></div>${wall}`; return; }
   const filter = appState.notifInboxFilter || 'all';
   const types = ['all','ALERT','SIGNAL','FEED','SYSTEM'];
   const pills = types.map(t=>`<span class="period-pill ${filter===t?'active':''}" onclick="appState.notifInboxFilter='${t}';renderNotifInbox()">${t==='all'?'All':t}</span>`).join('');
-  const filtered = notifInboxItems.filter(n=> filter==='all' || n.type===filter);
-  const unreadCount = notifInboxItems.filter(n=>!n.read).length;
+  const active = notifInboxItems.filter(n=>!n.deleted);
+  const filtered = active.filter(n=> filter==='all' || n.type===filter);
+  const unreadCount = active.filter(n=>!n.read).length;
+  const typeColors = {ALERT:'var(--accent)',SIGNAL:'var(--pos)',FEED:'var(--muted)',SYSTEM:'var(--warn)'};
   const rows = filtered.map(n=>`
-    <div class="notif-inbox-row ${n.read?'':'unread'}" onclick="n_inboxClick('${n.id}','${n.page}')">
-      <div class="notif-inbox-dot ${n.read?'read':''}"></div>
+    <div class="notif-inbox-row ${n.read?'':'unread'}" style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line-2);cursor:pointer;${!n.read?'border-left:3px solid var(--accent);':''}" onclick="n_inboxClick('${n.id}','${n.page}')">
+      <div class="notif-inbox-dot ${n.read?'read':''}" style="${!n.read?'background:var(--accent);':''}"></div>
       <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
-          <span class="notif-inbox-type">${n.type}</span>
-          <span style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.title}</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:0.05em;background:${typeColors[n.type]||'var(--muted)'};color:#fff;">${n.type||'INFO'}</span>
+          <span style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.title}</span>
         </div>
         <div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.body}</div>
       </div>
-      <div style="font-size:10px;color:var(--muted);flex-shrink:0;margin-left:8px;">${n.time}</div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px;">
+        <span style="font-size:10px;color:var(--muted);">${n.time}</span>
+        <button class="btn btn-sm btn-ghost" style="padding:2px 6px;font-size:10px;" onclick="event.stopPropagation();n_markRead('${n.id}')" title="Mark read">Read</button>
+        <button class="btn btn-sm btn-ghost" style="padding:2px 6px;font-size:10px;color:var(--neg);" onclick="event.stopPropagation();n_delete('${n.id}')" title="Delete">Del</button>
+      </div>
     </div>`).join('');
   document.getElementById('content').innerHTML = `
-    <div class="hero"><div><h1>Notification <span class="serif">Inbox</span></h1><p class="sub">${unreadCount} unread notification${unreadCount!==1?'s':''}.</p></div>
-      <button class="btn" onclick="markAllInboxRead()" style="align-self:center;">Mark all read</button>
+    <div class="hero">
+      <div class="hero-row">
+        <div><h1>Notification <span class="serif">Inbox</span></h1><p class="sub">${unreadCount} unread notification${unreadCount!==1?'s':''}.</p></div>
+        <div style="display:flex;gap:8px;align-self:center;">
+          <button class="btn btn-sm" onclick="markAllInboxRead()">Mark all read</button>
+          <button class="btn btn-sm" onclick="n_deleteAllRead()">Delete read</button>
+        </div>
+      </div>
     </div>
     <div class="period-pills" style="margin-bottom:12px;">${pills}</div>
     <div class="card" style="padding:0;overflow:hidden;">
-      ${rows||`<div class="empty-state"><div class="empty-state-title">No notifications</div><p>Nothing matching "${filter}" filter.</p></div>`}
+      ${rows||`<div class="empty-state" style="padding:40px;text-align:center;"><div class="empty-state-title">${unreadCount===0?'All caught up':'No notifications here'}</div><p>${filter==='all'?'No notifications to display.':'No '+filter+' notifications.'}</p></div>`}
     </div>`;
 }
 function n_inboxClick(id, page){
@@ -8626,6 +8877,22 @@ function n_inboxClick(id, page){
   if (item){ item.read = true; }
   syncInboxBadge();
   if (page){ navigateTo(page); } else { renderNotifInbox(); }
+}
+function n_markRead(id){
+  const item = notifInboxItems.find(n=>n.id===id);
+  if (item){ item.read = true; }
+  syncInboxBadge(); renderNotifInbox();
+}
+function n_delete(id){
+  const item = notifInboxItems.find(n=>n.id===id);
+  if (item){ item.deleted = true; if (!item.read) item.read = true; }
+  syncInboxBadge(); renderNotifInbox();
+  showToast('Notification removed');
+}
+function n_deleteAllRead(){
+  notifInboxItems.forEach(n=>{ if (n.read) n.deleted = true; });
+  syncInboxBadge(); renderNotifInbox();
+  showToast('All read notifications removed');
 }
 function markAllInboxRead(){
   notifInboxItems.forEach(n=>n.read=true);
@@ -8646,39 +8913,132 @@ function renderShareHub(){
   const totalVal = portfolioHoldings.reduce((s,h)=>s+h.qty*h.currentPrice,0);
   const totalPnlAbs = portfolioHoldings.reduce((s,h)=>s+h.qty*(h.currentPrice-h.avgCost),0);
   const pnlPos = totalPnlAbs >= 0;
+  const totalReturn = ((totalPnlAbs/(totalVal-totalPnlAbs))*100).toFixed(1);
+
+  // Milestone data
+  const milestones = [
+    {count:1, reward:'1 week Pro extension', reached: shareHubData.referralCount >= 1},
+    {count:3, reward:'1 month Pro extension', reached: shareHubData.referralCount >= 3},
+    {count:5, reward:'2 months Pro extension', reached: shareHubData.referralCount >= 5},
+    {count:10, reward:'Lifetime Pro discount 30%', reached: shareHubData.referralCount >= 10},
+  ];
+  const nextMilestone = milestones.find(m=>!m.reached) || milestones[milestones.length-1];
+  const progressPct = Math.min(100, (shareHubData.referralCount / nextMilestone.count) * 100);
+
+  const milestoneRows = milestones.map(m=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line-2);">
+      <div style="width:28px;height:28px;border-radius:50%;background:${m.reached?'var(--pos)':'var(--surface-3)'};border:2px solid ${m.reached?'var(--pos)':'var(--line)'};display:grid;place-items:center;flex-shrink:0;">
+        ${m.reached
+          ? `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+          : `<span style="font-size:10px;font-weight:700;color:var(--muted-2);">${m.count}</span>`}
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:600;">${m.count} referral${m.count>1?'s':''}</div>
+        <div style="font-size:11px;color:var(--muted);">${m.reward}</div>
+      </div>
+      <div>
+        ${m.reached
+          ? `<span class="badge badge-success">Unlocked</span>`
+          : `<span class="badge">${m.count - shareHubData.referralCount > 0 ? (m.count - shareHubData.referralCount) + ' to go' : 'Next'}</span>`}
+      </div>
+    </div>`).join('');
+
   document.getElementById('content').innerHTML = `
-    <div class="hero"><div><h1>Share <span class="serif">&amp; Refer</span></h1><p class="sub">Share your portfolio performance and earn rewards by inviting friends.</p></div></div>
-    <div class="share-preview-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <div class="hero">
+      <div class="hero-row">
         <div>
-          <div style="font-size:12px;opacity:.7;text-transform:uppercase;letter-spacing:1px;">My Portfolio · Unlimit</div>
-          <div style="font-size:26px;font-weight:800;margin-top:8px;">$${(totalVal/1000).toFixed(2)}K</div>
-          <div style="font-size:13px;opacity:.8;margin-top:2px;">${pnlPos?'+':''}$${Math.abs(totalPnlAbs).toFixed(2)} unrealised P&amp;L</div>
+          <h1>Share <span class="serif">&amp; Refer</span></h1>
+          <p class="sub">Share your portfolio performance and earn rewards for every friend who subscribes to Unlimit Pro.</p>
         </div>
-        <div class="share-qr">📊</div>
-      </div>
-      <div class="share-stat-row">
-        <div class="share-stat"><div class="share-stat-val">${portfolioHoldings.length}</div><div class="share-stat-lbl">Assets</div></div>
-        <div class="share-stat"><div class="share-stat-val">${pnlPos?'+':''}${((totalPnlAbs/(totalVal-totalPnlAbs))*100).toFixed(1)}%</div><div class="share-stat-lbl">Total Return</div></div>
-        <div class="share-stat"><div class="share-stat-val">Solana</div><div class="share-stat-lbl">Network</div></div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-      <button class="btn btn-accent" style="flex:1;" onclick="showToast('Link copied: ${shareHubData.shareUrl}')">📋 Copy Share Link</button>
-      <button class="btn" style="flex:1;" onclick="showToast('Screenshot saved to clipboard')">📸 Screenshot</button>
-    </div>
-    <div class="card">
-      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">🎁 Referral Programme</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Invite friends to Unlimit and earn 1 month of Pro for each signup who subscribes.</div>
-      <div class="referral-code-box">${shareHubData.referralCode}</div>
-      <div style="display:flex;gap:10px;margin-top:12px;">
-        <button class="btn btn-accent" style="flex:1;" onclick="showToast('Referral code copied!')">Copy Code</button>
-        <button class="btn" style="flex:1;" onclick="showToast('Link copied: ${shareHubData.shareUrl}')">Share Link</button>
+
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div>
+        <div class="share-preview-card" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+            <div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:.65;">My Portfolio · Unlimit</div>
+              <div style="font-size:28px;font-weight:800;margin-top:6px;letter-spacing:-0.03em;">$${(totalVal/1000).toFixed(2)}K</div>
+              <div style="font-size:12px;opacity:.8;margin-top:2px;font-family:'JetBrains Mono',monospace;">${pnlPos?'+':''}$${Math.abs(totalPnlAbs).toFixed(2)} unrealised P&amp;L</div>
+            </div>
+            <div style="width:42px;height:42px;border-radius:var(--r-sm);background:rgba(255,255,255,0.15);display:grid;place-items:center;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 5-5"/></svg>
+            </div>
+          </div>
+          <div class="share-stat-row">
+            <div class="share-stat"><div class="share-stat-val">${portfolioHoldings.length}</div><div class="share-stat-lbl">Assets</div></div>
+            <div class="share-stat"><div class="share-stat-val">${pnlPos?'+':''}${totalReturn}%</div><div class="share-stat-lbl">Total Return</div></div>
+            <div class="share-stat"><div class="share-stat-val">Solana</div><div class="share-stat-lbl">Network</div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;">
+          <button class="btn btn-accent" style="flex:1;gap:6px;display:flex;align-items:center;justify-content:center;" onclick="showToast('Share link copied to clipboard')">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Share Link
+          </button>
+          <button class="btn" style="flex:1;gap:6px;display:flex;align-items:center;justify-content:center;" onclick="showToast('Image saved to clipboard')">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Export Image
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-icon"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+              Referral Programme
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Invite friends to Unlimit. When they subscribe to any paid plan, you earn rewards automatically. No cap on rewards.</div>
+            <div class="referral-code-box">${shareHubData.referralCode}</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-accent" style="flex:1;" onclick="showToast('Referral code copied to clipboard')">Copy Code</button>
+              <button class="btn" style="flex:1;" onclick="showToast('Share link copied: ${shareHubData.shareUrl}')">Share Link</button>
+              <button class="btn" style="flex:1;" onclick="showToast('Email invite drafted')">Invite via Email</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:12px;padding:10px;background:var(--surface-2);border-radius:8px;">
-        <span>👥 Referrals: <strong>${shareHubData.referralCount}</strong></span>
-        <span>💰 Earned: <strong>${shareHubData.earningsStr}</strong></span>
-        <span>🏅 Next milestone: 5 referrals</span>
+
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+              Your Referral Stats
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="stats" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+              <div class="stat" style="padding:12px;"><div class="stat-label">Total Referrals</div><div class="stat-value" style="font-size:22px;">${shareHubData.referralCount}</div></div>
+              <div class="stat" style="padding:12px;"><div class="stat-label">Active Subscribers</div><div class="stat-value" style="font-size:22px;">${Math.floor(shareHubData.referralCount * 0.6)}</div></div>
+              <div class="stat" style="padding:12px;"><div class="stat-label">Rewards Earned</div><div class="stat-value" style="font-size:18px;">${shareHubData.earningsStr}</div></div>
+            </div>
+            <div style="margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:11px;font-weight:600;">Progress to next milestone</span>
+                <span style="font-size:11px;color:var(--muted);">${shareHubData.referralCount} / ${nextMilestone.count}</span>
+              </div>
+              <div class="progress"><div class="progress-fill" style="width:${progressPct}%;"></div></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Next: ${nextMilestone.reward}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-title-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+              Reward Milestones
+            </div>
+          </div>
+          <div class="card-body" style="padding:0 18px;">
+            ${milestoneRows}
+            <div style="padding:10px 0;font-size:11px;color:var(--muted);">Rewards applied automatically to your account within 24 hours of qualifying referral.</div>
+          </div>
+        </div>
       </div>
     </div>`;
 }
@@ -8779,7 +9139,7 @@ function renderTradeJournal(){
       <td class="${pct>=0?'pnl-pos':'pnl-neg'}">$${pct>=0?'+':''}${pnlDollar}</td>
       <td class="${pct>=0?'change-pos':'change-neg'}">${fmtPct(pct)}</td>
       <td style="font-size:10px;">${e.tags.map(t=>`<span style="padding:1px 6px;border-radius:3px;background:var(--surface-3);margin-right:3px;">${t}</span>`).join('')}</td>
-      <td title="${e.notes}" style="cursor:default;color:var(--muted);font-size:12px;">${e.notes?'📝':''}</td>
+      <td title="${e.notes}" style="cursor:default;color:var(--muted);font-size:12px;">${e.notes?'':''}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="deleteJournalEntry('${e.id}')">✕</button></td>
     </tr>`;
   }).join('');
@@ -8883,7 +9243,7 @@ function renderAlertsHistory(){
       <td><span class="badge" style="background:${ALERT_TYPE_COLORS[e.type]||'var(--surface-3)'};color:#fff;">${e.type}</span></td>
       <td><span class="token-pill-sm">${e.token}</span></td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${e.value}</td>
-      <td style="font-size:12px;">${e.delivery.map(d=>d==='in-app'?'🔔':d==='email'?'📧':'').join(' ')}</td>
+      <td style="font-size:12px;">${e.delivery.map(d=>d==='in-app'?'App':d==='email'?'Email':'').join(', ')}</td>
     </tr>`).join('');
     const label = date==='today'?'Today':date==='yesterday'?'Yesterday':date;
     return `<div style="margin-bottom:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:8px 0 4px;">${label}</div>
@@ -9163,7 +9523,7 @@ function renderAiCurator(){
       <div class="news-top">
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           <span class="impact-badge ${n.impact>=7?'high':''}">${n.impact}/10</span>
-          ${isRelevant?'<span class="curator-relevant-badge">🎯 Relevant to you</span>':''}
+          ${isRelevant?'<span class="curator-relevant-badge">Relevant to you</span>':''}
         </div>
         <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);">${n.time}</span>
       </div>
@@ -9221,7 +9581,7 @@ function renderPriceAlerts(){
   const rows = alerts.map(a=>{
     const tok = top100Tokens.find(t=>t.sym===a.token);
     const curPrice = tok ? (a.token==='BONK'?'$'+tok.price.toFixed(8):'$'+tok.price.toFixed(2)) : '—';
-    const statusEl = a.status==='triggered'?`<span class="pa-status-triggered">🔔 Triggered</span>`:a.status==='paused'?`<span class="pa-status-paused">Paused</span>`:`<span class="pa-status-active">Active</span>`;
+    const statusEl = a.status==='triggered'?`<span class="pa-status-triggered">Triggered</span>`:a.status==='paused'?`<span class="pa-status-paused">Paused</span>`:`<span class="pa-status-active">Active</span>`;
     return `<div class="pa-row">
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -9286,40 +9646,40 @@ function togglePriceAlert(id){ const a = (appState.priceAlerts||[]).find(x=>x.id
 // ─── IS-436: Community Leaderboard ───
 const communityLeaderboard = {
   '7d':[
-    {rank:1,avatar:'🦅',user:'CryptoEagle',returnPct:28.4,tier:'Mid',strategy:'Swing',followers:1240,isYou:false},
-    {rank:2,avatar:'🐉',user:'SolDragon88',returnPct:22.1,tier:'Small',strategy:'DCA',followers:890,isYou:false},
-    {rank:3,avatar:'🦊',user:'FoxTrader',returnPct:19.5,tier:'Micro',strategy:'Aggressive',followers:645,isYou:false},
-    {rank:4,avatar:'🤖',user:'AlgoBot-X',returnPct:17.2,tier:'Mid',strategy:'DCA',followers:512,isYou:false},
-    {rank:5,avatar:'🌊',user:'WaveRider',returnPct:14.8,tier:'Small',strategy:'Swing',followers:398,isYou:false},
-    {rank:6,avatar:'⚡',user:'You',returnPct:12.3,tier:'Small',strategy:'DCA',followers:0,isYou:true},
-    {rank:7,avatar:'🦁',user:'LionHeart',returnPct:10.9,tier:'Micro',strategy:'Aggressive',followers:210,isYou:false},
-    {rank:8,avatar:'🐻',user:'BearBull',returnPct:8.7,tier:'Small',strategy:'Swing',followers:187,isYou:false},
-    {rank:9,avatar:'🦋',user:'ButterFly',returnPct:6.2,tier:'Micro',strategy:'DCA',followers:142,isYou:false},
-    {rank:10,avatar:'🏄',user:'SolSurfer',returnPct:4.1,tier:'Micro',strategy:'Swing',followers:98,isYou:false},
+    {rank:1,avatar:'CE',user:'CryptoEagle',returnPct:28.4,tier:'Mid',strategy:'Swing',followers:1240,isYou:false},
+    {rank:2,avatar:'SD',user:'SolDragon88',returnPct:22.1,tier:'Small',strategy:'DCA',followers:890,isYou:false},
+    {rank:3,avatar:'FT',user:'FoxTrader',returnPct:19.5,tier:'Micro',strategy:'Aggressive',followers:645,isYou:false},
+    {rank:4,avatar:'AB',user:'AlgoBot-X',returnPct:17.2,tier:'Mid',strategy:'DCA',followers:512,isYou:false},
+    {rank:5,avatar:'WR',user:'WaveRider',returnPct:14.8,tier:'Small',strategy:'Swing',followers:398,isYou:false},
+    {rank:6,avatar:'YO',user:'You',returnPct:12.3,tier:'Small',strategy:'DCA',followers:0,isYou:true},
+    {rank:7,avatar:'LH',user:'LionHeart',returnPct:10.9,tier:'Micro',strategy:'Aggressive',followers:210,isYou:false},
+    {rank:8,avatar:'BB',user:'BearBull',returnPct:8.7,tier:'Small',strategy:'Swing',followers:187,isYou:false},
+    {rank:9,avatar:'BF',user:'ButterFly',returnPct:6.2,tier:'Micro',strategy:'DCA',followers:142,isYou:false},
+    {rank:10,avatar:'SL',user:'SolSurfer',returnPct:4.1,tier:'Micro',strategy:'Swing',followers:98,isYou:false},
   ],
   '30d':[
-    {rank:1,avatar:'🐙',user:'OctagonDeFi',returnPct:94.2,tier:'Mid',strategy:'Aggressive',followers:2100,isYou:false},
-    {rank:2,avatar:'🦅',user:'CryptoEagle',returnPct:81.5,tier:'Mid',strategy:'Swing',followers:1240,isYou:false},
-    {rank:3,avatar:'🤖',user:'AlgoBot-X',returnPct:74.3,tier:'Mid',strategy:'DCA',followers:512,isYou:false},
-    {rank:4,avatar:'🐉',user:'SolDragon88',returnPct:68.0,tier:'Small',strategy:'DCA',followers:890,isYou:false},
-    {rank:5,avatar:'⚡',user:'You',returnPct:51.2,tier:'Small',strategy:'DCA',followers:0,isYou:true},
-    {rank:6,avatar:'🦊',user:'FoxTrader',returnPct:44.5,tier:'Micro',strategy:'Aggressive',followers:645,isYou:false},
-    {rank:7,avatar:'🌊',user:'WaveRider',returnPct:38.1,tier:'Small',strategy:'Swing',followers:398,isYou:false},
-    {rank:8,avatar:'🦁',user:'LionHeart',returnPct:32.9,tier:'Micro',strategy:'Aggressive',followers:210,isYou:false},
-    {rank:9,avatar:'🐻',user:'BearBull',returnPct:24.3,tier:'Small',strategy:'Swing',followers:187,isYou:false},
-    {rank:10,avatar:'🏄',user:'SolSurfer',returnPct:18.0,tier:'Micro',strategy:'Swing',followers:98,isYou:false},
+    {rank:1,avatar:'OD',user:'OctagonDeFi',returnPct:94.2,tier:'Mid',strategy:'Aggressive',followers:2100,isYou:false},
+    {rank:2,avatar:'CE',user:'CryptoEagle',returnPct:81.5,tier:'Mid',strategy:'Swing',followers:1240,isYou:false},
+    {rank:3,avatar:'AB',user:'AlgoBot-X',returnPct:74.3,tier:'Mid',strategy:'DCA',followers:512,isYou:false},
+    {rank:4,avatar:'SD',user:'SolDragon88',returnPct:68.0,tier:'Small',strategy:'DCA',followers:890,isYou:false},
+    {rank:5,avatar:'YO',user:'You',returnPct:51.2,tier:'Small',strategy:'DCA',followers:0,isYou:true},
+    {rank:6,avatar:'FT',user:'FoxTrader',returnPct:44.5,tier:'Micro',strategy:'Aggressive',followers:645,isYou:false},
+    {rank:7,avatar:'WR',user:'WaveRider',returnPct:38.1,tier:'Small',strategy:'Swing',followers:398,isYou:false},
+    {rank:8,avatar:'LH',user:'LionHeart',returnPct:32.9,tier:'Micro',strategy:'Aggressive',followers:210,isYou:false},
+    {rank:9,avatar:'BB',user:'BearBull',returnPct:24.3,tier:'Small',strategy:'Swing',followers:187,isYou:false},
+    {rank:10,avatar:'SL',user:'SolSurfer',returnPct:18.0,tier:'Micro',strategy:'Swing',followers:98,isYou:false},
   ],
   'alltime':[
-    {rank:1,avatar:'🐙',user:'OctagonDeFi',returnPct:412.8,tier:'Mid',strategy:'Aggressive',followers:2100,isYou:false},
-    {rank:2,avatar:'🤖',user:'AlgoBot-X',returnPct:380.1,tier:'Mid',strategy:'DCA',followers:512,isYou:false},
-    {rank:3,avatar:'🐉',user:'SolDragon88',returnPct:310.4,tier:'Small',strategy:'DCA',followers:890,isYou:false},
-    {rank:4,avatar:'🦅',user:'CryptoEagle',returnPct:287.2,tier:'Mid',strategy:'Swing',followers:1240,isYou:false},
-    {rank:5,avatar:'🌊',user:'WaveRider',returnPct:230.5,tier:'Small',strategy:'Swing',followers:398,isYou:false},
-    {rank:6,avatar:'🦊',user:'FoxTrader',returnPct:198.7,tier:'Micro',strategy:'Aggressive',followers:645,isYou:false},
-    {rank:7,avatar:'⚡',user:'You',returnPct:165.4,tier:'Small',strategy:'DCA',followers:0,isYou:true},
-    {rank:8,avatar:'🦁',user:'LionHeart',returnPct:142.1,tier:'Micro',strategy:'Aggressive',followers:210,isYou:false},
-    {rank:9,avatar:'🐻',user:'BearBull',returnPct:118.0,tier:'Small',strategy:'Swing',followers:187,isYou:false},
-    {rank:10,avatar:'🏄',user:'SolSurfer',returnPct:84.3,tier:'Micro',strategy:'Swing',followers:98,isYou:false},
+    {rank:1,avatar:'OD',user:'OctagonDeFi',returnPct:412.8,tier:'Mid',strategy:'Aggressive',followers:2100,isYou:false},
+    {rank:2,avatar:'AB',user:'AlgoBot-X',returnPct:380.1,tier:'Mid',strategy:'DCA',followers:512,isYou:false},
+    {rank:3,avatar:'SD',user:'SolDragon88',returnPct:310.4,tier:'Small',strategy:'DCA',followers:890,isYou:false},
+    {rank:4,avatar:'CE',user:'CryptoEagle',returnPct:287.2,tier:'Mid',strategy:'Swing',followers:1240,isYou:false},
+    {rank:5,avatar:'WR',user:'WaveRider',returnPct:230.5,tier:'Small',strategy:'Swing',followers:398,isYou:false},
+    {rank:6,avatar:'FT',user:'FoxTrader',returnPct:198.7,tier:'Micro',strategy:'Aggressive',followers:645,isYou:false},
+    {rank:7,avatar:'YO',user:'You',returnPct:165.4,tier:'Small',strategy:'DCA',followers:0,isYou:true},
+    {rank:8,avatar:'LH',user:'LionHeart',returnPct:142.1,tier:'Micro',strategy:'Aggressive',followers:210,isYou:false},
+    {rank:9,avatar:'BB',user:'BearBull',returnPct:118.0,tier:'Small',strategy:'Swing',followers:187,isYou:false},
+    {rank:10,avatar:'SL',user:'SolSurfer',returnPct:84.3,tier:'Micro',strategy:'Swing',followers:98,isYou:false},
   ]
 };
 function renderCommunity(){
@@ -9328,11 +9688,11 @@ function renderCommunity(){
   const list = communityLeaderboard[period]||[];
   const stratColors = {DCA:'oklch(55% 0.18 230)',Swing:'oklch(60% 0.18 55)',Aggressive:'var(--neg)'};
   const rows = list.map((u,i)=>{
-    const rankEl = u.rank===1?`<span class="community-rank-gold">🥇 1st</span>`:u.rank===2?`<span class="community-rank-silver">🥈 2nd</span>`:u.rank===3?`<span class="community-rank-bronze">🥉 3rd</span>`:`<span class="rank">#${u.rank}</span>`;
+    const rankEl = u.rank===1?`<span class="community-rank-gold">1st</span>`:u.rank===2?`<span class="community-rank-silver">2nd</span>`:u.rank===3?`<span class="community-rank-bronze">3rd</span>`:`<span class="rank">#${u.rank}</span>`;
     const tierCls = {Mid:'badge-accent',Small:'',Micro:'badge-warning'}[u.tier]||'';
     return `<tr ${u.isYou?'class="community-own-row"':''}>
       <td>${rankEl}</td>
-      <td style="font-size:18px;">${u.avatar}</td>
+      <td><span class="kol-avatar" style="width:28px;height:28px;font-size:10px;">${u.avatar}</span></td>
       <td style="font-weight:700;">${u.user}${u.isYou?' <span style="font-size:10px;color:var(--accent);">(You)</span>':''}</td>
       <td class="${u.returnPct>=0?'pnl-pos':'pnl-neg'}">${u.returnPct>=0?'+':''}${u.returnPct}%</td>
       <td><span class="badge ${tierCls}">${u.tier}</span></td>
@@ -9414,14 +9774,15 @@ function renderTaxSummary(){
     <div class="card">
       <div class="card-header">
         <div class="card-title">Realised Gains / Losses</div>
-        <button class="btn btn-sm" onclick="showToast('Report opened in new tab')">📤 Export CSV</button>
+        <button class="btn btn-sm" onclick="showToast('Report opened in new tab')">Export CSV</button>
       </div>
       <div class="card-body tight" style="overflow-x:auto;"><table><thead><tr><th>Token</th><th>Qty Sold</th><th>Avg Cost</th><th>Avg Sell</th><th>Gain $</th><th>Gain %</th><th>Term</th></tr></thead><tbody>${rows}</tbody></table></div>
     </div>`;
 }
 
 // ==================== END SPRINT 23-25 ====================
-function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+function openModal(id){ const el = document.getElementById(id); if (el) el.classList.add('active'); }
+function closeModal(id){ const el = document.getElementById(id); if (el) el.classList.remove('active'); }
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('active');

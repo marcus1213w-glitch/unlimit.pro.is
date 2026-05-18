@@ -4525,6 +4525,386 @@
             IS-446 UI/UX Consistency Pass — FE (8 SP) · IS-447 Breadcrumb &amp; Page State — BE (5 SP) · IS-448 Component Audit — Design (3 SP) · IS-449 Responsive Hardening — QA (3 SP). Sprint 28 total: <strong>19 SP</strong>. Cumulative grand total across all sprints (8–28): <strong>412 SP</strong>. Prototype: <a href="index_v7.html" style="color:#000;font-weight:700;">index_v7.html → index_v8.html</a>.
         </div>
 
+        <!-- ═══════════════════════════════════════════════ SPRINT 29 ══ -->
+        <div class="sprint-divider">
+            <span class="sprint-divider-label">Sprint 29 — Professional UI Polish, Consolidated Navigation &amp; Enriched Features</span>
+            <span class="sprint-divider-line"></span>
+            <span style="font-size:11px;font-weight:700;color:#999;">IS-450 → IS-459 · 38 SP</span>
+        </div>
+
+        <!-- IS-450 FE: Top 100 Tab Consolidation -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-450</span>
+                    <span class="task-title">Top 100 Assets — Consolidated Tab View (Screener + Trending)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">6 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Merge the standalone Token Screener page and Trending Tokens page into a single Top 100 Assets page using a tab bar. Tabs: All Assets (default), Screener, Trending. Remove the separate nav items. Update <code>navigateTo()</code> routing so <code>screener</code> and <code>trending</code> deep-links set <code>feedState.top100Tab</code> before calling <code>renderTop100()</code>. Sidebar Markets section: remove nav-trending, keep nav-heatmap.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Tab bar renders with All Assets / Screener / Trending tabs; active tab persists in <code>feedState.top100Tab</code></li>
+                        <li>All Assets tab: full 100-row table with Watch button, search input, sort columns</li>
+                        <li>Screener tab: all filter controls (sector, whale score, change %, volume), Pro gate on whale score column</li>
+                        <li>Trending tab: rank movement indicators (up/down/new), 24h change, volume, mention count</li>
+                        <li>Deep-link from <code>navigateTo('screener')</code> opens Top 100 with Screener tab active</li>
+                        <li>No standalone screener or trending pages remain in navigation</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">feedState.top100Tab state</span>
+                        <span class="tech-tag">.settings-tabs / .stab CSS classes reused</span>
+                        <span class="tech-tag">_renderScreenerTab() + _renderTrendingTab() internal helpers</span>
+                        <span class="tech-tag">Remove renderScreener() and renderTrending() from navigateTo()</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-438 (Sidebar Nav Polish) · top100Tokens[] · trendingTokens[] · feedState.screener{}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-451 Design: Top 100 Tab UI Specification -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-451</span>
+                    <span class="task-title">Top 100 Tab View — Design Specification &amp; Component Audit</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge design">Design</span>
+                    <span class="story-points">3 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Create the design spec for the consolidated Top 100 page. Define tab bar visual treatment, Screener filter bar layout, Trending rank-movement badge styles, and column hierarchy. Ensure all states (empty, loading, Pro-gated) are specced. Confirm consistent low-fidelity style: Inter font, --accent / --pos / --neg tokens, no colour outside the design system.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Annotated mockup for each of the 3 tabs in Figma / wireframe</li>
+                        <li>Rank movement indicators defined (+N, -N, NEW badges)</li>
+                        <li>Pro-gate overlay spec for Screener whale score column</li>
+                        <li>Empty state designs for all three tabs</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-450 (FE implementation)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-452 FE: Emoji Removal — Professional Tone Pass -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-452</span>
+                    <span class="task-title">Emoji Removal — Full Professional Tone Pass</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">5 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Audit and remove all emoji from the entire prototype. Replace with text labels, 2-letter monogram initials, typographic symbols, or SVG icons. Scope: sidebar nav icons, avatar data arrays (KOL, community leaderboard, copy-trade wallets, discover wallets), notification type icons, onboarding step icons, toast messages, page headings, button labels, status indicators, disclaimer text, and all inline JS template strings. Preserve legitimate UI symbols: arrows (↑↓), sort indicators (▲▼), close (✕), stars (★☆), caret (▾), keyboard (⌘), hamburger (☰), status dots (●).</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Zero emoji codepoints (U+1F000 and above) in any rendered UI string</li>
+                        <li>All avatar data objects use 2-letter string initials</li>
+                        <li>Notification/onboarding icon fields use 2-letter codes (WH, SG, AL, etc.)</li>
+                        <li>Risk buttons: Conservative / Moderate / Aggressive (no 🛡️⚖️🔥)</li>
+                        <li>Page headers and export buttons: plain text (no 📊📤)</li>
+                        <li>All disclaimer / warning blocks: plain text (no ⚠️)</li>
+                        <li>Automated grep for U+1F000–U+1FFFF returns zero matches</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Python regex audit script in repo /tools/</span>
+                        <span class="tech-tag">kol-avatar CSS class handles 2-letter initials</span>
+                        <span class="tech-tag">Preserve ↑↓▲▼✕★☆▾⌘☰●</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-446 (UI consistency pass) · all render functions in index_v7.html</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-453 QA: Emoji Removal Regression Test -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-453</span>
+                    <span class="task-title">Emoji Removal — QA Regression &amp; Visual Audit</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge qa">QA</span>
+                    <span class="story-points">2 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Verify the emoji removal pass across all pages. Open every route in index_v7.html; confirm no emoji renders in headings, buttons, table cells, cards, toasts, badges, or modals. Run automated grep/regex scan of the source file. Confirm avatar initials render correctly in the .kol-avatar CSS class. Confirm that intentional symbols (arrows, stars, ✕) still render.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>All 30+ pages visually confirmed: no emoji in rendered UI</li>
+                        <li>Automated grep reports 0 matches for emoji codepoints</li>
+                        <li>Avatar initials (2-letter) render with correct background colour and font</li>
+                        <li>✕ close buttons, ★☆ watchlist stars, ↑↓ change arrows still present</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-452 (FE emoji removal)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-454 FE: Navigation Removal — Journal, Network, Research -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-454</span>
+                    <span class="task-title">Remove Trade Journal, Network &amp; Token Research Navigation Items</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">3 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Remove the Trade Journal, Network, and Token Research nav items from the sidebar. Update <code>navigateTo()</code> to redirect stale routes: <code>tradeJournal → portfolio</code>, <code>network → overview</code>, <code>research → overview</code>. Remove duplicate routing entries. Keep underlying render functions in codebase but mark as deprecated; they will be cleaned in a future sprint once confirmed no longer referenced.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Sidebar does not show Journal, Network, or Research nav items</li>
+                        <li>Direct calls to <code>navigateTo('tradeJournal')</code> redirect to Portfolio without error</li>
+                        <li>Direct calls to <code>navigateTo('network')</code> redirect to Overview without error</li>
+                        <li>No broken layout or console errors after removal</li>
+                        <li>Sidebar section structure (Markets, Analytics, Portfolio, Tools, Account) remains intact</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">navigateTo() switch statement updated</span>
+                        <span class="tech-tag">nav-item HTML blocks removed from sidebar</span>
+                        <span class="tech-tag">pageNavMap{} updated to remove stale keys</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-438 (Sidebar Nav Polish) · index_v7.html sidebar HTML</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-455 Design: Navigation Removal — Spec &amp; Sidebar Audit -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-455</span>
+                    <span class="task-title">Sidebar Navigation Removal — Design Spec &amp; Information Architecture Update</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge design">Design</span>
+                    <span class="story-points">2 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Update the information architecture document and sidebar nav mockup to reflect the removal of Trade Journal, Network, and Token Research. Confirm that removed pages are not referenced in any onboarding flows, tooltips, or help text. Update the sitemap. Ensure sidebar section labels and groupings remain logical after removal.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Sidebar IA document updated in Figma</li>
+                        <li>Sitemap reflects removal of 3 pages</li>
+                        <li>Onboarding flow reviewed: no references to removed pages</li>
+                        <li>Sidebar section structure annotated and approved</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-454 (FE removal)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-456 FE: Enhanced Referral Programme UI -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-456</span>
+                    <span class="task-title">Share &amp; Referral Hub — Enhanced UI with Milestone Tracker</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">5 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Rebuild <code>renderShareHub()</code> with a two-column layout. Left column: Portfolio Share Card (SVG chart icon, Copy Share Link + Export Image buttons), Referral Programme card (referral code display, Copy Code / Share Link / Invite via Email CTAs). Right column: 3-stat summary (Total Referrals, Active Subscribers, Rewards Earned), progress bar to next milestone, Reward Milestones card with 4 tiers (1/3/5/10 referrals) using SVG checkmarks for unlocked tiers and X-to-go badges for locked tiers. No emoji anywhere.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Two-column grid layout renders correctly (stacks on mobile)</li>
+                        <li>Referral code displayed in monospace with copy button</li>
+                        <li>Copy Code button triggers <code>showToast('Copied!')</code></li>
+                        <li>Progress bar fills proportionally based on <code>shareHubData.referrals</code></li>
+                        <li>Milestone tiers show SVG checkmark if unlocked, X-to-go badge if locked</li>
+                        <li>Zero emoji in rendered HTML</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">shareHubData{} data object</span>
+                        <span class="tech-tag">grid-2 CSS class for two-column layout</span>
+                        <span class="tech-tag">SVG icons inline — no external dependencies</span>
+                        <span class="tech-tag">Progress bar: width:${pct}% inline style</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">shareHubData{} · IS-446 (UI consistency)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-457 BE: Referral Programme Backend -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-457</span>
+                    <span class="task-title">Referral Programme — Backend Tracking &amp; Reward Attribution</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge be">BE</span>
+                    <span class="story-points">8 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Implement the backend for referral programme tracking. Each user has a unique referral code. When a new user signs up via a referral link, attribute the referral to the referrer. Track: total referrals, active subscribers (converted to paid), rewards earned (credit/discount). Expose a <code>GET /v1/user/referrals</code> endpoint returning referral stats. Implement webhook trigger on subscription activation to update referrer rewards. Store referral chain in the database with UTM attribution.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li><code>GET /v1/user/referrals</code> returns <code>{code, totalReferrals, activeSubscribers, rewardsEarned, milestones[]}</code></li>
+                        <li>Referral code is unique per user, persisted in DB</li>
+                        <li>Sign-up via referral link correctly attributes the referral</li>
+                        <li>Subscription activation webhook increments active subscriber count</li>
+                        <li>Milestone tier thresholds (1/3/5/10) evaluated server-side</li>
+                        <li>API protected by user auth JWT</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">POST /v1/auth/signup accepts ?ref=CODE query param</span>
+                        <span class="tech-tag">referrals table: referrer_id, referee_id, created_at, converted_at</span>
+                        <span class="tech-tag">Webhook: subscription.activated event</span>
+                        <span class="tech-tag">Rate-limit referral code generation</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">Auth service · Subscription billing service · IS-456 (FE)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-458 FE: Enhanced Token Comparison UI -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-458</span>
+                    <span class="task-title">Token Comparison — Enriched Metric Rows &amp; Winner Highlighting</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge fe">FE</span>
+                    <span class="story-points">4 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Rebuild <code>renderTokenComparison()</code> with richer slot cards and a <code>getWinner()</code> helper. Slot cards display: price, 24h change, market cap, rank, whale score (seeded from token symbol), View Detail + Watch action buttons, and a text Remove button. Empty slots show an SVG plus-circle. Add 6 metric rows: Price, 24h Change, Market Cap, Rank, Whale Score, Solana Network. Winner cells render bold green with an inline SVG checkmark. Quick-add pills show <code>.active</code> state when the token is already in a slot.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Up to 3 tokens can be added to comparison slots</li>
+                        <li>Slot cards show all 5 data points (price, change, mcap, rank, whale score)</li>
+                        <li>Metric table shows winner per row with green bold + SVG checkmark</li>
+                        <li><code>getWinner(vals, higherIsBetter)</code> correctly identifies winner for each metric</li>
+                        <li>Quick-add pills: already-selected tokens show <code>.active</code> class</li>
+                        <li>Remove slot clears the token and re-renders</li>
+                        <li>Zero emoji in comparison UI</li>
+                    </ul>
+                </div>
+                <div class="tech-section">
+                    <div class="tech-label">Tech Notes</div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">tokenCompareSlots[null,null,null] state</span>
+                        <span class="tech-tag">_tokSeed(sym) for deterministic whale score</span>
+                        <span class="tech-tag">getWinner(vals, higherIsBetter) helper</span>
+                        <span class="tech-tag">Rank: lower is better (higherIsBetter:false)</span>
+                    </div>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">top100Tokens[] · tokenCompareSlots[] · IS-446 (UI consistency)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IS-459 QA: Sprint 29 Full Regression -->
+        <div class="task-card">
+            <div class="task-header">
+                <div style="display:flex;align-items:center;">
+                    <span class="task-id">IS-459</span>
+                    <span class="task-title">Sprint 29 Full Regression — Navigation, Emoji, Referral, Comparison</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="team-badge qa">QA</span>
+                    <span class="story-points">3 SP</span>
+                </div>
+            </div>
+            <div class="task-body">
+                <div class="task-desc">Full regression test covering all Sprint 29 changes: (1) Top 100 tab consolidation — all 3 tabs render correctly, deep-links work; (2) Emoji removal — no emoji in any rendered page; (3) Navigation removal — no broken routes, redirects work; (4) Share Hub — referral code copy, milestone tiers, progress bar; (5) Token Comparison — 3-slot compare, winner highlighting, quick-add pills. Run automated emoji grep. Confirm zero JS console errors across all routes.</div>
+                <div class="acceptance">
+                    <div class="acc-title">Acceptance Criteria</div>
+                    <ul>
+                        <li>Top 100 tabs: All Assets / Screener / Trending all render without errors</li>
+                        <li>Deep-links <code>navigateTo('screener')</code> and <code>navigateTo('trending')</code> open correct tab</li>
+                        <li>Emoji grep returns 0 matches for U+1F000 and above</li>
+                        <li>Trade Journal / Network / Research nav items absent from sidebar</li>
+                        <li>Share Hub: Copy Code toast fires, milestone tiers display, progress bar renders</li>
+                        <li>Token Comparison: add/remove slots, winner cells highlighted, no emoji</li>
+                        <li>Zero JS console errors on any route</li>
+                    </ul>
+                </div>
+                <div class="dep-section">
+                    <div class="tech-label">Dependencies</div>
+                    <div class="dep-item">IS-450 · IS-452 · IS-454 · IS-456 · IS-458</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scope-note">
+            <strong>Sprint 29 Scope Summary:</strong>
+            IS-450 Top 100 Tab Consolidation — FE (6 SP) · IS-451 Top 100 Tab Design Spec — Design (3 SP) · IS-452 Emoji Removal Pass — FE (5 SP) · IS-453 Emoji Removal QA — QA (2 SP) · IS-454 Nav Removal (Journal/Network/Research) — FE (3 SP) · IS-455 Nav Removal Design Spec — Design (2 SP) · IS-456 Referral Hub Enrichment — FE (5 SP) · IS-457 Referral Backend — BE (8 SP) · IS-458 Token Comparison Enrichment — FE (4 SP) · IS-459 Sprint 29 Regression — QA (3 SP). Sprint 29 total: <strong>41 SP</strong>. Cumulative grand total across all sprints (8–29): <strong>453 SP</strong>. Prototype: <a href="index_v7.html" style="color:#000;font-weight:700;">index_v7.html</a>.
+        </div>
+
     </div>
 
     <footer>
